@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>InstaGram</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  :root {
+    --bg:#0a0e14;--bg2:#111820;--bg-card:#151d28;--bg-el:#1a2332;
+    --fg:#e8edf3;--fg-m:#6b7d94;--fg-d:#3d4f63;
+    --accent:#00d4aa;--accent-glow:rgba(0,212,170,.25);--accent-dk:#00a885;
+    --danger:#ff4757;--warn:#ffa502;--ok:#2ed573;
+    --border:rgba(255,255,255,.06);--glass:rgba(17,24,32,.85);
+    --r:14px;--rs:8px;--rf:9999px;
+    --tr:.3s cubic-bezier(.4,0,.2,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+  .app{max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
+  .bg-atm{position:fixed;top:0;left:50%;transform:translateX(-50%);max-width:430px;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+  .bg-atm .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.12;animation:orbF 12s ease-in-out infinite}
+  .bg-atm .orb:nth-child(1){width:300px;height:300px;background:var(--accent);top:-80px;right:-60px}
+  .bg-atm .orb:nth-child(2){width:200px;height:200px;background:#ff6b6b;bottom:100px;left:-40px;opacity:.06;animation-delay:-4s}
+  @keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.1)}66%{transform:translate(-15px,20px) scale(.95)}}
+  .page{position:absolute;top:0;left:0;right:0;bottom:64px;overflow-y:auto;overflow-x:hidden;z-index:1;opacity:0;transform:translateY(20px);pointer-events:none;transition:opacity .35s ease,transform .35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .page::-webkit-scrollbar{display:none}
+  .page.active{opacity:1;transform:translateY(0);pointer-events:all}
+  .top-bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .logo{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .logo .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+  .top-actions{display:flex;gap:16px}
+  .top-actions button{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;position:relative;transition:var(--tr)}
+  .top-actions button:hover{color:var(--accent)}
+  .badge{position:absolute;top:-4px;right:-6px;width:16px;height:16px;border-radius:50%;background:var(--danger);color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;border:2px solid var(--bg)}
+  .stories-bar{display:flex;gap:14px;padding:16px 18px;overflow-x:auto;scrollbar-width:none}
+  .stories-bar::-webkit-scrollbar{display:none}
+  .story-item{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;cursor:pointer}
+  .story-ring{width:64px;height:64px;border-radius:50%;padding:3px;background:linear-gradient(135deg,var(--accent),#ffd93d,#ff6b6b);transition:var(--tr)}
+  .story-ring.seen{background:var(--fg-d)}
+  .story-ring:hover{transform:scale(1.06)}
+  .story-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2.5px solid var(--bg)}
+  .story-item .name{font-size:11px;color:var(--fg-m);max-width:64px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .story-add{position:relative}
+  .story-add .add-b{position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);font-weight:700}
+  .post-card{border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:8px}
+  .post-hdr{display:flex;align-items:center;padding:12px 16px;gap:10px}
+  .post-av{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0}
+  .post-uinfo{flex:1}
+  .post-uinfo .un{font-weight:600;font-size:13px}
+  .post-uinfo .loc{font-size:11px;color:var(--fg-m)}
+  .post-more{background:none;border:none;color:var(--fg-m);font-size:18px;cursor:pointer;padding:4px;transition:var(--tr)}
+  .post-more:hover{color:var(--fg)}
+  .post-img-w{position:relative;width:100%;aspect-ratio:1;overflow:hidden;background:var(--bg2)}
+  .post-img-w img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+  .post-img-w:active img{transform:scale(.98)}
+  .post-img-w video{width:100%;height:100%;object-fit:cover}
+  .video-badge{position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);color:#fff;padding:4px 10px;border-radius:var(--rf);font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px}
+  .dbl-heart{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:80px;color:#fff;pointer-events:none;filter:drop-shadow(0 4px 20px rgba(0,0,0,.5));z-index:5}
+  .dbl-heart.show{animation:heartB .8s ease forwards}
+  @keyframes heartB{0%{transform:translate(-50%,-50%) scale(0);opacity:1}40%{transform:translate(-50%,-50%) scale(1.3);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
+  .post-acts{display:flex;align-items:center;padding:10px 14px;gap:16px}
+  .post-acts .left{display:flex;gap:14px;flex:1}
+  .post-acts button{background:none;border:none;color:var(--fg);font-size:22px;cursor:pointer;transition:var(--tr);padding:2px;position:relative}
+  .post-acts button:hover{transform:scale(1.15)}
+  .post-acts button.liked{color:var(--danger)}
+  .post-acts button.liked i{animation:likePop .35s ease}
+  @keyframes likePop{0%{transform:scale(1)}30%{transform:scale(1.35)}60%{transform:scale(.9)}100%{transform:scale(1)}}
+  .post-acts button.bookmarked{color:var(--warn)}
+  .post-likes{padding:0 16px;font-size:13px;font-weight:600;margin-bottom:4px;transition:color .4s ease}
+  .post-likes.flash{color:var(--accent)!important}
+  .post-cap{padding:0 16px;font-size:13px;line-height:1.5;color:var(--fg-m)}
+  .post-cap .cu{color:var(--fg);font-weight:600}
+  .post-cp{padding:4px 16px 0;font-size:12px;color:var(--fg-d);cursor:pointer}
+  .post-time{padding:4px 16px 0;font-size:11px;color:var(--fg-d)}
+  .bottom-nav{position:absolute;bottom:0;left:0;right:0;height:64px;z-index:100;display:flex;align-items:center;justify-content:space-around;background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid var(--border)}
+  .nav-i{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--fg-d);font-size:10px;font-family:'Outfit',sans-serif;font-weight:500;cursor:pointer;padding:6px 14px;border-radius:var(--rs);transition:var(--tr);position:relative;text-decoration:none}
+  .nav-i i{font-size:20px;transition:var(--tr)}
+  .nav-i.active{color:var(--accent)}
+  .nav-i.active i{transform:scale(1.1)}
+  .nav-i::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%) scaleX(0);width:24px;height:2px;border-radius:2px;background:var(--accent);transition:var(--tr)}
+  .nav-i.active::before{transform:translateX(-50%) scaleX(1)}
+  .nav-i.up-btn{position:relative;top:-10px}
+  .nav-i.up-btn .up-ic{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-dk));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,212,170,.3);transition:var(--tr)}
+  .nav-i.up-btn:hover .up-ic{transform:scale(1.08);box-shadow:0 6px 28px rgba(0,212,170,.45)}
+  .nav-i.up-btn i{color:#fff;font-size:20px}
+  .nav-i.up-btn span{display:none}
+  .story-viewer{position:fixed;inset:0;z-index:600;background:#000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease}
+  .story-viewer.show{opacity:1;pointer-events:all}
+  .story-viewer img,.story-viewer video{max-width:100%;max-height:100%;object-fit:contain}
+  .story-prog{position:absolute;top:12px;left:12px;right:12px;display:flex;gap:4px;z-index:10}
+  .story-prog-bar{flex:1;height:3px;background:rgba(255,255,255,.3);border-radius:3px;overflow:hidden}
+  .story-prog-bar .fill{height:100%;background:#fff;border-radius:3px;width:0%;transition:width .1s linear}
+  .story-prog-bar.done .fill{width:100%}
+  .story-prog-bar.active .fill{animation:storyProg 5s linear forwards}
+  @keyframes storyProg{from{width:0%}to{width:100%}}
+  .story-close{position:absolute;top:28px;right:16px;background:none;border:none;color:#fff;font-size:24px;cursor:pointer;z-index:10;opacity:.7;transition:var(--tr)}
+  .story-close:hover{opacity:1}
+  .story-ubar{position:absolute;top:28px;left:16px;display:flex;align-items:center;gap:10px;z-index:10}
+  .story-ubar img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+  .story-ubar .sun{color:#fff;font-size:13px;font-weight:600}
+  .story-ubar .stm{color:rgba(255,255,255,.5);font-size:11px}
+  .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease}
+  .modal-ov.show{opacity:1;pointer-events:all}
+  .modal-sh{max-width:430px;width:100%;background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:70vh;overflow-y:auto}
+  .modal-ov.show .modal-sh{transform:translateY(0)}
+  .modal-handle{width:40px;height:4px;border-radius:4px;background:var(--fg-d);margin:0 auto 16px}
+  .modal-title{font-size:16px;font-weight:700;margin-bottom:16px;text-align:center}
+  .modal-opt{display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--rs);cursor:pointer;transition:var(--tr)}
+  .modal-opt:hover{background:var(--bg-el)}
+  .modal-opt i{font-size:20px;width:28px;text-align:center}
+  .modal-opt span{font-size:14px;font-weight:500}
+  .modal-opt.danger{color:var(--danger)}
+  .toast-c{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;max-width:400px;width:calc(100% - 36px)}
+  .toast{padding:14px 18px;border-radius:var(--rs);font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;margin-bottom:8px;animation:tIn .35s ease,tOut .35s ease 2.5s forwards;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+  .toast.success{background:#0d2818;border:1px solid rgba(46,213,115,.3);color:var(--ok)}
+  .toast.error{background:#2d0f13;border:1px solid rgba(255,71,87,.3);color:var(--danger)}
+  .toast.info{background:#0d1f2d;border:1px solid rgba(0,212,170,.3);color:var(--accent)}
+  @keyframes tIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes tOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-20px)}}
+  .fade-up{opacity:0;transform:translateY(16px);animation:fadeU .5s ease forwards}
+  @keyframes fadeU{to{opacity:1;transform:translateY(0)}}
+  .fade-up:nth-child(2){animation-delay:.05s}
+  .fade-up:nth-child(3){animation-delay:.1s}
+  .fade-up:nth-child(4){animation-delay:.15s}
+  .fade-up:nth-child(5){animation-delay:.2s}
+  .empty-state{text-align:center;padding:60px 20px;color:var(--fg-d)}
+  .empty-state i{font-size:48px;opacity:.2;margin-bottom:12px;display:block}
+  @media(min-width:431px){.app{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="bg-atm"><div class="orb"></div><div class="orb"></div></div>
+
+  <div class="page active" id="page-home">
+    <div class="top-bar">
+      <div class="logo"><div class="dot"></div>InstaGram</div>
+      <div class="top-actions">
+        <button aria-label="Notifications" id="notifBtn"><i class="far fa-bell"></i><span class="badge" id="notifBadge">3</span></button>
+        <button aria-label="Messages" id="msgBtn"><i class="far fa-paper-plane"></i><span class="badge" id="msgBadge">5</span></button>
+      </div>
+    </div>
+    <div class="stories-bar" id="storiesBar"></div>
+    <div id="postsFeed"></div>
+  </div>
+
+  <nav class="bottom-nav" role="navigation" aria-label="Main">
+    <a class="nav-i active" href="index.html" aria-label="Home"><i class="fas fa-home"></i><span>Home</span></a>
+    <a class="nav-i" href="wallet.html" aria-label="Wallet"><i class="fas fa-wallet"></i><span>Wallet</span></a>
+    <a class="nav-i up-btn" href="upload.html" aria-label="Upload"><div class="up-ic"><i class="fas fa-plus"></i></div><span>Upload</span></a>
+    <a class="nav-i" href="#" aria-label="Invite" onclick="event.preventDefault();showToast('Referral page coming soon','info')"><i class="fas fa-gift"></i><span>Invite</span></a>
+    <a class="nav-i" href="edit-profile.html" aria-label="Profile"><i class="fas fa-user"></i><span>Profile</span></a>
+  </nav>
+
+  <div class="story-viewer" id="storyViewer">
+    <div class="story-prog" id="storyProg"></div>
+    <button class="story-close" onclick="closeStory()" aria-label="Close"><i class="fas fa-times"></i></button>
+    <div class="story-ubar" id="storyUbar"></div>
+    <div id="storyMedia"></div>
+  </div>
+
+  <div class="modal-ov" id="modalOv" onclick="closeModal(event)">
+    <div class="modal-sh" id="modalSh" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div class="toast-c" id="toastC"></div>
+</div>
+
+<script>
+/* ── Firebase Config ── */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const USER_ID = "user_alex_morgan";
+
+/* ── Data ── */
+const currentUser = { username:'alex_morgan', displayName:'Alex Morgan', avatar:'https://picsum.photos/seed/myprofile/200/200.jpg' };
+
+const stories = [
+  {id:0,username:'Your Story',avatar:currentUser.avatar,isOwn:true,seen:false,items:[{type:'image',src:'https://picsum.photos/seed/mystory/600/1000.jpg'}]},
+  {id:1,username:'sarah_lens',avatar:'https://picsum.photos/seed/user1/100/100.jpg',seen:false,items:[{type:'image',src:'https://picsum.photos/seed/story1/600/1000.jpg'},{type:'image',src:'https://picsum.photos/seed/story1b/600/1000.jpg'}]},
+  {id:2,username:'jake_photo',avatar:'https://picsum.photos/seed/user2/100/100.jpg',seen:false,items:[{type:'image',src:'https://picsum.photos/seed/story2/600/1000.jpg'}]},
+  {id:3,username:'nomad_ella',avatar:'https://picsum.photos/seed/user3/100/100.jpg',seen:false,items:[{type:'image',src:'https://picsum.photos/seed/story3/600/1000.jpg'},{type:'image',src:'https://picsum.photos/seed/story3b/600/1000.jpg'}]},
+  {id:4,username:'chef_mike',avatar:'https://picsum.photos/seed/user4/100/100.jpg',seen:true,items:[{type:'image',src:'https://picsum.photos/seed/story4/600/1000.jpg'}]},
+  {id:5,username:'travel_luna',avatar:'https://picsum.photos/seed/user5/100/100.jpg',seen:true,items:[{type:'image',src:'https://picsum.photos/seed/story5/600/1000.jpg'}]},
+  {id:6,username:'art_by_nina',avatar:'https://picsum.photos/seed/user6/100/100.jpg',seen:false,items:[{type:'image',src:'https://picsum.photos/seed/story6/600/1000.jpg'}]},
+];
+
+let posts = [];
+
+const defaultPosts = [
+  {id:'p1',username:'sarah_lens',avatar:'https://picsum.photos/seed/user1/100/100.jpg',location:'Tokyo, Japan',mediaType:'image',mediaUrl:'https://picsum.photos/seed/post1/800/800.jpg',thumbnailUrl:'',caption:'Lost in the neon glow of Shibuya. This city never sleeps and neither do I when I am here.',likes:1247,liked:false,bookmarked:false,comments:[{user:'jake_photo',text:'Incredible shot!'},{user:'nomad_ella',text:'Take me there!'}],time:'2h',timestamp:Date.now()-7200000},
+  {id:'p2',username:'jake_photo',avatar:'https://picsum.photos/seed/user2/100/100.jpg',location:'Yosemite Valley',mediaType:'image',mediaUrl:'https://picsum.photos/seed/post2/800/800.jpg',thumbnailUrl:'',caption:'First light hitting El Capitan. Woke up at 3am for this and every second was worth it.',likes:3891,liked:false,bookmarked:false,comments:[{user:'alex_morgan',text:'Breathtaking composition.'}],time:'5h',timestamp:Date.now()-18000000},
+  {id:'p3',username:'nomad_ella',avatar:'https://picsum.photos/seed/user3/100/100.jpg',location:'Santorini, Greece',mediaType:'video',mediaUrl:'https://www.w3schools.com/html/mov_bbb.mp4',thumbnailUrl:'https://picsum.photos/seed/post3/800/800.jpg',caption:'Blue domes and white walls. Santorini in the golden hour is pure magic.',likes:5620,liked:false,bookmarked:false,comments:[{user:'sarah_lens',text:'The colors here are unreal'},{user:'chef_mike',text:'Adding this to my bucket list'},{user:'travel_luna',text:'I miss this place so much'}],time:'8h',timestamp:Date.now()-28800000},
+  {id:'p4',username:'chef_mike',avatar:'https://picsum.photos/seed/user4/100/100.jpg',location:'Home Kitchen',mediaType:'image',mediaUrl:'https://picsum.photos/seed/post4/800/800.jpg',thumbnailUrl:'',caption:'Homemade sourdough with roasted garlic butter. Three days of patience for this loaf.',likes:892,liked:false,bookmarked:false,comments:[],time:'12h',timestamp:Date.now()-43200000},
+  {id:'p5',username:'travel_luna',avatar:'https://picsum.photos/seed/user5/100/100.jpg',location:'Northern Lights, Iceland',mediaType:'image',mediaUrl:'https://picsum.photos/seed/post5/800/800.jpg',thumbnailUrl:'',caption:'Danced under the aurora for four hours. Some moments photos cannot fully capture but I tried anyway.',likes:9432,liked:false,bookmarked:false,comments:[{user:'nomad_ella',text:'This is on another level!'},{user:'jake_photo',text:'What camera settings did you use?'}],time:'1d',timestamp:Date.now()-86400000},
+];
+
+/* ── Firebase Load / Save ── */
+function loadFromFirebase() {
+  db.ref('likes/' + USER_ID).once('value').then(snap => {
+    const likedPosts = snap.val() || {};
+    db.ref('bookmarks/' + USER_ID).once('value').then(bSnap => {
+      const bookmarkedPosts = bSnap.val() || {};
+      posts = defaultPosts.map(p => ({
+        ...p,
+        liked: !!likedPosts[p.id],
+        bookmarked: !!bookmarkedPosts[p.id],
+        likes: p.likes + (likedPosts[p.id] ? 1 : 0)
+      }));
+
+      // Load any user-uploaded posts from Firebase
+      db.ref('posts').orderByChild('timestamp').limitToLast(50).once('value').then(pSnap => {
+        const uploaded = [];
+        pSnap.forEach(child => uploaded.push(child.val()));
+        uploaded.sort((a,b) => b.timestamp - a.timestamp);
+        uploaded.forEach(up => {
+          if (!posts.find(p => p.id === up.id)) {
+            posts.push({...up, liked:!!likedPosts[up.id], bookmarked:!!bookmarkedPosts[up.id]});
+          }
+        });
+        posts.sort((a,b) => b.timestamp - a.timestamp);
+        renderPosts();
+      });
+    });
+  }).catch(() => {
+    // Firebase not configured, use defaults
+    posts = [...defaultPosts];
+    renderPosts();
+  });
+}
+
+function saveLike(postId, liked) {
+  db.ref('likes/' + USER_ID + '/' + postId).set(liked ? true : null).catch(()=>{});
+}
+function saveBookmark(postId, bookmarked) {
+  db.ref('bookmarks/' + USER_ID + '/' + postId).set(bookmarked ? true : null).catch(()=>{});
+}
+
+/* ── Format ── */
+function fmtLikes(n){ return n>=1000?(n/1000).toFixed(1).replace(/\.0$/,'')+'K':n.toString(); }
+
+/* ── Render Stories ── */
+function renderStories(){
+  document.getElementById('storiesBar').innerHTML = stories.map(s=>`
+    <div class="story-item" onclick="openStory(${s.id})">
+      <div class="story-ring ${s.seen?'seen':''} ${s.isOwn?'story-add':''}">
+        <img src="${s.avatar}" alt="${s.username}" loading="lazy">
+        ${s.isOwn?'<div class="add-b"><i class="fas fa-plus"></i></div>':''}
+      </div>
+      <span class="name">${s.username}</span>
+    </div>`).join('');
+}
+
+/* ── Render Posts ── */
+function renderPosts(){
+  const feed = document.getElementById('postsFeed');
+  if(posts.length===0){
+    feed.innerHTML='<div class="empty-state"><i class="fas fa-camera"></i><p>No posts yet. Be the first to share!</p></div>';
+    return;
+  }
+  feed.innerHTML = posts.map((p,i)=>`
+    <article class="post-card fade-up" data-post-id="${p.id}" style="animation-delay:${i*0.04}s">
+      <div class="post-hdr">
+        <img class="post-av" src="${p.avatar}" alt="${p.username}" loading="lazy">
+        <div class="post-uinfo"><div class="un">${p.username}</div><div class="loc">${p.location||''}</div></div>
+        <button class="post-more" onclick="openPostMenu('${p.id}')" aria-label="More"><i class="fas fa-ellipsis-h"></i></button>
+      </div>
+      <div class="post-img-w" ondblclick="doubleTapLike('${p.id}',this)">
+        ${p.mediaType==='video'
+          ? `<img src="${p.thumbnailUrl}" alt="Video thumbnail" loading="lazy"><div class="video-badge"><i class="fas fa-play"></i> Video</div>`
+          : `<img src="${p.mediaUrl}" alt="Post by ${p.username}" loading="lazy">`}
+        <i class="fas fa-heart dbl-heart" id="heart-${p.id}"></i>
+      </div>
+      <div class="post-acts">
+        <div class="left">
+          <button class="${p.liked?'liked':''}" id="like-btn-${p.id}" onclick="toggleLike('${p.id}')" aria-label="Like">
+            <i class="${p.liked?'fas':'far'} fa-heart"></i>
+          </button>
+          <button onclick="openComments('${p.id}')" aria-label="Comment"><i class="far fa-comment"></i></button>
+          <button onclick="sharePost('${p.id}')" aria-label="Share"><i class="far fa-paper-plane"></i></button>
+        </div>
+        <button class="${p.bookmarked?'bookmarked':''}" id="bm-btn-${p.id}" onclick="toggleBookmark('${p.id}')" aria-label="Bookmark">
+          <i class="${p.bookmarked?'fas':'far'} fa-bookmark"></i>
+        </button>
+      </div>
+      <div class="post-likes" id="likes-${p.id}">${fmtLikes(p.likes)} likes</div>
+      <div class="post-cap"><span class="cu">${p.username}</span> ${p.caption}</div>
+      ${p.comments&&p.comments.length>0?`<div class="post-cp" onclick="openComments('${p.id}')">View all ${p.comments.length} comments</div>`:''}
+      <div class="post-time">${p.time} ago</div>
+    </article>`).join('');
+}
+
+/* ── LIKE: targeted DOM update, NO re-render ── */
+function toggleLike(postId){
+  const post = posts.find(p=>p.id===postId);
+  if(!post) return;
+  post.liked = !post.liked;
+  post.likes += post.liked ? 1 : -1;
+
+  const btn = document.getElementById('like-btn-'+postId);
+  const likesEl = document.getElementById('likes-'+postId);
+
+  // Update button icon and class without replacing element
+  const icon = btn.querySelector('i');
+  if(post.liked){
+    btn.classList.add('liked');
+    icon.className = 'fas fa-heart';
+    // Re-trigger animation by cloning
+    const newIcon = icon.cloneNode(true);
+    btn.replaceChild(newIcon, icon);
+  } else {
+    btn.classList.remove('liked');
+    icon.className = 'far fa-heart';
+  }
+
+  // Update likes count with flash
+  likesEl.textContent = fmtLikes(post.likes)+' likes';
+  likesEl.classList.add('flash');
+  setTimeout(()=>likesEl.classList.remove('flash'), 500);
+
+  saveLike(postId, post.liked);
+}
+
+function doubleTapLike(postId, el){
+  const post = posts.find(p=>p.id===postId);
+  if(!post) return;
+  if(!post.liked){
+    post.liked = true;
+    post.likes += 1;
+    const btn = document.getElementById('like-btn-'+postId);
+    const likesEl = document.getElementById('likes-'+postId);
+    btn.classList.add('liked');
+    const icon = btn.querySelector('i');
+    icon.className = 'fas fa-heart';
+    const newIcon = icon.cloneNode(true);
+    btn.replaceChild(newIcon, icon);
+    likesEl.textContent = fmtLikes(post.likes)+' likes';
+    likesEl.classList.add('flash');
+    setTimeout(()=>likesEl.classList.remove('flash'), 500);
+    saveLike(postId, true);
+  }
+  const heart = document.getElementById('heart-'+postId);
+  if(heart){heart.classList.remove('show');void heart.offsetWidth;heart.classList.add('show');setTimeout(()=>heart.classList.remove('show'),900);}
+}
+
+function toggleBookmark(postId){
+  const post = posts.find(p=>p.id===postId);
+  if(!post) return;
+  post.bookmarked = !post.bookmarked;
+
+  const btn = document.getElementById('bm-btn-'+postId);
+  const icon = btn.querySelector('i');
+  if(post.bookmarked){
+    btn.classList.add('bookmarked');
+    icon.className = 'fas fa-bookmark';
+  } else {
+    btn.classList.remove('bookmarked');
+    icon.className = 'far fa-bookmark';
+  }
+  showToast(post.bookmarked?'Saved to collection':'Removed from collection','info');
+  saveBookmark(postId, post.bookmarked);
+}
+
+function sharePost(postId){
+  const post = posts.find(p=>p.id===postId);
+  if(navigator.share){navigator.share({title:'Post by '+post.username,text:post.caption});}
+  else{showToast('Link copied to clipboard','success');}
+}
+
+/* ── Comments ── */
+function openComments(postId){
+  const post = posts.find(p=>p.id===postId);
+  let html = (post.comments||[]).map(c=>`
+    <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)">
+      <img src="https://picsum.photos/seed/${c.user}/50/50.jpg" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0" alt="${c.user}">
+      <div style="flex:1"><span style="font-weight:600;font-size:13px">${c.user}</span><span style="font-size:13px;color:var(--fg-m);margin-left:6px">${c.text}</span><div style="font-size:11px;color:var(--fg-d);margin-top:4px">2h &middot; Reply</div></div>
+    </div>`).join('');
+  if(!post.comments||!post.comments.length) html='<div style="text-align:center;padding:32px;color:var(--fg-d);font-size:14px">No comments yet.</div>';
+  document.getElementById('modalContent').innerHTML=`
+    <div class="modal-title">Comments</div>
+    <div style="max-height:300px;overflow-y:auto">${html}</div>
+    <div style="display:flex;gap:10px;margin-top:16px;align-items:center">
+      <img src="${currentUser.avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0" alt="You">
+      <input class="form-input" id="commentInput" type="text" placeholder="Add a comment..." style="flex:1;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rs);color:var(--fg);font-size:14px;font-family:'Outfit',sans-serif;outline:none">
+      <button onclick="addComment('${postId}')" style="background:none;border:none;color:var(--accent);font-weight:700;font-size:14px;cursor:pointer;font-family:'Outfit',sans-serif;padding:8px">Post</button>
+    </div>`;
+  openModal();
+}
+function addComment(postId){
+  const inp=document.getElementById('commentInput');
+  const txt=inp.value.trim();if(!txt)return;
+  const post=posts.find(p=>p.id===postId);
+  if(!post.comments)post.comments=[];
+  post.comments.push({user:currentUser.username,text:txt});
+  // Save comment to Firebase
+  db.ref('posts/'+postId+'/comments').set(post.comments).catch(()=>{});
+  inp.value='';openComments(postId);showToast('Comment posted','success');
+}
+
+/* ── Post Menu ── */
+function openPostMenu(postId){
+  document.getElementById('modalContent').innerHTML=`
+    <div class="modal-title">Options</div>
+    <div class="modal-opt" onclick="showToast('Link copied','success');closeModal()"><i class="far fa-link" style="color:var(--accent)"></i><span>Copy Link</span></div>
+    <div class="modal-opt" onclick="showToast('Shared to story','success');closeModal()"><i class="fas fa-plus-circle" style="color:var(--accent)"></i><span>Share to Story</span></div>
+    <div class="modal-opt" onclick="showToast('Post archived','info');closeModal()"><i class="fas fa-archive" style="color:var(--warn)"></i><span>Archive</span></div>
+    <div class="modal-opt danger" onclick="showToast('Post reported','error');closeModal()"><i class="fas fa-flag"></i><span>Report</span></div>`;
+  openModal();
+}
+
+/* ── Story Viewer ── */
+let storyTimer=null,curStory=null,curStoryIdx=0;
+function openStory(id){
+  const s=stories[id];if(s.isOwn){showToast('Add to your story','info');return;}
+  curStory=s;curStoryIdx=0;showStorySlide();
+  document.getElementById('storyViewer').classList.add('show');
+}
+function showStorySlide(){
+  const s=curStory,idx=curStoryIdx,item=s.items[idx];
+  const media=document.getElementById('storyMedia');
+  if(item.type==='video'){media.innerHTML=`<video src="${item.src}" autoplay muted style="max-width:100%;max-height:100%;object-fit:contain"></video>`;}
+  else{media.innerHTML=`<img src="${item.src}" alt="Story" style="max-width:100%;max-height:100%;object-fit:contain">`;}
+  document.getElementById('storyProg').innerHTML=s.items.map((_,i)=>{
+    let c='';if(i<idx)c='done';else if(i===idx)c='active';return`<div class="story-prog-bar ${c}"><div class="fill"></div></div>`;
+  }).join('');
+  document.getElementById('storyUbar').innerHTML=`<img src="${s.avatar}" alt="${s.username}"><div><div class="sun">${s.username}</div><div class="stm">${idx+1}h ago</div></div>`;
+  s.seen=true;renderStories();
+  clearTimeout(storyTimer);
+  storyTimer=setTimeout(()=>{if(curStoryIdx<s.items.length-1){curStoryIdx++;showStorySlide();}else{closeStory();}},5000);
+}
+function closeStory(){clearTimeout(storyTimer);document.getElementById('storyViewer').classList.remove('show');curStory=null;}
+document.getElementById('storyViewer').addEventListener('click',e=>{
+  if(e.target.closest('.story-close')||e.target.closest('.story-ubar'))return;
+  const r=document.getElementById('storyViewer').getBoundingClientRect();
+  const x=e.clientX-r.left;
+  if(x<r.width*.35){if(curStoryIdx>0){curStoryIdx--;showStorySlide();}}
+  else{if(curStoryIdx<curStory.items.length-1){curStoryIdx++;showStorySlide();}else{closeStory();}}
+});
+
+/* ── Modal ── */
+function openModal(){document.getElementById('modalOv').classList.add('show');}
+function closeModal(e){if(e&&e.target!==document.getElementById('modalOv'))return;document.getElementById('modalOv').classList.remove('show');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal({target:document.getElementById('modalOv')});closeStory();}});
+
+/* ── Toast ── */
+function showToast(msg,type='info'){
+  const c=document.getElementById('toastC'),t=document.createElement('div');
+  t.className='toast '+type;
+  const icons={success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'};
+  t.innerHTML=`<i class="fas ${icons[type]||icons.info}"></i> ${msg}`;
+  c.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
+
+/* ── Notification / Message buttons ── */
+document.getElementById('notifBtn').addEventListener('click',()=>{
+  document.getElementById('modalContent').innerHTML=`
+    <div class="modal-title">Notifications</div>
+    <div style="max-height:400px;overflow-y:auto">
+      <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center"><img src="https://picsum.photos/seed/user1/50/50.jpg" style="width:40px;height:40px;border-radius:50%;object-fit:cover" alt=""><div style="flex:1"><span style="font-weight:600">sarah_lens</span> liked your photo.<span style="color:var(--fg-d);font-size:11px;display:block;margin-top:2px">2m</span></div><img src="https://picsum.photos/seed/grid3/50/50.jpg" style="width:40px;height:40px;border-radius:var(--rs);object-fit:cover" alt=""></div>
+      <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center"><img src="https://picsum.photos/seed/user3/50/50.jpg" style="width:40px;height:40px;border-radius:50%;object-fit:cover" alt=""><div style="flex:1"><span style="font-weight:600">nomad_ella</span> started following you.<span style="color:var(--fg-d);font-size:11px;display:block;margin-top:2px">15m</span></div><button style="padding:6px 16px;border-radius:var(--rf);background:var(--accent);color:#000;border:none;font-weight:600;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">Follow</button></div>
+      <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center"><img src="https://picsum.photos/seed/user2/50/50.jpg" style="width:40px;height:40px;border-radius:50%;object-fit:cover" alt=""><div style="flex:1"><span style="font-weight:600">jake_photo</span> commented: "Amazing shot!"<span style="color:var(--fg-d);font-size:11px;display:block;margin-top:2px">1h</span></div></div>
+    </div>`;
+  openModal();
+  document.getElementById('notifBadge').style.display='none';
+});
+document.getElementById('msgBtn').addEventListener('click',()=>{
+  document.getElementById('modalContent').innerHTML=`
+    <div class="modal-title">Messages</div>
+    <div style="max-height:400px;overflow-y:auto">
+      ${[{u:'sarah_lens',m:'Hey! Love your latest post',t:'2m',un:true},{u:'jake_photo',m:'Are you going to the photo walk?',t:'30m',un:true},{u:'nomad_ella',m:'Thanks for the referral!',t:'1h',un:false},{u:'chef_mike',m:'That recipe is live now',t:'3h',un:false}].map(x=>`
+        <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onclick="showToast('Opening chat with ${x.u}','info');closeModal()">
+          <div style="position:relative;flex-shrink:0"><img src="https://picsum.photos/seed/${x.u}/50/50.jpg" style="width:48px;height:48px;border-radius:50%;object-fit:cover" alt="${x.u}">${x.un?'<div style="position:absolute;bottom:0;right:0;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg2)"></div>':''}</div>
+          <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between"><span style="font-weight:${x.un?'700':'500'};font-size:14px">${x.u}</span><span style="font-size:11px;color:var(--fg-d)">${x.t}</span></div><div style="font-size:13px;color:${x.un?'var(--fg)':'var(--fg-d)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">${x.m}</div></div>
+        </div>`).join('')}
+    </div>`;
+  openModal();
+  document.getElementById('msgBadge').style.display='none';
+});
+
+/* ── Live like simulation ── */
+setInterval(()=>{
+  if(posts.length===0)return;
+  const rp=posts[Math.floor(Math.random()*posts.length)];
+  if(Math.random()>.6){
+    rp.likes+=Math.floor(Math.random()*3)+1;
+    const el=document.getElementById('likes-'+rp.id);
+    if(el){el.textContent=fmtLikes(rp.likes)+' likes';el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),600);}
+  }
+},8000);
+
+/* ── Init ── */
+renderStories();
+loadFromFirebase();
+</script>
+</body>
+</html>
