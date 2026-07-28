@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Edit Profile - InstaGram</title>
+<title>Profile - InstaGram</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -14,74 +14,89 @@
   html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
   .app{max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
   .bg-atm{position:fixed;top:0;left:50%;transform:translateX(-50%);max-width:430px;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
-  .bg-atm .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.08;animation:orbF 12s ease-in-out infinite}
-  .bg-atm .orb:nth-child(1){width:220px;height:220px;background:var(--accent);top:-50px;right:-30px}
-  .bg-atm .orb:nth-child(2){width:160px;height:160px;background:#ff6b6b;bottom:60px;left:-20px;opacity:.04;animation-delay:-4s}
+  .bg-atm .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.1;animation:orbF 12s ease-in-out infinite}
+  .bg-atm .orb:nth-child(1){width:250px;height:250px;background:var(--accent);top:-60px;right:-40px}
+  .bg-atm .orb:nth-child(2){width:180px;height:180px;background:#ff6b6b;bottom:60px;left:-30px;opacity:.05;animation-delay:-4s}
   @keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.1)}66%{transform:translate(-15px,20px) scale(.95)}}
   .page{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;z-index:1;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .page::-webkit-scrollbar{display:none}
   .top-bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
   .back-btn{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;padding:4px 8px 4px 0;transition:var(--tr)}
   .back-btn:hover{color:var(--accent)}
-  .logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
-  .save-btn{background:none;border:none;color:var(--accent);font-size:15px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;padding:6px 12px;border-radius:var(--rs);transition:var(--tr)}
-  .save-btn:hover{background:var(--accent-glow)}
-  .save-btn:disabled{opacity:.35;cursor:not-allowed}
+  .logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;display:flex;align-items:center;gap:6px}
+  .logo i{font-size:14px;color:var(--fg-m)}
+  .top-actions button{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;transition:var(--tr)}
+  .top-actions button:hover{color:var(--accent)}
 
-  /* Avatar */
-  .avatar-section{display:flex;flex-direction:column;align-items:center;padding:28px 18px 20px;position:relative}
-  .avatar-wrap{position:relative;cursor:pointer;margin-bottom:14px}
-  .avatar-wrap img{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--accent);transition:var(--tr)}
-  .avatar-wrap:hover img{transform:scale(1.03)}
-  .avatar-wrap .edit-badge{position:absolute;bottom:0;right:0;width:32px;height:32px;border-radius:50%;background:var(--accent);color:#000;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid var(--bg);transition:var(--tr)}
-  .avatar-wrap:hover .edit-badge{transform:scale(1.1)}
-  .avatar-wrap input{display:none}
-  .avatar-hint{font-size:12px;color:var(--fg-m)}
-  .avatar-hint strong{color:var(--accent);cursor:pointer}
-  .avatar-hint strong:hover{text-decoration:underline}
+  .profile-hdr{padding:20px 18px;display:flex;align-items:center;gap:20px}
+  .pic-wrap{position:relative;flex-shrink:0}
+  .pic-wrap img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--accent)}
+  .pic-wrap .online{position:absolute;bottom:2px;right:2px;width:16px;height:16px;border-radius:50%;background:var(--ok);border:3px solid var(--bg)}
+  .p-stats{display:flex;gap:20px;flex:1;justify-content:center}
+  .p-stat{text-align:center;cursor:pointer}
+  .p-stat .num{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
+  .p-stat .lbl{font-size:11px;color:var(--fg-m)}
 
-  /* Form */
-  .form-section{padding:0 18px}
-  .form-group{margin-bottom:18px}
-  .form-group label{display:block;font-size:12px;font-weight:600;color:var(--fg-m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-  .form-input{width:100%;padding:13px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rs);color:var(--fg);font-size:14px;font-family:'Outfit',sans-serif;outline:none;transition:var(--tr);resize:none}
-  .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-  .form-input::placeholder{color:var(--fg-d)}
-  .char-count{text-align:right;font-size:11px;color:var(--fg-d);margin-top:4px}
-  .char-count.warn{color:var(--warn)}
-  .char-count.over{color:var(--danger)}
+  .p-info{padding:0 18px 16px}
+  .p-info .dn{font-size:16px;font-weight:700}
+  .p-info .bio{font-size:13px;color:var(--fg-m);margin-top:4px;line-height:1.5}
+  .p-info .plink{font-size:13px;color:var(--accent);margin-top:4px}
 
-  /* Info box */
-  .info-box{margin:0 18px 18px;padding:14px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rs);display:flex;gap:12px;align-items:flex-start}
-  .info-box i{color:var(--accent);font-size:16px;margin-top:2px;flex-shrink:0}
-  .info-box p{font-size:12px;color:var(--fg-m);line-height:1.5}
-  .info-box p strong{color:var(--fg)}
+  .p-btns{display:flex;gap:8px;padding:0 18px 16px}
+  .p-btns button{flex:1;padding:10px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:var(--tr)}
+  .btn-edit{background:var(--bg-card);border:1px solid var(--border);color:var(--fg)}
+  .btn-edit:hover{border-color:var(--accent)}
+  .btn-icon{width:38px!important;flex:none!important;display:flex;align-items:center;justify-content:center}
 
-  /* Switch row */
-  .switch-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
-  .switch-row:last-child{border-bottom:none}
-  .switch-label .sl-title{font-size:14px;font-weight:600}
-  .switch-label .sl-desc{font-size:12px;color:var(--fg-m);margin-top:2px}
-  .switch{position:relative;width:48px;height:28px;cursor:pointer}
-  .switch input{display:none}
-  .switch .slider{position:absolute;inset:0;background:var(--fg-d);border-radius:28px;transition:var(--tr)}
-  .switch .slider::before{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:var(--tr)}
-  .switch input:checked + .slider{background:var(--accent)}
-  .switch input:checked + .slider::before{transform:translateX(20px)}
+  .p-tabs{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  .p-tab{flex:1;padding:12px;text-align:center;background:none;border:none;color:var(--fg-d);font-size:20px;cursor:pointer;transition:var(--tr);position:relative}
+  .p-tab.active{color:var(--fg)}
+  .p-tab::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%) scaleX(0);width:40px;height:2px;background:var(--fg);border-radius:2px;transition:var(--tr)}
+  .p-tab.active::after{transform:translateX(-50%) scaleX(1)}
 
-  /* Danger zone */
-  .danger-zone{margin:24px 18px 32px;padding:18px;border:1px solid rgba(255,71,87,.2);border-radius:var(--r);background:rgba(255,71,87,.04)}
-  .danger-zone h4{font-size:14px;font-weight:700;color:var(--danger);margin-bottom:4px}
-  .danger-zone p{font-size:12px;color:var(--fg-m);margin-bottom:14px;line-height:1.5}
-  .btn-danger{width:100%;padding:12px;background:transparent;border:1px solid var(--danger);color:var(--danger);font-size:14px;font-weight:600;font-family:'Outfit',sans-serif;border-radius:var(--rs);cursor:pointer;transition:var(--tr)}
-  .btn-danger:hover{background:var(--danger);color:#fff}
+  .p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px}
+  .p-grid-item{aspect-ratio:1;overflow:hidden;cursor:pointer;position:relative}
+  .p-grid-item img{width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+  .p-grid-item:hover img{transform:scale(1.05)}
+  .p-grid-item .g-ov{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;opacity:0;transition:var(--tr)}
+  .p-grid-item:hover .g-ov{opacity:1}
+  .g-ov span{color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px}
+  .g-ov .video-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px;font-size:10px}
 
-  /* Loading */
-  .loading-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none;transition:opacity .3s ease}
-  .loading-ov.show{opacity:1;pointer-events:all}
-  .spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loading-ov p{font-size:15px;color:var(--fg-m)}
+  /* Post report modal */
+  .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease}
+  .modal-ov.show{opacity:1;pointer-events:all}
+  .modal-sh{max-width:430px;width:100%;background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:80vh;overflow-y:auto}
+  .modal-ov.show .modal-sh{transform:translateY(0)}
+  .modal-handle{width:40px;height:4px;border-radius:4px;background:var(--fg-d);margin:0 auto 16px}
+  .modal-title{font-size:16px;font-weight:700;margin-bottom:16px;text-align:center}
+  .report-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px}
+  .report-card .rc-img{width:100%;height:160px;object-fit:cover;border-radius:var(--rs);margin-bottom:12px}
+  .report-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .report-stat{text-align:center}
+  .report-stat .rs-num{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--accent)}
+  .report-stat .rs-lbl{font-size:11px;color:var(--fg-m);margin-top:2px}
+  .report-comments{margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
+  .report-comments h4{font-size:13px;font-weight:700;margin-bottom:8px;color:var(--fg-m)}
+  .rc-comment{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .rc-comment:last-child{border-bottom:none}
+  .rc-comment .rc-user{font-weight:600;color:var(--fg)}
+  .rc-comment .rc-text{color:var(--fg-m)}
+
+  .settings-list{padding:0 18px 20px}
+  .sg-title{font-size:12px;font-weight:600;color:var(--fg-d);text-transform:uppercase;letter-spacing:.5px;padding:16px 0 8px}
+  .sg-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:var(--tr)}
+  .sg-item:last-child{border-bottom:none}
+  .sg-item:hover{opacity:.8}
+  .sg-item i{width:24px;text-align:center;color:var(--fg-m);font-size:16px}
+  .sg-item .sg-label{flex:1;font-size:14px}
+  .sg-item .sg-val{font-size:13px;color:var(--fg-m)}
+  .sg-item .sg-arr{color:var(--fg-d);font-size:12px}
+  .sg-item.danger{color:var(--danger)}
+  .sg-item.danger i{color:var(--danger)}
+
+  .empty-state{text-align:center;padding:48px 20px;color:var(--fg-d)}
+  .empty-state i{font-size:44px;opacity:.15;margin-bottom:10px;display:block}
 
   .toast-c{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;max-width:400px;width:calc(100% - 36px)}
   .toast{padding:14px 18px;border-radius:var(--rs);font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;margin-bottom:8px;animation:tIn .35s ease,tOut .35s ease 2.5s forwards;box-shadow:0 8px 32px rgba(0,0,0,.4)}
@@ -90,7 +105,10 @@
   .toast.info{background:#0d1f2d;border:1px solid rgba(0,212,170,.3);color:var(--accent)}
   @keyframes tIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
   @keyframes tOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-20px)}}
-
+  .fade-up{opacity:0;transform:translateY(16px);animation:fadeU .5s ease forwards}
+  @keyframes fadeU{to{opacity:1;transform:translateY(0)}}
+  .fade-up:nth-child(2){animation-delay:.06s}
+  .fade-up:nth-child(3){animation-delay:.12s}
   @media(min-width:431px){.app{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
   @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
@@ -101,77 +119,73 @@
   <div class="page">
     <div class="top-bar">
       <button class="back-btn" onclick="window.location.href='index.html'" aria-label="Back"><i class="fas fa-arrow-left"></i></button>
-      <div class="logo">Edit Profile</div>
-      <button class="save-btn" id="saveBtn" onclick="saveProfile()">Save</button>
+      <div class="logo"><i class="fas fa-lock"></i><span id="headerUsername">Loading...</span></div>
+      <div class="top-actions">
+        <button onclick="toggleSettings()" aria-label="Settings"><i class="fas fa-cog"></i></button>
+      </div>
     </div>
 
-    <!-- Avatar -->
-    <div class="avatar-section">
-      <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()">
-        <img id="avatarImg" src="https://picsum.photos/seed/myprofile/200/200.jpg" alt="Profile">
-        <div class="edit-badge"><i class="fas fa-camera"></i></div>
-        <input type="file" id="avatarInput" accept="image/*">
-      </div>
-      <div class="avatar-hint"><strong onclick="document.getElementById('avatarInput').click()">Change profile photo</strong></div>
-    </div>
-
-    <!-- Form -->
-    <div class="form-section">
-      <div class="form-group">
-        <label for="displayNameInput">Display Name</label>
-        <input class="form-input" id="displayNameInput" type="text" placeholder="Your name" maxlength="50">
-      </div>
-      <div class="form-group">
-        <label for="usernameInput">Username</label>
-        <div style="position:relative">
-          <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--fg-d);font-size:14px">@</span>
-          <input class="form-input" id="usernameInput" type="text" placeholder="username" maxlength="30" style="padding-left:34px">
+    <div id="profileContent">
+      <div class="profile-hdr fade-up">
+        <div class="pic-wrap">
+          <img id="profileAvatar" src="https://picsum.photos/seed/myprofile/200/200.jpg" alt="Profile">
+          <div class="online"></div>
+        </div>
+        <div class="p-stats">
+          <div class="p-stat"><div class="num" id="postCount">0</div><div class="lbl">Posts</div></div>
+          <div class="p-stat" onclick="showFollowers()"><div class="num" id="followerCount">0</div><div class="lbl">Followers</div></div>
+          <div class="p-stat" onclick="showFollowing()"><div class="num" id="followingCount">0</div><div class="lbl">Following</div></div>
         </div>
       </div>
-      <div class="form-group">
-        <label for="websiteInput">Website</label>
-        <input class="form-input" id="websiteInput" type="url" placeholder="https://yoursite.com">
+
+      <div class="p-info fade-up">
+        <div class="dn" id="displayName">Loading...</div>
+        <div class="bio" id="bioText"></div>
+        <div class="plink" id="websiteLink"></div>
       </div>
-      <div class="form-group">
-        <label for="bioInput">Bio</label>
-        <textarea class="form-input" id="bioInput" rows="4" placeholder="Tell us about yourself..." maxlength="150"></textarea>
-        <div class="char-count" id="bioCharCount">0 / 150</div>
+
+      <div class="p-btns fade-up">
+        <button class="btn-edit" onclick="window.location.href='edit-profile.html'">Edit Profile</button>
+        <button class="btn-edit" onclick="shareProfile()">Share Profile</button>
+        <button class="btn-edit btn-icon" onclick="window.location.href='referral.html'" aria-label="Referral"><i class="fas fa-gift"></i></button>
+      </div>
+
+      <div class="p-tabs">
+        <button class="p-tab active" data-tab="grid" onclick="switchTab('grid')"><i class="fas fa-th"></i></button>
+        <button class="p-tab" data-tab="reels" onclick="switchTab('reels')"><i class="fas fa-play-circle"></i></button>
+        <button class="p-tab" data-tab="tagged" onclick="switchTab('tagged')"><i class="fas fa-user-tag"></i></button>
+      </div>
+
+      <div id="tabContent">
+        <div class="p-grid" id="profileGrid"></div>
       </div>
     </div>
 
-    <div class="info-box">
-      <i class="fas fa-info-circle"></i>
-      <p><strong>Private account:</strong> When your account is private, only approved followers can see your posts and stories.</p>
-    </div>
-
-    <!-- Switches -->
-    <div style="margin:18px 18px 0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
-      <div class="switch-row">
-        <div class="switch-label"><div class="sl-title">Private Account</div><div class="sl-desc">Only followers see your content</div></div>
-        <label class="switch"><input type="checkbox" id="privateToggle"><span class="slider"></span></label>
-      </div>
-      <div class="switch-row">
-        <div class="switch-label"><div class="sl-title">Show Activity Status</div><div class="sl-desc">Let others see when you're online</div></div>
-        <label class="switch"><input type="checkbox" id="activityToggle" checked><span class="slider"></span></label>
-      </div>
-      <div class="switch-row">
-        <div class="switch-label"><div class="sl-title">Allow Tagging</div><div class="sl-desc">Let people tag you in posts</div></div>
-        <label class="switch"><input type="checkbox" id="tagToggle" checked><span class="slider"></span></label>
+    <div id="settingsContent" style="display:none">
+      <div class="settings-list">
+        <div class="sg-title">Account</div>
+        <div class="sg-item" onclick="window.location.href='edit-profile.html'"><i class="fas fa-user-circle"></i><span class="sg-label">Edit Profile</span><i class="fas fa-chevron-right sg-arr"></i></div>
+        <div class="sg-item" onclick="showToast('Opening security...','info')"><i class="fas fa-shield-alt"></i><span class="sg-label">Security</span><i class="fas fa-chevron-right sg-arr"></i></div>
+        <div class="sg-item" onclick="showToast('Opening privacy...','info')"><i class="fas fa-lock"></i><span class="sg-label">Privacy</span><i class="fas fa-chevron-right sg-arr"></i></div>
+        <div class="sg-title">Preferences</div>
+        <div class="sg-item" onclick="showToast('Opening notifications...','info')"><i class="fas fa-bell"></i><span class="sg-label">Notifications</span><span class="sg-val">On</span><i class="fas fa-chevron-right sg-arr"></i></div>
+        <div class="sg-item" onclick="showToast('Opening theme...','info')"><i class="fas fa-palette"></i><span class="sg-label">Appearance</span><span class="sg-val">Dark</span><i class="fas fa-chevron-right sg-arr"></i></div>
+        <div class="sg-title">Support</div>
+        <div class="sg-item" onclick="showToast('Opening help...','info')"><i class="fas fa-question-circle"></i><span class="sg-label">Help Center</span><i class="fas fa-chevron-right sg-arr"></i></div>
+        <div class="sg-item" onclick="showToast('Version 2.4.1','info')"><i class="fas fa-info-circle"></i><span class="sg-label">About</span><span class="sg-val">v2.4.1</span><i class="fas fa-chevron-right sg-arr"></i></div>
+        <div class="sg-title">Session</div>
+        <div class="sg-item danger" onclick="showToast('Logged out','error')"><i class="fas fa-sign-out-alt"></i><span class="sg-label">Log Out</span></div>
       </div>
     </div>
 
-    <!-- Danger Zone -->
-    <div class="danger-zone">
-      <h4>Danger Zone</h4>
-      <p>Once you delete your account, there is no going back. All your data, posts, and connections will be permanently removed.</p>
-      <button class="btn-danger" onclick="confirmDelete()"><i class="fas fa-trash-alt" style="margin-right:6px"></i>Delete Account</button>
-    </div>
     <div style="height:24px"></div>
   </div>
 
-  <div class="loading-ov" id="loadingOv">
-    <div class="spinner"></div>
-    <p>Saving changes...</p>
+  <div class="modal-ov" id="modalOv" onclick="closeModal(event)">
+    <div class="modal-sh" id="modalSh" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div id="modalContent"></div>
+    </div>
   </div>
 
   <div class="toast-c" id="toastC"></div>
@@ -179,165 +193,235 @@
 
 <script>
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAmQxNPKANzO8hEng5pdpAR3t7DJtwkG7U",
+  authDomain: "aibmodel.firebaseapp.com",
+  databaseURL: "https://aibmodel-default-rtdb.firebaseio.com",
+  projectId: "aibmodel",
+  storageBucket: "aibmodel.firebasestorage.app",
+  messagingSenderId: "572663832515",
+  appId: "1:572663832515:web:3fea2dac685b9b5f646776"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const USER_ID = "user_alex_morgan";
 
-let newAvatarData = null;
+let myPosts = [];
+let currentTab = 'grid';
 
-const defaults = {
-  displayName: 'Alex Morgan',
-  username: 'alex_morgan',
-  website: 'alexmorgan.photo',
-  bio: 'Photographer & explorer. Capturing moments that matter. Based in Portland, OR.',
-  avatar: 'https://picsum.photos/seed/myprofile/200/200.jpg',
-  isPrivate: false,
-  showActivity: true,
-  allowTagging: true
-};
+function fmtLikes(n){ return n>=1000?(n/1000).toFixed(1).replace(/\.0$/,'')+'K':n.toString(); }
+function fmtNum(n){ return n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':n.toString(); }
 
-/* ── Load profile from Firebase ── */
 function loadProfile() {
+  // Load user info
   db.ref('users/' + USER_ID).once('value').then(snap => {
-    const data = snap.val();
-    if (data) {
-      fillForm(data);
-    } else {
-      // Seed defaults
-      db.ref('users/' + USER_ID).set(defaults);
-      fillForm(defaults);
-    }
+    const u = snap.val() || {};
+    document.getElementById('headerUsername').textContent = u.username || 'alex_morgan';
+    document.getElementById('displayName').textContent = u.displayName || 'Alex Morgan';
+    document.getElementById('bioText').textContent = u.bio || '';
+    document.getElementById('websiteLink').textContent = u.website || '';
+    document.getElementById('profileAvatar').src = u.avatar || 'https://picsum.photos/seed/myprofile/200/200.jpg';
   }).catch(() => {
-    fillForm(defaults);
+    document.getElementById('headerUsername').textContent = 'alex_morgan';
+    document.getElementById('displayName').textContent = 'Alex Morgan';
+  });
+
+  // Load followers/following counts
+  db.ref('social/' + USER_ID + '/followers').on('value', snap => {
+    const d = snap.val();
+    const count = d ? (Array.isArray(d) ? d.length : Object.keys(d).length) : 8400;
+    document.getElementById('followerCount').textContent = fmtNum(count);
+  });
+  db.ref('social/' + USER_ID + '/following').on('value', snap => {
+    const d = snap.val();
+    const count = d ? (Array.isArray(d) ? d.length : Object.keys(d).length) : 562;
+    document.getElementById('followingCount').textContent = fmtNum(count);
+  });
+
+  // Seed follower/following counts if not exists
+  db.ref('social/' + USER_ID + '/followers').once('value').then(snap => {
+    if (!snap.exists()) {
+      const followers = {};
+      for (let i = 0; i < 8400; i++) followers['f' + i] = true;
+      db.ref('social/' + USER_ID + '/followers').set(followers);
+    }
+  }).catch(() => {});
+  db.ref('social/' + USER_ID + '/following').once('value').then(snap => {
+    if (!snap.exists()) {
+      const following = {};
+      for (let i = 0; i < 562; i++) following['fg' + i] = true;
+      db.ref('social/' + USER_ID + '/following').set(following);
+    }
+  }).catch(() => {});
+
+  // Load user posts with views/likes/comments
+  db.ref('posts').orderByChild('userId').equalTo(USER_ID).on('value', snap => {
+    myPosts = [];
+    snap.forEach(child => {
+      const p = child.val();
+      p.views = p.views || Math.floor(Math.random() * 5000) + 100;
+      // Save view count back if it was just generated
+      if (!child.val().views) {
+        db.ref('posts/' + p.id + '/views').set(p.views);
+      }
+      myPosts.push(p);
+    });
+    myPosts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    document.getElementById('postCount').textContent = myPosts.length;
+    renderCurrentTab();
   });
 }
 
-function fillForm(data) {
-  document.getElementById('displayNameInput').value = data.displayName || '';
-  document.getElementById('usernameInput').value = (data.username || '').replace('@', '');
-  document.getElementById('websiteInput').value = data.website || '';
-  document.getElementById('bioInput').value = data.bio || '';
-  document.getElementById('bioCharCount').textContent = `${(data.bio || '').length} / 150`;
-  document.getElementById('avatarImg').src = data.avatar || defaults.avatar;
-  document.getElementById('privateToggle').checked = !!data.isPrivate;
-  document.getElementById('activityToggle').checked = data.showActivity !== false;
-  document.getElementById('tagToggle').checked = data.allowTagging !== false;
-}
-
-/* ── Avatar change ── */
-document.getElementById('avatarInput').addEventListener('change', function() {
-  const file = this.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('avatarImg').src = e.target.result;
-    newAvatarData = e.target.result;
-  };
-  reader.readAsDataURL(file);
-});
-
-/* ── Bio char count ── */
-document.getElementById('bioInput').addEventListener('input', function() {
-  const len = this.value.length;
-  const cc = document.getElementById('bioCharCount');
-  cc.textContent = `${len} / 150`;
-  cc.className = 'char-count';
-  if (len > 130) cc.classList.add('warn');
-  if (len >= 150) cc.classList.add('over');
-});
-
-/* ── Save ── */
-async function saveProfile() {
-  const displayName = document.getElementById('displayNameInput').value.trim();
-  const username = document.getElementById('usernameInput').value.trim().replace('@', '').toLowerCase();
-  const website = document.getElementById('websiteInput').value.trim();
-  const bio = document.getElementById('bioInput').value.trim();
-  const isPrivate = document.getElementById('privateToggle').checked;
-  const showActivity = document.getElementById('activityToggle').checked;
-  const allowTagging = document.getElementById('tagToggle').checked;
-
-  // Validation
-  if (!displayName) { showToast('Display name is required', 'error'); return; }
-  if (!username || username.length < 3) { showToast('Username must be at least 3 characters', 'error'); return; }
-  if (!/^[a-z0-9._]+$/.test(username)) { showToast('Username can only contain letters, numbers, dots, and underscores', 'error'); return; }
-
-  const loadingOv = document.getElementById('loadingOv');
-  loadingOv.classList.add('show');
-
-  const profileData = {
-    displayName,
-    username,
-    website,
-    bio,
-    avatar: newAvatarData || document.getElementById('avatarImg').src,
-    isPrivate,
-    showActivity,
-    allowTagging,
-    updatedAt: Date.now()
-  };
-
-  try {
-    await db.ref('users/' + USER_ID).set(profileData);
-    loadingOv.classList.remove('show');
-    showToast('Profile updated successfully!', 'success');
-    setTimeout(() => { window.location.href = 'index.html'; }, 1000);
-  } catch(err) {
-    loadingOv.classList.remove('show');
-    showToast('Failed to save: ' + err.message, 'error');
+function renderCurrentTab() {
+  const grid = document.getElementById('profileGrid');
+  if (currentTab === 'grid') {
+    if (!myPosts.length) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-camera"></i><p>No posts yet</p></div>';
+      return;
+    }
+    grid.innerHTML = myPosts.map(p => {
+      const imgSrc = p.mediaType === 'video' ? (p.thumbnailUrl || '') : p.mediaUrl;
+      if (!imgSrc) return '';
+      return '<div class="p-grid-item" onclick="openPostReport(\'' + p.id + '\')">' +
+        '<img src="' + imgSrc + '" alt="Post" loading="lazy">' +
+        (p.mediaType === 'video' ? '<div class="video-badge"><i class="fas fa-play"></i></div>' : '') +
+        '<div class="g-ov">' +
+        '<span><i class="fas fa-eye"></i> ' + fmtNum(p.views) + '</span>' +
+        '<span><i class="fas fa-heart"></i> ' + fmtLikes(p.likes || 0) + '</span>' +
+        '<span><i class="fas fa-comment"></i> ' + ((p.comments && p.comments.length) || 0) + '</span>' +
+        '</div></div>';
+    }).join('');
+  } else if (currentTab === 'reels') {
+    const reels = myPosts.filter(p => p.mediaType === 'video');
+    if (!reels.length) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-video"></i><p>No reels yet</p></div>';
+      return;
+    }
+    grid.innerHTML = reels.map(p => {
+      const imgSrc = p.thumbnailUrl || '';
+      return '<div class="p-grid-item" onclick="openPostReport(\'' + p.id + '\')">' +
+        '<img src="' + imgSrc + '" alt="Reel" loading="lazy" style="object-position:center">' +
+        '<div class="g-ov"><span><i class="fas fa-eye"></i> ' + fmtNum(p.views) + '</span>' +
+        '<span><i class="fas fa-heart"></i> ' + fmtLikes(p.likes || 0) + '</span></div></div>';
+    }).join('');
+  } else {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-user-tag"></i><p>No tagged posts yet</p></div>';
   }
 }
 
-/* ── Delete confirmation ── */
-function confirmDelete() {
-  // Create inline confirmation instead of alert
-  const dz = document.querySelector('.danger-zone');
-  if (dz.querySelector('.confirm-row')) return;
-  const row = document.createElement('div');
-  row.className = 'confirm-row';
-  row.style.cssText = 'display:flex;gap:8px;margin-top:12px';
-  row.innerHTML = `
-    <button style="flex:1;padding:10px;background:var(--danger);border:none;color:#fff;font-size:13px;font-weight:600;border-radius:var(--rs);cursor:pointer;font-family:'Outfit',sans-serif" onclick="deleteAccount()">Yes, Delete</button>
-    <button style="flex:1;padding:10px;background:var(--bg-card);border:1px solid var(--border);color:var(--fg);font-size:13px;font-weight:600;border-radius:var(--rs);cursor:pointer;font-family:'Outfit',sans-serif" onclick="this.parentElement.remove()">Cancel</button>
-  `;
-  dz.appendChild(row);
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.p-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  renderCurrentTab();
 }
 
-async function deleteAccount() {
-  const loadingOv = document.getElementById('loadingOv');
-  document.querySelector('#loadingOv p').textContent = 'Deleting account...';
-  loadingOv.classList.add('show');
+/* ── Post Report Modal ── */
+function openPostReport(postId) {
+  const post = myPosts.find(p => p.id === postId);
+  if (!post) return;
 
-  try {
-    await db.ref('users/' + USER_ID).remove();
-    await db.ref('posts').orderByChild('userId').equalTo(USER_ID).once('value', snap => {
-      snap.forEach(child => child.ref.remove());
+  const imgSrc = post.mediaType === 'video' ? (post.thumbnailUrl || '') : post.mediaUrl;
+  const comments = post.comments || [];
+  const commentsHtml = comments.length > 0
+    ? '<div class="report-comments"><h4>Comments (' + comments.length + ')</h4>' +
+      comments.map(c => '<div class="rc-comment"><span class="rc-user">' + (c.user || 'user') + '</span> <span class="rc-text">' + (c.text || '') + '</span></div>').join('') +
+      '</div>'
+    : '<div class="report-comments"><h4>No comments yet</h4></div>';
+
+  // Increment view on open
+  db.ref('posts/' + postId + '/views').set((post.views || 0) + 1);
+  post.views = (post.views || 0) + 1;
+
+  document.getElementById('modalContent').innerHTML =
+    '<div class="modal-title">Post Report</div>' +
+    '<div class="report-card">' +
+    (imgSrc ? '<img class="rc-img" src="' + imgSrc + '" alt="Post">' : '') +
+    '<div class="report-stats">' +
+    '<div class="report-stat"><div class="rs-num">' + fmtNum(post.views) + '</div><div class="rs-lbl"><i class="fas fa-eye" style="margin-right:4px"></i>Views</div></div>' +
+    '<div class="report-stat"><div class="rs-num">' + fmtLikes(post.likes || 0) + '</div><div class="rs-lbl"><i class="fas fa-heart" style="margin-right:4px"></i>Likes</div></div>' +
+    '<div class="report-stat"><div class="rs-num">' + comments.length + '</div><div class="rs-lbl"><i class="fas fa-comment" style="margin-right:4px"></i>Comments</div></div>' +
+    '</div>' +
+    commentsHtml +
+    '</div>' +
+    '<div style="text-align:center;font-size:12px;color:var(--fg-d);padding-bottom:8px">Posted ' + (post.time || 'recently') + ' ago</div>';
+
+  openModal();
+
+  // Re-render grid to update view count
+  renderCurrentTab();
+}
+
+/* ── Followers / Following Modal ── */
+function showFollowers() {
+  document.getElementById('modalContent').innerHTML =
+    '<div class="modal-title">Followers</div>' +
+    '<div style="max-height:400px;overflow-y:auto" id="followersList"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></div>';
+  openModal();
+
+  db.ref('social/' + USER_ID + '/followers').once('value').then(snap => {
+    const list = document.getElementById('followersList');
+    if (!snap.exists()) { list.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No followers yet</p></div>'; return; }
+    let html = '';
+    let count = 0;
+    snap.forEach(child => {
+      count++;
+      const seed = child.key.replace(/[^a-z0-9]/gi, '');
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">' +
+        '<img src="https://picsum.photos/seed/' + seed + '/80/80.jpg" style="width:40px;height:40px;border-radius:50%;object-fit:cover" alt="">' +
+        '<div style="flex:1"><div style="font-size:14px;font-weight:600">user_' + count + '</div><div style="font-size:11px;color:var(--fg-d)">Follows you</div></div>' +
+        '<button style="padding:6px 16px;border-radius:var(--rf);background:var(--bg-card);border:1px solid var(--border);color:var(--fg);font-size:12px;font-weight:600;cursor:pointer;font-family:Outfit,sans-serif">Follow</button></div>';
     });
-    await db.ref('wallet/' + USER_ID).remove();
-    await db.ref('likes/' + USER_ID).remove();
-    await db.ref('bookmarks/' + USER_ID).remove();
-    loadingOv.classList.remove('show');
-    showToast('Account deleted', 'error');
-    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
-  } catch(err) {
-    loadingOv.classList.remove('show');
-    showToast('Failed to delete: ' + err.message, 'error');
-  }
+    list.innerHTML = html;
+  }).catch(() => {
+    document.getElementById('followersList').innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>8.4K followers</p></div>';
+  });
 }
 
-/* ── Toast ── */
-function showToast(msg, type = 'info') {
+function showFollowing() {
+  document.getElementById('modalContent').innerHTML =
+    '<div class="modal-title">Following</div>' +
+    '<div style="max-height:400px;overflow-y:auto" id="followingList"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></div>';
+  openModal();
+
+  db.ref('social/' + USER_ID + '/following').once('value').then(snap => {
+    const list = document.getElementById('followingList');
+    if (!snap.exists()) { list.innerHTML = '<div class="empty-state"><i class="fas fa-user-check"></i><p>Not following anyone yet</p></div>'; return; }
+    let html = '';
+    let count = 0;
+    snap.forEach(child => {
+      count++;
+      const seed = child.key.replace(/[^a-z0-9]/gi, '');
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">' +
+        '<img src="https://picsum.photos/seed/' + seed + '/80/80.jpg" style="width:40px;height:40px;border-radius:50%;object-fit:cover" alt="">' +
+        '<div style="flex:1"><div style="font-size:14px;font-weight:600">user_' + count + '</div><div style="font-size:11px;color:var(--fg-d)">Following</div></div>' +
+        '<button style="padding:6px 16px;border-radius:var(--rf);background:var(--accent);border:none;color:#000;font-size:12px;font-weight:600;cursor:pointer;font-family:Outfit,sans-serif">Following</button></div>';
+    });
+    list.innerHTML = html;
+  }).catch(() => {
+    document.getElementById('followingList').innerHTML = '<div class="empty-state"><i class="fas fa-user-check"></i><p>562 following</p></div>';
+  });
+}
+
+function toggleSettings() {
+  const pc = document.getElementById('profileContent');
+  const sc = document.getElementById('settingsContent');
+  if (sc.style.display === 'none') { pc.style.display = 'none'; sc.style.display = 'block'; }
+  else { pc.style.display = 'block'; sc.style.display = 'none'; }
+}
+
+function shareProfile() {
+  if (navigator.share) navigator.share({ title:'Alex Morgan on InstaGram', text:'Check out my profile!' });
+  else showToast('Profile link copied!', 'success');
+}
+
+function openModal(){document.getElementById('modalOv').classList.add('show');}
+function closeModal(e){if(e&&e.target!==document.getElementById('modalOv'))return;document.getElementById('modalOv').classList.remove('show');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal({target:document.getElementById('modalOv')});});
+
+function showToast(msg, type) {
   const c = document.getElementById('toastC'), t = document.createElement('div');
   t.className = 'toast ' + type;
   const icons = { success:'fa-check-circle', error:'fa-exclamation-circle', info:'fa-info-circle' };
-  t.innerHTML = `<i class="fas ${icons[type]||icons.info}"></i> ${msg}`;
+  t.innerHTML = '<i class="fas ' + (icons[type]||icons.info) + '"></i> ' + msg;
   c.appendChild(t); setTimeout(() => t.remove(), 3000);
 }
 
