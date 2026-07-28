@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Referral - InstaGram</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  :root{--bg:#0a0e14;--bg2:#111820;--bg-card:#151d28;--bg-el:#1a2332;--fg:#e8edf3;--fg-m:#6b7d94;--fg-d:#3d4f63;--accent:#00d4aa;--accent-glow:rgba(0,212,170,.25);--accent-dk:#00a885;--danger:#ff4757;--warn:#ffa502;--ok:#2ed573;--border:rgba(255,255,255,.06);--glass:rgba(17,24,32,.85);--r:14px;--rs:8px;--rf:9999px;--tr:.3s cubic-bezier(.4,0,.2,1)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+  .app{max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
+  .bg-atm{position:fixed;top:0;left:50%;transform:translateX(-50%);max-width:430px;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+  .bg-atm .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.1;animation:orbF 12s ease-in-out infinite}
+  .bg-atm .orb:nth-child(1){width:250px;height:250px;background:#ff6b6b;top:-60px;right:-40px}
+  .bg-atm .orb:nth-child(2){width:200px;height:200px;background:#ffd93d;bottom:60px;left:-30px;opacity:.05;animation-delay:-4s}
+  @keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.1)}66%{transform:translate(-15px,20px) scale(.95)}}
+  .page{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;z-index:1;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .page::-webkit-scrollbar{display:none}
+  .top-bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .back-btn{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;padding:4px 8px 4px 0;transition:var(--tr)}
+  .back-btn:hover{color:var(--accent)}
+  .logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
+  .top-actions button{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;transition:var(--tr)}
+  .top-actions button:hover{color:var(--accent)}
+
+  .ref-hero{margin:16px 18px;padding:32px 22px;border-radius:var(--r);text-align:center;position:relative;overflow:hidden;background:linear-gradient(135deg,#1a0a2e,#0d1b2a);border:1px solid rgba(255,107,107,.15)}
+  .ref-hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:200px;height:200px;border-radius:50%;background:#ff6b6b;opacity:.08;filter:blur(50px)}
+  .gift-icon{font-size:48px;margin-bottom:12px;display:inline-block;animation:giftB 2s ease-in-out infinite}
+  @keyframes giftB{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .ref-hero h2{font-size:22px;font-weight:800;margin-bottom:6px}
+  .ref-hero p{font-size:13px;color:var(--fg-m);line-height:1.5}
+  .ref-hero .comm-amount{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:var(--accent);margin-top:8px}
+
+  .code-box{margin:16px 18px;padding:18px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);display:flex;align-items:center;gap:12px}
+  .code-box .code{flex:1;font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;letter-spacing:3px;color:var(--accent)}
+  .code-box .copy-btn{padding:8px 16px;background:var(--bg-el);border:1px solid var(--border);border-radius:var(--rs);color:var(--fg);font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:var(--tr);white-space:nowrap}
+  .code-box .copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .code-box .copy-btn.copied{background:var(--accent);color:#000;border-color:var(--accent)}
+
+  .apply-section{margin:0 18px 16px;padding:18px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r)}
+  .apply-section h4{font-size:14px;font-weight:700;margin-bottom:10px}
+  .apply-row{display:flex;gap:8px}
+  .apply-row input{flex:1;padding:11px 14px;background:var(--bg-el);border:1px solid var(--border);border-radius:var(--rs);color:var(--fg);font-size:14px;font-family:'Space Grotesk',sans-serif;outline:none;text-transform:uppercase;letter-spacing:2px;font-weight:600}
+  .apply-row input:focus{border-color:var(--accent)}
+  .apply-row input::placeholder{color:var(--fg-d);letter-spacing:1px;font-weight:400}
+  .apply-row button{padding:11px 20px;background:var(--accent);color:#000;border:none;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:var(--tr);white-space:nowrap}
+  .apply-row button:hover{box-shadow:0 4px 16px rgba(0,212,170,.3)}
+  .apply-row button:disabled{opacity:.4;cursor:not-allowed}
+
+  .ref-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 18px;margin-bottom:24px}
+  .ref-stat{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:18px 12px;text-align:center}
+  .ref-stat .num{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--accent)}
+  .ref-stat .lbl{font-size:11px;color:var(--fg-m);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+
+  .sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 18px;margin-bottom:14px}
+  .sec-hdr h3{font-size:16px;font-weight:700}
+  .sec-hdr .see-all{font-size:13px;color:var(--accent);cursor:pointer;background:none;border:none;font-family:'Outfit',sans-serif;font-weight:500}
+
+  .ref-list{padding:0 18px}
+  .ref-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+  .ref-item:last-child{border-bottom:none}
+  .ref-item img{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0}
+  .ref-info{flex:1;min-width:0}
+  .ref-info .ri-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ref-info .ri-date{font-size:11px;color:var(--fg-d);margin-top:2px;display:flex;align-items:center;gap:6px}
+  .ref-info .ri-date .status{padding:1px 8px;border-radius:var(--rf);font-size:10px;font-weight:600}
+  .status.active{background:rgba(46,213,115,.15);color:var(--ok)}
+  .status.pending{background:rgba(255,165,2,.15);color:var(--warn)}
+  .ref-earn{font-weight:700;font-size:14px;color:var(--ok);font-family:'Space Grotesk',sans-serif;flex-shrink:0}
+
+  .empty-state{text-align:center;padding:48px 20px;color:var(--fg-d)}
+  .empty-state i{font-size:44px;opacity:.15;margin-bottom:10px;display:block}
+
+  .toast-c{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;max-width:400px;width:calc(100% - 36px)}
+  .toast{padding:14px 18px;border-radius:var(--rs);font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;margin-bottom:8px;animation:tIn .35s ease,tOut .35s ease 2.5s forwards;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+  .toast.success{background:#0d2818;border:1px solid rgba(46,213,115,.3);color:var(--ok)}
+  .toast.error{background:#2d0f13;border:1px solid rgba(255,71,87,.3);color:var(--danger)}
+  .toast.info{background:#0d1f2d;border:1px solid rgba(0,212,170,.3);color:var(--accent)}
+  @keyframes tIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes tOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-20px)}}
+
+  .fade-up{opacity:0;transform:translateY(16px);animation:fadeU .5s ease forwards}
+  @keyframes fadeU{to{opacity:1;transform:translateY(0)}}
+  .fade-up:nth-child(2){animation-delay:.06s}
+  .fade-up:nth-child(3){animation-delay:.12s}
+
+  @media(min-width:431px){.app{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bg-atm"><div class="orb"></div><div class="orb"></div></div>
+  <div class="page">
+    <div class="top-bar">
+      <button class="back-btn" onclick="window.location.href='index.html'" aria-label="Back"><i class="fas fa-arrow-left"></i></button>
+      <div class="logo">Invite & Earn</div>
+      <div class="top-actions"><button onclick="shareReferral()" aria-label="Share"><i class="fas fa-share-alt"></i></button></div>
+    </div>
+
+    <div class="ref-hero fade-up">
+      <div class="gift-icon">&#127873;</div>
+      <h2>Earn While You Share</h2>
+      <p>Invite friends and earn commission for each referral who joins using your code.</p>
+      <div class="comm-amount" id="commDisplay">Loading...</div>
+      <div style="font-size:11px;color:var(--fg-d);margin-top:2px">Commission per referral</div>
+    </div>
+
+    <div class="code-box fade-up">
+      <div class="code" id="myCode">Loading...</div>
+      <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copy</button>
+    </div>
+
+    <div class="apply-section fade-up">
+      <h4><i class="fas fa-ticket-alt" style="color:var(--accent);margin-right:6px"></i>Have a referral code?</h4>
+      <div class="apply-row">
+        <input type="text" id="applyInput" placeholder="ENTER CODE" maxlength="12">
+        <button id="applyBtn" onclick="applyCode()">Apply</button>
+      </div>
+    </div>
+
+    <div class="ref-stats fade-up">
+      <div class="ref-stat"><div class="num" id="statInvited">0</div><div class="lbl">Invited</div></div>
+      <div class="ref-stat"><div class="num" id="statActive">0</div><div class="lbl">Active</div></div>
+      <div class="ref-stat"><div class="num" id="statEarned">$0</div><div class="lbl">Earned</div></div>
+    </div>
+
+    <div class="sec-hdr fade-up"><h3>Referral History</h3></div>
+    <div class="ref-list fade-up" id="refList"><div class="empty-state"><i class="fas fa-users"></i><p>Loading referrals...</p></div></div>
+    <div style="height:24px"></div>
+  </div>
+
+  <div class="toast-c" id="toastC"></div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAmQxNPKANzO8hEng5pdpAR3t7DJtwkG7U",
+  authDomain: "aibmodel.firebaseapp.com",
+  databaseURL: "https://aibmodel-default-rtdb.firebaseio.com",
+  projectId: "aibmodel",
+  storageBucket: "aibmodel.firebasestorage.app",
+  messagingSenderId: "572663832515",
+  appId: "1:572663832515:web:3fea2dac685b9b5f646776"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const USER_ID = "user_alex_morgan";
+
+let myRefCode = '';
+let commissionAmount = 0;
+
+function generateCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = 'GRAM-';
+  for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function loadReferralData() {
+  // Load admin commission setting
+  db.ref('admin/referralCommission').once('value').then(snap => {
+    commissionAmount = snap.val() || 10;
+    document.getElementById('commDisplay').textContent = '$' + commissionAmount.toFixed(2);
+  }).catch(() => {
+    commissionAmount = 10;
+    document.getElementById('commDisplay').textContent = '$10.00';
+  });
+
+  // Load or create user's referral code
+  db.ref('referrals/codes/' + USER_ID).once('value').then(snap => {
+    const data = snap.val();
+    if (data && data.code) {
+      myRefCode = data.code;
+    } else {
+      myRefCode = generateCode();
+      db.ref('referrals/codes/' + USER_ID).set({
+        code: myRefCode,
+        createdAt: Date.now(),
+        userId: USER_ID
+      });
+    }
+    document.getElementById('myCode').textContent = myRefCode;
+  }).catch(() => {
+    myRefCode = 'GRAM-TEST';
+    document.getElementById('myCode').textContent = myRefCode;
+  });
+
+  // Listen for my referrals
+  db.ref('referrals/links/' + myRefCode).on('value', snap => {
+    // This will re-trigger once myRefCode is set
+  });
+
+  // Load all referrals where I am the referrer
+  loadMyReferrals();
+}
+
+function loadMyReferrals() {
+  db.ref('referrals/users/' + USER_ID + '/referred').on('value', snap => {
+    const data = snap.val();
+    if (!data) {
+      document.getElementById('refList').innerHTML = '<div class="empty-state"><i class="fas fa-user-friends"></i><p>No referrals yet. Share your code to start earning!</p></div>';
+      document.getElementById('statInvited').textContent = '0';
+      document.getElementById('statActive').textContent = '0';
+      document.getElementById('statEarned').textContent = '$0';
+      return;
+    }
+
+    const list = Array.isArray(data) ? data : Object.values(data);
+    let invited = list.length;
+    let active = list.filter(r => r.status === 'active').length;
+    let earned = list.filter(r => r.status === 'active').reduce((s, r) => s + (r.commission || commissionAmount), 0);
+
+    animateNum('statInvited', invited, '');
+    animateNum('statActive', active, '');
+    animateNum('statEarned', Math.round(earned), '$');
+
+    list.sort((a, b) => (b.joinedAt || 0) - (a.joinedAt || 0));
+
+    document.getElementById('refList').innerHTML = list.map(r => {
+      const date = r.joinedAt ? new Date(r.joinedAt).toLocaleDateString('en-US', {month:'short',day:'numeric'}) : 'Unknown';
+      const statusClass = r.status === 'active' ? 'active' : 'pending';
+      const statusText = r.status === 'active' ? 'Active' : 'Pending';
+      const earn = r.commission || commissionAmount;
+      return '<div class="ref-item">' +
+        '<img src="' + (r.avatar || 'https://picsum.photos/seed/' + (r.username||'x') + '/100/100.jpg') + '" alt="' + (r.username||'User') + '">' +
+        '<div class="ref-info"><div class="ri-name">' + (r.username || 'Unknown User') + '</div>' +
+        '<div class="ri-date">' + date + ' <span class="status ' + statusClass + '">' + statusText + '</span></div></div>' +
+        '<div class="ref-earn">+$' + earn.toFixed(2) + '</div></div>';
+    }).join('');
+  });
+}
+
+function animateNum(id, target, prefix) {
+  const el = document.getElementById(id);
+  let current = 0;
+  const step = Math.max(1, Math.ceil(target / 25));
+  const iv = setInterval(() => {
+    current += step;
+    if (current >= target) { current = target; clearInterval(iv); }
+    el.textContent = prefix + current;
+  }, 35);
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(myRefCode).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    showToast('Referral code copied!', 'success');
+  }).catch(() => showToast('Code: ' + myRefCode, 'info'));
+}
+
+function shareReferral() {
+  if (navigator.share) {
+    navigator.share({ title:'Join me on InstaGram', text:'Use my referral code ' + myRefCode + ' to sign up and earn rewards!' });
+  } else { copyCode(); }
+}
+
+function applyCode() {
+  const code = document.getElementById('applyInput').value.trim().toUpperCase();
+  if (!code) { showToast('Please enter a referral code', 'error'); return; }
+  if (code === myRefCode) { showToast('You cannot use your own code', 'error'); return; }
+
+  const btn = document.getElementById('applyBtn');
+  btn.disabled = true;
+  btn.textContent = 'Applying...';
+
+  // Check if code exists
+  db.ref('referrals/codes').orderByChild('code').equalTo(code).once('value').then(snap => {
+    if (!snap.exists()) {
+      btn.disabled = false;
+      btn.textContent = 'Apply';
+      showToast('Invalid referral code', 'error');
+      return;
+    }
+
+    // Find referrer
+    let referrerId = null;
+    snap.forEach(child => { referrerId = child.key; });
+
+    // Check if already applied
+    db.ref('referrals/users/' + USER_ID + '/appliedCode').once('value').then(aSnap => {
+      if (aSnap.val()) {
+        btn.disabled = false;
+        btn.textContent = 'Apply';
+        showToast('You have already applied a referral code', 'error');
+        return;
+      }
+
+      // Apply the code
+      const refData = {
+        appliedCode: code,
+        referredBy: referrerId,
+        appliedAt: Date.now(),
+        status: 'active'
+      };
+
+      db.ref('referrals/users/' + USER_ID).update(refData).then(() => {
+        // Add to referrer's list
+        db.ref('users/' + USER_ID).once('value').then(uSnap => {
+          const uData = uSnap.val() || {};
+          const newRef = {
+            userId: USER_ID,
+            username: uData.username || 'Unknown',
+            avatar: uData.avatar || '',
+            status: 'active',
+            commission: commissionAmount,
+            joinedAt: Date.now()
+          };
+          db.ref('referrals/users/' + referrerId + '/referred').push(newRef);
+        });
+
+        btn.disabled = false;
+        btn.textContent = 'Applied';
+        btn.style.background = 'var(--ok)';
+        showToast('Referral code applied! You earned $' + commissionAmount.toFixed(2), 'success');
+      });
+    });
+  }).catch(err => {
+    btn.disabled = false;
+    btn.textContent = 'Apply';
+    showToast('Error: ' + err.message, 'error');
+  });
+}
+
+function showToast(msg, type) {
+  const c = document.getElementById('toastC'), t = document.createElement('div');
+  t.className = 'toast ' + type;
+  const icons = { success:'fa-check-circle', error:'fa-exclamation-circle', info:'fa-info-circle' };
+  t.innerHTML = '<i class="fas ' + (icons[type]||icons.info) + '"></i> ' + msg;
+  c.appendChild(t); setTimeout(() => t.remove(), 3000);
+}
+
+// Re-load referrals once code is known
+let codeCheckInterval = setInterval(() => {
+  if (myRefCode) {
+    clearInterval(codeCheckInterval);
+    loadMyReferrals();
+  }
+}, 300);
+
+loadReferralData();
+</script>
+</body>
+</html>
