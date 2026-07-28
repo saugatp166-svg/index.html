@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Edit Profile - InstaGram</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  :root{--bg:#0a0e14;--bg2:#111820;--bg-card:#151d28;--bg-el:#1a2332;--fg:#e8edf3;--fg-m:#6b7d94;--fg-d:#3d4f63;--accent:#00d4aa;--accent-glow:rgba(0,212,170,.25);--accent-dk:#00a885;--danger:#ff4757;--warn:#ffa502;--ok:#2ed573;--border:rgba(255,255,255,.06);--glass:rgba(17,24,32,.85);--r:14px;--rs:8px;--rf:9999px;--tr:.3s cubic-bezier(.4,0,.2,1)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+  .app{max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
+  .bg-atm{position:fixed;top:0;left:50%;transform:translateX(-50%);max-width:430px;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+  .bg-atm .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.08;animation:orbF 12s ease-in-out infinite}
+  .bg-atm .orb:nth-child(1){width:220px;height:220px;background:var(--accent);top:-50px;right:-30px}
+  .bg-atm .orb:nth-child(2){width:160px;height:160px;background:#ff6b6b;bottom:60px;left:-20px;opacity:.04;animation-delay:-4s}
+  @keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.1)}66%{transform:translate(-15px,20px) scale(.95)}}
+  .page{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;z-index:1;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .page::-webkit-scrollbar{display:none}
+  .top-bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .back-btn{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;padding:4px 8px 4px 0;transition:var(--tr)}
+  .back-btn:hover{color:var(--accent)}
+  .logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
+  .save-btn{background:none;border:none;color:var(--accent);font-size:15px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;padding:6px 12px;border-radius:var(--rs);transition:var(--tr)}
+  .save-btn:hover{background:var(--accent-glow)}
+  .save-btn:disabled{opacity:.35;cursor:not-allowed}
+
+  /* Avatar */
+  .avatar-section{display:flex;flex-direction:column;align-items:center;padding:28px 18px 20px;position:relative}
+  .avatar-wrap{position:relative;cursor:pointer;margin-bottom:14px}
+  .avatar-wrap img{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--accent);transition:var(--tr)}
+  .avatar-wrap:hover img{transform:scale(1.03)}
+  .avatar-wrap .edit-badge{position:absolute;bottom:0;right:0;width:32px;height:32px;border-radius:50%;background:var(--accent);color:#000;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid var(--bg);transition:var(--tr)}
+  .avatar-wrap:hover .edit-badge{transform:scale(1.1)}
+  .avatar-wrap input{display:none}
+  .avatar-hint{font-size:12px;color:var(--fg-m)}
+  .avatar-hint strong{color:var(--accent);cursor:pointer}
+  .avatar-hint strong:hover{text-decoration:underline}
+
+  /* Form */
+  .form-section{padding:0 18px}
+  .form-group{margin-bottom:18px}
+  .form-group label{display:block;font-size:12px;font-weight:600;color:var(--fg-m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .form-input{width:100%;padding:13px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rs);color:var(--fg);font-size:14px;font-family:'Outfit',sans-serif;outline:none;transition:var(--tr);resize:none}
+  .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+  .form-input::placeholder{color:var(--fg-d)}
+  .char-count{text-align:right;font-size:11px;color:var(--fg-d);margin-top:4px}
+  .char-count.warn{color:var(--warn)}
+  .char-count.over{color:var(--danger)}
+
+  /* Info box */
+  .info-box{margin:0 18px 18px;padding:14px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rs);display:flex;gap:12px;align-items:flex-start}
+  .info-box i{color:var(--accent);font-size:16px;margin-top:2px;flex-shrink:0}
+  .info-box p{font-size:12px;color:var(--fg-m);line-height:1.5}
+  .info-box p strong{color:var(--fg)}
+
+  /* Switch row */
+  .switch-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+  .switch-row:last-child{border-bottom:none}
+  .switch-label .sl-title{font-size:14px;font-weight:600}
+  .switch-label .sl-desc{font-size:12px;color:var(--fg-m);margin-top:2px}
+  .switch{position:relative;width:48px;height:28px;cursor:pointer}
+  .switch input{display:none}
+  .switch .slider{position:absolute;inset:0;background:var(--fg-d);border-radius:28px;transition:var(--tr)}
+  .switch .slider::before{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:var(--tr)}
+  .switch input:checked + .slider{background:var(--accent)}
+  .switch input:checked + .slider::before{transform:translateX(20px)}
+
+  /* Danger zone */
+  .danger-zone{margin:24px 18px 32px;padding:18px;border:1px solid rgba(255,71,87,.2);border-radius:var(--r);background:rgba(255,71,87,.04)}
+  .danger-zone h4{font-size:14px;font-weight:700;color:var(--danger);margin-bottom:4px}
+  .danger-zone p{font-size:12px;color:var(--fg-m);margin-bottom:14px;line-height:1.5}
+  .btn-danger{width:100%;padding:12px;background:transparent;border:1px solid var(--danger);color:var(--danger);font-size:14px;font-weight:600;font-family:'Outfit',sans-serif;border-radius:var(--rs);cursor:pointer;transition:var(--tr)}
+  .btn-danger:hover{background:var(--danger);color:#fff}
+
+  /* Loading */
+  .loading-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none;transition:opacity .3s ease}
+  .loading-ov.show{opacity:1;pointer-events:all}
+  .spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-ov p{font-size:15px;color:var(--fg-m)}
+
+  .toast-c{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;max-width:400px;width:calc(100% - 36px)}
+  .toast{padding:14px 18px;border-radius:var(--rs);font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;margin-bottom:8px;animation:tIn .35s ease,tOut .35s ease 2.5s forwards;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+  .toast.success{background:#0d2818;border:1px solid rgba(46,213,115,.3);color:var(--ok)}
+  .toast.error{background:#2d0f13;border:1px solid rgba(255,71,87,.3);color:var(--danger)}
+  .toast.info{background:#0d1f2d;border:1px solid rgba(0,212,170,.3);color:var(--accent)}
+  @keyframes tIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes tOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-20px)}}
+
+  @media(min-width:431px){.app{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bg-atm"><div class="orb"></div><div class="orb"></div></div>
+  <div class="page">
+    <div class="top-bar">
+      <button class="back-btn" onclick="window.location.href='index.html'" aria-label="Back"><i class="fas fa-arrow-left"></i></button>
+      <div class="logo">Edit Profile</div>
+      <button class="save-btn" id="saveBtn" onclick="saveProfile()">Save</button>
+    </div>
+
+    <!-- Avatar -->
+    <div class="avatar-section">
+      <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()">
+        <img id="avatarImg" src="https://picsum.photos/seed/myprofile/200/200.jpg" alt="Profile">
+        <div class="edit-badge"><i class="fas fa-camera"></i></div>
+        <input type="file" id="avatarInput" accept="image/*">
+      </div>
+      <div class="avatar-hint"><strong onclick="document.getElementById('avatarInput').click()">Change profile photo</strong></div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-section">
+      <div class="form-group">
+        <label for="displayNameInput">Display Name</label>
+        <input class="form-input" id="displayNameInput" type="text" placeholder="Your name" maxlength="50">
+      </div>
+      <div class="form-group">
+        <label for="usernameInput">Username</label>
+        <div style="position:relative">
+          <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--fg-d);font-size:14px">@</span>
+          <input class="form-input" id="usernameInput" type="text" placeholder="username" maxlength="30" style="padding-left:34px">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="websiteInput">Website</label>
+        <input class="form-input" id="websiteInput" type="url" placeholder="https://yoursite.com">
+      </div>
+      <div class="form-group">
+        <label for="bioInput">Bio</label>
+        <textarea class="form-input" id="bioInput" rows="4" placeholder="Tell us about yourself..." maxlength="150"></textarea>
+        <div class="char-count" id="bioCharCount">0 / 150</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <i class="fas fa-info-circle"></i>
+      <p><strong>Private account:</strong> When your account is private, only approved followers can see your posts and stories.</p>
+    </div>
+
+    <!-- Switches -->
+    <div style="margin:18px 18px 0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+      <div class="switch-row">
+        <div class="switch-label"><div class="sl-title">Private Account</div><div class="sl-desc">Only followers see your content</div></div>
+        <label class="switch"><input type="checkbox" id="privateToggle"><span class="slider"></span></label>
+      </div>
+      <div class="switch-row">
+        <div class="switch-label"><div class="sl-title">Show Activity Status</div><div class="sl-desc">Let others see when you're online</div></div>
+        <label class="switch"><input type="checkbox" id="activityToggle" checked><span class="slider"></span></label>
+      </div>
+      <div class="switch-row">
+        <div class="switch-label"><div class="sl-title">Allow Tagging</div><div class="sl-desc">Let people tag you in posts</div></div>
+        <label class="switch"><input type="checkbox" id="tagToggle" checked><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="danger-zone">
+      <h4>Danger Zone</h4>
+      <p>Once you delete your account, there is no going back. All your data, posts, and connections will be permanently removed.</p>
+      <button class="btn-danger" onclick="confirmDelete()"><i class="fas fa-trash-alt" style="margin-right:6px"></i>Delete Account</button>
+    </div>
+    <div style="height:24px"></div>
+  </div>
+
+  <div class="loading-ov" id="loadingOv">
+    <div class="spinner"></div>
+    <p>Saving changes...</p>
+  </div>
+
+  <div class="toast-c" id="toastC"></div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const USER_ID = "user_alex_morgan";
+
+let newAvatarData = null;
+
+const defaults = {
+  displayName: 'Alex Morgan',
+  username: 'alex_morgan',
+  website: 'alexmorgan.photo',
+  bio: 'Photographer & explorer. Capturing moments that matter. Based in Portland, OR.',
+  avatar: 'https://picsum.photos/seed/myprofile/200/200.jpg',
+  isPrivate: false,
+  showActivity: true,
+  allowTagging: true
+};
+
+/* ── Load profile from Firebase ── */
+function loadProfile() {
+  db.ref('users/' + USER_ID).once('value').then(snap => {
+    const data = snap.val();
+    if (data) {
+      fillForm(data);
+    } else {
+      // Seed defaults
+      db.ref('users/' + USER_ID).set(defaults);
+      fillForm(defaults);
+    }
+  }).catch(() => {
+    fillForm(defaults);
+  });
+}
+
+function fillForm(data) {
+  document.getElementById('displayNameInput').value = data.displayName || '';
+  document.getElementById('usernameInput').value = (data.username || '').replace('@', '');
+  document.getElementById('websiteInput').value = data.website || '';
+  document.getElementById('bioInput').value = data.bio || '';
+  document.getElementById('bioCharCount').textContent = `${(data.bio || '').length} / 150`;
+  document.getElementById('avatarImg').src = data.avatar || defaults.avatar;
+  document.getElementById('privateToggle').checked = !!data.isPrivate;
+  document.getElementById('activityToggle').checked = data.showActivity !== false;
+  document.getElementById('tagToggle').checked = data.allowTagging !== false;
+}
+
+/* ── Avatar change ── */
+document.getElementById('avatarInput').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('avatarImg').src = e.target.result;
+    newAvatarData = e.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+/* ── Bio char count ── */
+document.getElementById('bioInput').addEventListener('input', function() {
+  const len = this.value.length;
+  const cc = document.getElementById('bioCharCount');
+  cc.textContent = `${len} / 150`;
+  cc.className = 'char-count';
+  if (len > 130) cc.classList.add('warn');
+  if (len >= 150) cc.classList.add('over');
+});
+
+/* ── Save ── */
+async function saveProfile() {
+  const displayName = document.getElementById('displayNameInput').value.trim();
+  const username = document.getElementById('usernameInput').value.trim().replace('@', '').toLowerCase();
+  const website = document.getElementById('websiteInput').value.trim();
+  const bio = document.getElementById('bioInput').value.trim();
+  const isPrivate = document.getElementById('privateToggle').checked;
+  const showActivity = document.getElementById('activityToggle').checked;
+  const allowTagging = document.getElementById('tagToggle').checked;
+
+  // Validation
+  if (!displayName) { showToast('Display name is required', 'error'); return; }
+  if (!username || username.length < 3) { showToast('Username must be at least 3 characters', 'error'); return; }
+  if (!/^[a-z0-9._]+$/.test(username)) { showToast('Username can only contain letters, numbers, dots, and underscores', 'error'); return; }
+
+  const loadingOv = document.getElementById('loadingOv');
+  loadingOv.classList.add('show');
+
+  const profileData = {
+    displayName,
+    username,
+    website,
+    bio,
+    avatar: newAvatarData || document.getElementById('avatarImg').src,
+    isPrivate,
+    showActivity,
+    allowTagging,
+    updatedAt: Date.now()
+  };
+
+  try {
+    await db.ref('users/' + USER_ID).set(profileData);
+    loadingOv.classList.remove('show');
+    showToast('Profile updated successfully!', 'success');
+    setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+  } catch(err) {
+    loadingOv.classList.remove('show');
+    showToast('Failed to save: ' + err.message, 'error');
+  }
+}
+
+/* ── Delete confirmation ── */
+function confirmDelete() {
+  // Create inline confirmation instead of alert
+  const dz = document.querySelector('.danger-zone');
+  if (dz.querySelector('.confirm-row')) return;
+  const row = document.createElement('div');
+  row.className = 'confirm-row';
+  row.style.cssText = 'display:flex;gap:8px;margin-top:12px';
+  row.innerHTML = `
+    <button style="flex:1;padding:10px;background:var(--danger);border:none;color:#fff;font-size:13px;font-weight:600;border-radius:var(--rs);cursor:pointer;font-family:'Outfit',sans-serif" onclick="deleteAccount()">Yes, Delete</button>
+    <button style="flex:1;padding:10px;background:var(--bg-card);border:1px solid var(--border);color:var(--fg);font-size:13px;font-weight:600;border-radius:var(--rs);cursor:pointer;font-family:'Outfit',sans-serif" onclick="this.parentElement.remove()">Cancel</button>
+  `;
+  dz.appendChild(row);
+}
+
+async function deleteAccount() {
+  const loadingOv = document.getElementById('loadingOv');
+  document.querySelector('#loadingOv p').textContent = 'Deleting account...';
+  loadingOv.classList.add('show');
+
+  try {
+    await db.ref('users/' + USER_ID).remove();
+    await db.ref('posts').orderByChild('userId').equalTo(USER_ID).once('value', snap => {
+      snap.forEach(child => child.ref.remove());
+    });
+    await db.ref('wallet/' + USER_ID).remove();
+    await db.ref('likes/' + USER_ID).remove();
+    await db.ref('bookmarks/' + USER_ID).remove();
+    loadingOv.classList.remove('show');
+    showToast('Account deleted', 'error');
+    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+  } catch(err) {
+    loadingOv.classList.remove('show');
+    showToast('Failed to delete: ' + err.message, 'error');
+  }
+}
+
+/* ── Toast ── */
+function showToast(msg, type = 'info') {
+  const c = document.getElementById('toastC'), t = document.createElement('div');
+  t.className = 'toast ' + type;
+  const icons = { success:'fa-check-circle', error:'fa-exclamation-circle', info:'fa-info-circle' };
+  t.innerHTML = `<i class="fas ${icons[type]||icons.info}"></i> ${msg}`;
+  c.appendChild(t); setTimeout(() => t.remove(), 3000);
+}
+
+loadProfile();
+</script>
+</body>
+</html>
