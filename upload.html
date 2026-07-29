@@ -1,136 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Upload</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/upload.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>InstaGram</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  /* COPY EXACT CSS FROM home.html HERE */
+  :root { --bg: #0a0e14; --bg-secondary: #111820; --bg-card: #151d28; --bg-elevated: #1a2332; --fg: #e8edf3; --fg-muted: #6b7d94; --fg-dim: #3d4f63; --accent: #00d4aa; --accent-glow: rgba(0, 212, 170, 0.25); --accent-dark: #00a885; --danger: #ff4757; --warning: #ffa502; --success: #2ed573; --border: rgba(255,255,255,0.06); --glass: rgba(17, 24, 32, 0.85); --radius: 14px; --radius-sm: 8px; --radius-full: 9999px; --shadow: 0 8px 32px rgba(0,0,0,0.4); --shadow-accent: 0 4px 20px rgba(0, 212, 170, 0.3); --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); } * { margin: 0; padding: 0; box-sizing: border-box; } html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--fg); font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; } .app-shell { max-width: 430px; margin: 0 auto; height: 100vh; height: 100dvh; position: relative; overflow: hidden; background: var(--bg); } .bg-atmosphere { position: fixed; top: 0; left: 50%; transform: translateX(-50%); max-width: 430px; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; } .bg-atmosphere .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: orbFloat 12s ease-in-out infinite; } .bg-atmosphere .orb:nth-child(1) { width: 300px; height: 300px; background: var(--accent); top: -80px; right: -60px; } .bg-atmosphere .orb:nth-child(2) { width: 200px; height: 200px; background: #ff6b6b; bottom: 100px; left: -40px; animation-delay: -4s; opacity: 0.08; } .bg-atmosphere .orb:nth-child(3) { width: 250px; height: 250px; background: #ffd93d; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -8s; opacity: 0.05; } @keyframes orbFloat { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(20px, -30px) scale(1.1); } 66% { transform: translate(-15px, 20px) scale(0.95); } } .page { position: absolute; top: 0; left: 0; right: 0; bottom: 64px; overflow-y: auto; overflow-x: hidden; z-index: 1; opacity: 0; transform: translateY(20px); pointer-events: none; transition: opacity 0.35s ease, transform 0.35s ease; -webkit-overflow-scrolling: touch; scrollbar-width: none; } .page::-webkit-scrollbar { display: none; } .page.active { opacity: 1; transform: translateY(0); pointer-events: all; } .top-bar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); } .top-bar .logo { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; color: var(--fg); display: flex; align-items: center; gap: 8px; } .top-bar .logo .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 2s ease-in-out infinite; } @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } } .top-bar .actions { display: flex; gap: 16px; } .top-bar .actions button { background: none; border: none; color: var(--fg); font-size: 20px; cursor: pointer; position: relative; transition: var(--transition); } .top-bar .actions button:hover { color: var(--accent); } .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 64px; z-index: 100; display: flex; align-items: center; justify-content: space-around; background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid var(--border); } .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; color: var(--fg-dim); font-size: 10px; font-family: 'Outfit', sans-serif; font-weight: 500; cursor: pointer; padding: 6px 14px; border-radius: var(--radius-sm); transition: var(--transition); position: relative; text-decoration: none; } .nav-item i { font-size: 20px; transition: var(--transition); } .nav-item.active { color: var(--accent); } .nav-item.active i { transform: scale(1.1); } .nav-item::before { content: ''; position: absolute; top: -1px; left: 50%; transform: translateX(-50%) scaleX(0); width: 24px; height: 2px; border-radius: 2px; background: var(--accent); transition: var(--transition); } .nav-item.active::before { transform: translateX(-50%) scaleX(1); } .nav-item.upload-btn { position: relative; top: -10px; } .nav-item.upload-btn .upload-icon-wrap { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-accent); transition: var(--transition); } .nav-item.upload-btn i { color: #fff; font-size: 20px; } .nav-item.upload-btn span { display: none; } .upload-area { margin: 20px 18px; border: 2px dashed var(--fg-dim); border-radius: var(--radius); padding: 40px 20px; text-align: center; transition: var(--transition); cursor: pointer; position: relative; overflow: hidden; } .upload-area:hover, .upload-area.dragover { border-color: var(--accent); background: var(--accent-glow); } .upload-area i { font-size: 48px; color: var(--fg-dim); margin-bottom: 12px; } .upload-area.dragover i { color: var(--accent); } .upload-area p { color: var(--fg-muted); font-size: 14px; } .upload-area .browse-btn { display: inline-block; margin-top: 12px; padding: 8px 24px; background: var(--accent); color: #000; font-weight: 600; font-size: 13px; border-radius: var(--radius-full); cursor: pointer; border: none; font-family: 'Outfit', sans-serif; transition: var(--transition); } .upload-area .browse-btn:hover { box-shadow: var(--shadow-accent); transform: translateY(-1px); } .upload-preview { display: none; margin: 0 18px 16px; border-radius: var(--radius); overflow: hidden; position: relative; } .upload-preview img { width: 100%; max-height: 350px; object-fit: cover; display: block; } .upload-preview .remove-preview { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border: none; color: #fff; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); } .upload-preview .remove-preview:hover { background: var(--danger); } .upload-form { padding: 0 18px; } .form-group { margin-bottom: 16px; } .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; } .form-input { width: 100%; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--fg); font-size: 14px; font-family: 'Outfit', sans-serif; outline: none; transition: var(--transition); resize: none; } .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); } .form-input::placeholder { color: var(--fg-dim); } .char-count { text-align: right; font-size: 11px; color: var(--fg-dim); margin-top: 4px; } .char-count.warn { color: var(--warning); } .char-count.over { color: var(--danger); } .filter-row { display: flex; gap: 10px; padding: 0 18px; overflow-x: auto; scrollbar-width: none; margin-bottom: 20px; } .filter-row::-webkit-scrollbar { display: none; } .filter-chip { flex-shrink: 0; padding: 8px 18px; border-radius: var(--radius-full); background: var(--bg-card); border: 1px solid var(--border); color: var(--fg-muted); font-size: 13px; font-family: 'Outfit', sans-serif; cursor: pointer; transition: var(--transition); font-weight: 500; } .filter-chip:hover { border-color: var(--accent); color: var(--fg); } .filter-chip.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; } .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: #000; font-size: 15px; font-weight: 700; font-family: 'Outfit', sans-serif; border: none; border-radius: var(--radius); cursor: pointer; transition: var(--transition); position: relative; overflow: hidden; } .btn-primary:hover { box-shadow: var(--shadow-accent); transform: translateY(-1px); } .btn-primary:active { transform: scale(0.98); } .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; } .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; max-width: 400px; width: calc(100% - 36px); } .toast { padding: 14px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; animation: toastIn 0.35s ease, toastOut 0.35s ease 2.5s forwards; box-shadow: var(--shadow); } .toast.success { background: #0d2818; border: 1px solid rgba(46, 213, 115, 0.3); color: var(--success); } .toast.error { background: #2d0f13; border: 1px solid rgba(255, 71, 87, 0.3); color: var(--danger); } .toast.info { background: #0d1f2d; border: 1px solid rgba(0, 212, 170, 0.3); color: var(--accent); } @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } } @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } } .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 500; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; } .modal-overlay.show { opacity: 1; pointer-events: all; } .modal-sheet { max-width: 430px; width: 100%; background: var(--bg-secondary); border-radius: 20px 20px 0 0; padding: 20px; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1); max-height: 70vh; overflow-y: auto; } .modal-overlay.show .modal-sheet { transform: translateY(0); } .modal-handle { width: 40px; height: 4px; border-radius: 4px; background: var(--fg-dim); margin: 0 auto 16px; } .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; text-align: center; } .modal-option { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); } .modal-option:hover { background: var(--bg-elevated); } .modal-option i { font-size: 20px; width: 28px; text-align: center; } .modal-option span { font-size: 14px; font-weight: 500; } .auth-screen { position: absolute; inset: 0; background: var(--bg); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; z-index: 200; } .auth-screen .logo-auth { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; } .auth-screen .logo-auth .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 15px var(--accent); } .auth-screen input { width: 100%; max-width: 300px; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--fg); font-size: 15px; font-family: 'Outfit', sans-serif; outline: none; margin-bottom: 16px; transition: var(--transition); } .auth-screen input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); } .auth-screen button { width: 100%; max-width: 300px; padding: 14px; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: #000; font-size: 15px; font-weight: 700; font-family: 'Outfit', sans-serif; border: none; border-radius: var(--radius); cursor: pointer; transition: var(--transition); } .auth-screen button:hover { box-shadow: var(--shadow-accent); transform: translateY(-1px); } @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } } @media (min-width: 431px) { .app-shell { border-left: 1px solid var(--border); border-right: 1px solid var(--border); } }
+</style>
 </head>
-<body class="light-mode">
-    <header class="top-bar">
-        <div class="top-bar-left">
-            <button class="icon-btn" id="back-btn" aria-label="Go back">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-        </div>
-        <h1 class="app-title">New Post</h1>
-        <div class="top-bar-right">
-            <button class="btn-share-post" id="btn-share-post" disabled>Share</button>
-        </div>
-    </header>
+<body>
 
-    <main class="upload-container">
-        <!-- 上传类型选择 -->
-        <div class="upload-type-tabs">
-            <button class="upload-tab active" data-type="image">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Image
-            </button>
-            <button class="upload-tab" data-type="video">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                Video
-            </button>
-        </div>
+<div class="app-shell" id="app">
+  <div class="bg-atmosphere"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+  
+  <div class="auth-screen" id="authScreen">
+    <div class="logo-auth"><div class="dot"></div>InstaGram</div>
+    <input type="text" id="regName" placeholder="Enter your name to continue">
+    <button onclick="registerBrowserUser()">Join InstaGram</button>
+  </div>
 
-        <!-- 上传区域 -->
-        <div class="upload-dropzone" id="upload-dropzone">
-            <div class="dropzone-content" id="dropzone-content">
-                <div class="dropzone-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                </div>
-                <p class="dropzone-text">Drag and drop or tap to upload</p>
-                <p class="dropzone-subtext">JPG, PNG, GIF, MP4, MOV</p>
-                <input type="file" id="file-input" accept="image/*,video/*" hidden>
-            </div>
-            <div class="preview-container" id="preview-container" style="display:none;">
-                <img id="image-preview" src="" alt="Preview" style="display:none;">
-                <video id="video-preview" src="" controls style="display:none;"></video>
-                <button class="preview-remove" id="preview-remove" aria-label="Remove">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-                <div class="upload-progress-bar" id="upload-progress-bar" style="display:none;">
-                    <div class="upload-progress-fill" id="upload-progress-fill"></div>
-                </div>
-                <span class="upload-progress-text" id="upload-progress-text" style="display:none;">0%</span>
-            </div>
-        </div>
+  <div class="page active" id="page-upload" style="display:none">
+    <div class="top-bar">
+      <div class="logo">New Post</div>
+      <div class="actions"><button aria-label="Close" onclick="resetUpload()"><i class="fas fa-times"></i></button></div>
+    </div>
 
-        <!-- URL输入 -->
-        <div class="url-input-section">
-            <div class="url-input-toggle" id="url-input-toggle">
-                <span>Or paste a URL</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="url-toggle-arrow"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <div class="url-input-fields" id="url-input-fields" style="display:none;">
-                <input type="url" id="media-url" class="input-field" placeholder="Image or Video URL">
-                <input type="url" id="thumbnail-url" class="input-field" placeholder="Thumbnail Image URL (for videos)" style="display:none;">
-                <button class="btn-secondary" id="btn-load-url">Load Preview</button>
-            </div>
-        </div>
+    <div class="upload-preview" id="uploadPreview">
+      <img id="previewImg" src="" alt="Preview">
+      <button class="remove-preview" onclick="removePreview()" aria-label="Remove"><i class="fas fa-times"></i></button>
+    </div>
 
-        <!-- 表单字段 -->
-        <div class="upload-form">
-            <div class="form-group">
-                <label for="caption-input">Caption</label>
-                <textarea id="caption-input" class="input-field textarea-field" placeholder="Write a caption..." maxlength="2200" rows="4"></textarea>
-                <span class="char-count" id="caption-count">0 / 2200</span>
-            </div>
-            <div class="form-group">
-                <label for="hashtags-input">Hashtags</label>
-                <input type="text" id="hashtags-input" class="input-field" placeholder="tag1, tag2, tag3...">
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="visibility-select">Visibility</label>
-                    <select id="visibility-select" class="input-field select-field">
-                        <option value="public">Public</option>
-                        <option value="private">Private</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Comments</label>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="comments-toggle" checked>
-                        <label for="comments-toggle" class="toggle-label"></label>
-                        <span class="toggle-text" id="comments-text">On</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+    <div class="upload-area" id="uploadArea">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <p>Drag and drop your photo here</p>
+      <button class="browse-btn" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+      <input type="file" id="fileInput" accept="image/*" style="display:none">
+    </div>
 
-    <!-- Toast -->
-    <div class="toast-container" id="toast-container"></div>
+    <div class="filter-row" id="filterRow" style="display:none">
+      <button class="filter-chip active" data-filter="none">Normal</button>
+      <button class="filter-chip" data-filter="grayscale(100%)">B&W</button>
+      <button class="filter-chip" data-filter="sepia(80%)">Sepia</button>
+      <button class="filter-chip" data-filter="contrast(140%)">Vivid</button>
+      <button class="filter-chip" data-filter="saturate(180%)">Saturated</button>
+      <button class="filter-chip" data-filter="brightness(110%) contrast(90%)">Soft</button>
+      <button class="filter-chip" data-filter="hue-rotate(30deg)">Warm</button>
+      <button class="filter-chip" data-filter="hue-rotate(180deg)">Cool</button>
+    </div>
 
-    <nav class="bottom-nav">
-        <a href="home.html" class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Home</span>
-        </a>
-        <a href="upload.html" class="nav-item active">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16" stroke="white" stroke-width="2"/><line x1="8" y1="12" x2="16" y2="12" stroke="white" stroke-width="2"/></svg>
-            <span>Upload</span>
-        </a>
-        <a href="wallet.html" class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="18" cy="15" r="1"/></svg>
-            <span>Wallet</span>
-        </a>
-        <a href="referral.html" class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-            <span>Refer</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Profile</span>
-        </a>
-    </nav>
+    <div class="upload-form" id="uploadForm" style="display:none">
+      <div class="form-group">
+        <label for="captionInput">Caption</label>
+        <textarea class="form-input" id="captionInput" rows="3" placeholder="Write a caption..." maxlength="500" oninput="updateCharCount()"></textarea>
+        <div class="char-count" id="charCount">0 / 500</div>
+      </div>
+      <div class="form-group">
+        <label for="tagsInput">Tags</label>
+        <input class="form-input" id="tagsInput" type="text" placeholder="#photography #nature #sunset">
+      </div>
+      <div class="form-group">
+        <label for="locationInput">Location</label>
+        <input class="form-input" id="locationInput" type="text" placeholder="Add a location...">
+      </div>
+      <button class="btn-primary" id="publishBtn" disabled onclick="publishPost()">Publish Post</button>
+      <div style="height:20px"></div>
+    </div>
+  </div>
 
-    <script src="js/firebase.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/database.js"></script>
-    <script src="js/helpers.js"></script>
-    <script src="js/upload.js"></script>
+  <nav class="bottom-nav" role="navigation" aria-label="Main navigation" style="display:none">
+    <a href="home.html" class="nav-item" aria-label="Home"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="wallet.html" class="nav-item" aria-label="Wallet"><i class="fas fa-wallet"></i><span>Wallet</span></a>
+    <a href="upload.html" class="nav-item upload-btn active" aria-label="Upload"><div class="upload-icon-wrap"><i class="fas fa-plus"></i></div><span>Upload</span></a>
+    <a href="referral.html" class="nav-item" aria-label="Referral"><i class="fas fa-gift"></i><span>Invite</span></a>
+    <a href="profile.html" class="nav-item" aria-label="Profile"><i class="fas fa-user"></i><span>Profile</span></a>
+  </nav>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)"><div class="modal-sheet" id="modalSheet" onclick="event.stopPropagation()"><div class="modal-handle"></div><div id="modalContent"></div></div></div>
+  <div class="toast-container" id="toastContainer"></div>
+</div>
+
+<script src="app.js"></script>
+<script>
+let selectedFileData = '';
+
+function setupPage() {
+  document.getElementById('page-upload').style.display = 'block';
+  document.querySelector('.bottom-nav').style.display = 'flex';
+  setupUploadListeners();
+}
+
+function setupUploadListeners() {
+  const fileInput = document.getElementById('fileInput');
+  const uploadArea = document.getElementById('uploadArea');
+  
+  fileInput.addEventListener('change', handleFileSelect);
+  
+  uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+  uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      document.getElementById('previewImg').style.filter = chip.dataset.filter;
+    });
+  });
+}
+
+function handleFileSelect(e) { if (e.target.files.length) handleFile(e.target.files[0]); }
+
+function handleFile(file) {
+  if (!file.type.startsWith('image/')) { showToast('Please select an image file', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    selectedFileData = e.target.result;
+    document.getElementById('previewImg').src = selectedFileData;
+    document.getElementById('uploadPreview').style.display = 'block';
+    document.getElementById('uploadArea').style.display = 'none';
+    document.getElementById('filterRow').style.display = 'flex';
+    document.getElementById('uploadForm').style.display = 'block';
+    document.getElementById('publishBtn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePreview() { resetUpload(); }
+
+function resetUpload() {
+  selectedFileData = '';
+  document.getElementById('previewImg').src = '';
+  document.getElementById('uploadPreview').style.display = 'none';
+  document.getElementById('uploadArea').style.display = 'block';
+  document.getElementById('filterRow').style.display = 'none';
+  document.getElementById('uploadForm').style.display = 'none';
+  document.getElementById('publishBtn').disabled = true;
+  document.getElementById('captionInput').value = '';
+  document.getElementById('tagsInput').value = '';
+  document.getElementById('locationInput').value = '';
+  document.getElementById('charCount').textContent = '0 / 500';
+  document.getElementById('charCount').className = 'char-count';
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  document.querySelector('.filter-chip').classList.add('active');
+  document.getElementById('previewImg').style.filter = 'none';
+}
+
+function updateCharCount() {
+  const len = document.getElementById('captionInput').value.length;
+  const countEl = document.getElementById('charCount');
+  countEl.textContent = len + ' / 500';
+  countEl.className = 'char-count' + (len > 450 ? (len >= 500 ? ' over' : ' warn') : '');
+}
+
+function publishPost() {
+  if (!selectedFileData) return;
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = true;
+  btn.textContent = 'Publishing...';
+  
+  const postData = {
+    imageUrl: selectedFileData,
+    caption: document.getElementById('captionInput').value,
+    tags: document.getElementById('tagsInput').value,
+    location: document.getElementById('locationInput').value
+  };
+
+  createPost(postData).then(() => {
+    showToast('Post published successfully!', 'success');
+    resetUpload();
+  }).catch((err) => {
+    showToast('Failed to publish post', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Publish Post';
+  });
+}
+</script>
 </body>
 </html>
