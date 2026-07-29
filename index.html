@@ -1,327 +1,3492 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>InstaGram</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>ReelGram</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0a0e14;--bg2:#111820;--bgc:#151d28;--bge:#1a2332;--fg:#e8edf3;--fm:#6b7d94;--fd:#3d4f63;--ac:#00d4aa;--acg:rgba(0,212,170,.25);--dn:#ff4757;--ok:#2ed573;--bd:rgba(255,255,255,.06);--gl:rgba(17,24,32,.88);--r:14px;--rs:8px;--rf:9999px;--t:.3s cubic-bezier(.4,0,.2,1)}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
-.app{max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
-.atm{position:fixed;top:0;left:50%;transform:translateX(-50%);max-width:430px;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
-.atm .o{position:absolute;border-radius:50%;filter:blur(80px);animation:of 12s ease-in-out infinite}
-.atm .o:nth-child(1){width:260px;height:260px;background:var(--ac);top:-70px;right:-50px;opacity:.07}
-.atm .o:nth-child(2){width:180px;height:180px;background:#ff6b6b;bottom:70px;left:-30px;opacity:.04;animation-delay:-4s}
-@keyframes of{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.1)}66%{transform:translate(-15px,20px) scale(.95)}}
-.pg{position:absolute;top:0;left:0;right:0;bottom:60px;overflow-y:auto;overflow-x:hidden;z-index:1;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.pg::-webkit-scrollbar{display:none}
-.tb{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--gl);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
-.lg{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;display:flex;align-items:center;gap:7px}
-.lg .dt{width:7px;height:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 8px var(--ac);animation:pu 2s ease-in-out infinite}
-@keyframes pu{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
-.ta{display:flex;gap:14px}
-.ta button{background:none;border:none;color:var(--fg);font-size:19px;cursor:pointer;transition:var(--t)}
-.ta button:hover{color:var(--ac)}
-.ef{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center}
-.ef i{font-size:56px;color:var(--fd);opacity:.2;margin-bottom:16px}
-.ef h3{font-size:18px;font-weight:700;margin-bottom:6px}
-.ef p{font-size:13px;color:var(--fm);line-height:1.5}
-.ef .cb{margin-top:20px;padding:12px 28px;background:var(--ac);color:#000;border:none;border-radius:var(--rf);font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:var(--t);text-decoration:none;display:inline-block}
-.ef .cb:hover{box-shadow:0 4px 20px rgba(0,212,170,.4);transform:translateY(-2px)}
-.pc{border-bottom:1px solid var(--bd);padding-bottom:10px;margin-bottom:6px}
-.ph{display:flex;align-items:center;padding:10px 14px;gap:9px}
-.pav{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0}
-.pav2{width:34px;height:34px;border-radius:50%;background:var(--bge);display:flex;align-items:center;justify-content:center;color:var(--fm);font-size:14px;font-weight:700;flex-shrink:0}
-.pui{flex:1}.pui .un{font-weight:600;font-size:13px}.pui .lc{font-size:11px;color:var(--fm)}
-.pmo{background:none;border:none;color:var(--fm);font-size:17px;cursor:pointer;padding:4px;transition:var(--t)}.pmo:hover{color:var(--fg)}
-.piw{position:relative;width:100%;aspect-ratio:1;overflow:hidden;background:var(--bg2)}
-.piw img{width:100%;height:100%;object-fit:cover}
-.piw video{width:100%;height:100%;object-fit:cover}
-.vb{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);color:#fff;padding:3px 8px;border-radius:var(--rf);font-size:10px;font-weight:600;display:flex;align-items:center;gap:4px}
-.dh{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:76px;color:#fff;pointer-events:none;filter:drop-shadow(0 4px 20px rgba(0,0,0,.5));z-index:5}
-.dh.sh{animation:hb .8s ease forwards}
-@keyframes hb{0%{transform:translate(-50%,-50%) scale(0);opacity:1}40%{transform:translate(-50%,-50%) scale(1.3);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
-.pa{display:flex;align-items:center;padding:9px 12px;gap:14px}
-.pa .pl{display:flex;gap:14px;flex:1}
-.pa button{background:none;border:none;color:var(--fg);font-size:21px;cursor:pointer;transition:var(--t);padding:2px}
-.pa button:hover{transform:scale(1.15)}
-.pa button.lk{color:var(--dn)}.pa button.lk i{animation:lp .35s ease}
-@keyframes lp{0%{transform:scale(1)}30%{transform:scale(1.35)}60%{transform:scale(.9)}100%{transform:scale(1)}}
-.pa button.bk{color:#ffa502}
-.plk{padding:0 14px;font-size:13px;font-weight:600;margin-bottom:3px;transition:color .4s ease}
-.plk.fl{color:var(--ac)!important}
-.pcp{padding:0 14px;font-size:13px;line-height:1.5;color:var(--fm)}
-.pcp .cu{color:var(--fg);font-weight:600}
-.pcv{padding:3px 14px 0;font-size:12px;color:var(--fd);cursor:pointer}
-.ptm{padding:3px 14px 0;font-size:11px;color:var(--fd)}
-.mov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease}
-.mov.sh{opacity:1;pointer-events:all}
-.msh{max-width:430px;width:100%;background:var(--bg2);border-radius:18px 18px 0 0;padding:18px;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:75vh;overflow-y:auto}
-.mov.sh .msh{transform:translateY(0)}
-.mhd{width:36px;height:4px;border-radius:4px;background:var(--fd);margin:0 auto 14px}
-.mtl{font-size:15px;font-weight:700;margin-bottom:14px;text-align:center}
-.mo{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--rs);cursor:pointer;transition:var(--t)}
-.mo:hover{background:var(--bge)}.mo i{font-size:18px;width:26px;text-align:center}.mo span{font-size:13px;font-weight:500}
-.mo.dn2{color:var(--dn)}
-.bn{position:absolute;bottom:0;left:0;right:0;height:60px;z-index:100;display:flex;align-items:center;justify-content:space-around;background:var(--gl);backdrop-filter:blur(24px);border-top:1px solid var(--bd)}
-.ni{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--fd);font-size:9px;font-family:'Outfit',sans-serif;font-weight:500;cursor:pointer;padding:4px 12px;border-radius:var(--rs);transition:var(--t);position:relative;text-decoration:none}
-.ni i{font-size:19px;transition:var(--t)}.ni.on{color:var(--ac)}.ni.on i{transform:scale(1.1)}
-.ni::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%) scaleX(0);width:22px;height:2px;border-radius:2px;background:var(--ac);transition:var(--t)}
-.ni.on::before{transform:translateX(-50%) scaleX(1)}
-.ni.ub{position:relative;top:-8px}
-.ni.ub .uw{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--ac),#00a885);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,212,170,.3);transition:var(--t)}
-.ni.ub i{color:#fff;font-size:18px}.ni.ub span{display:none}
-.tc{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:9999;max-width:390px;width:calc(100% - 32px)}
-.to{padding:12px 16px;border-radius:var(--rs);font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:6px;animation:ti .3s ease,to2 .3s ease 2.5s forwards;box-shadow:0 8px 28px rgba(0,0,0,.4)}
-.to.su{background:#0d2818;border:1px solid rgba(46,213,115,.3);color:var(--ok)}
-.to.er{background:#2d0f13;border:1px solid rgba(255,71,87,.3);color:var(--dn)}
-.to.in{background:#0d1f2d;border:1px solid rgba(0,212,170,.3);color:var(--ac)}
-@keyframes ti{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
-@keyframes to2{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-18px)}}
-@media(min-width:431px){.app{border-left:1px solid var(--bd);border-right:1px solid var(--bd)}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* ============================================
+   CSS VARIABLES & THEME SYSTEM
+   ============================================ */
+:root {
+  --font: 'Outfit', sans-serif;
+  --nav-h: 60px;
+  --header-h: 52px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+  --transition: 0.25s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"] {
+  --bg: #050505;
+  --bg2: #0a0a0a;
+  --card: #111111;
+  --card2: #161616;
+  --border: #1e1e1e;
+  --fg: #f0f0f0;
+  --fg2: #999999;
+  --fg3: #555555;
+  --accent: #ff3b5c;
+  --accent2: #ff6b81;
+  --accent-bg: rgba(255,59,92,0.1);
+  --success: #00d68f;
+  --warning: #ffaa00;
+  --danger: #ff3b5c;
+  --overlay: rgba(0,0,0,0.7);
+  --glass: rgba(17,17,17,0.85);
+  --shadow: 0 4px 24px rgba(0,0,0,0.5);
+  --input-bg: #141414;
+  --nav-bg: rgba(5,5,5,0.92);
+}
+[data-theme="light"] {
+  --bg: #f5f5f5;
+  --bg2: #eeeeee;
+  --card: #ffffff;
+  --card2: #f8f8f8;
+  --border: #e0e0e0;
+  --fg: #111111;
+  --fg2: #666666;
+  --fg3: #aaaaaa;
+  --accent: #e6234b;
+  --accent2: #ff4d6d;
+  --accent-bg: rgba(230,35,75,0.08);
+  --success: #00b377;
+  --warning: #e69500;
+  --danger: #e6234b;
+  --overlay: rgba(0,0,0,0.4);
+  --glass: rgba(255,255,255,0.88);
+  --shadow: 0 4px 24px rgba(0,0,0,0.1);
+  --input-bg: #f0f0f0;
+  --nav-bg: rgba(245,245,245,0.92);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--fg);
+  overflow:hidden;
+  height:100dvh;
+  width:100vw;
+  position:relative;
+}
+a{color:var(--accent);text-decoration:none}
+button{font-family:var(--font);cursor:pointer;border:none;background:none;color:var(--fg);font-size:inherit}
+input,textarea,select{
+  font-family:var(--font);
+  background:var(--input-bg);
+  color:var(--fg);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:12px 14px;
+  font-size:0.9rem;
+  width:100%;
+  outline:none;
+  transition:border var(--transition);
+}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+img{display:block;max-width:100%}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--fg3);border-radius:4px}
+
+/* ============================================
+   APP SHELL
+   ============================================ */
+#app{
+  height:100dvh;
+  width:100%;
+  position:relative;
+  overflow:hidden;
+}
+.page{
+  position:absolute;
+  inset:0;
+  bottom:var(--nav-h);
+  overflow-y:auto;
+  overflow-x:hidden;
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(8px);
+  transition:opacity 0.3s ease, transform 0.3s ease;
+  -webkit-overflow-scrolling:touch;
+}
+.page.active{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateY(0);
+}
+
+/* Header */
+.app-header{
+  position:fixed;
+  top:0;left:0;right:0;
+  height:var(--header-h);
+  background:var(--nav-bg);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  z-index:100;
+}
+.app-header .logo{
+  font-weight:800;
+  font-size:1.3rem;
+  letter-spacing:-0.5px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.app-header .header-actions{display:flex;gap:12px;align-items:center}
+.app-header .header-actions button{
+  width:36px;height:36px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;
+  transition:background var(--transition);
+}
+.app-header .header-actions button:hover{background:var(--accent-bg)}
+.header-title{
+  font-weight:700;
+  font-size:1.05rem;
+  position:absolute;
+  left:50%;transform:translateX(-50%);
+  white-space:nowrap;
+}
+
+/* Bottom Navigation */
+.bottom-nav{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  height:var(--nav-h);
+  background:var(--nav-bg);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  z-index:100;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 14px;
+  border-radius:var(--radius);
+  transition:all var(--transition);
+  position:relative;
+  font-size:0.65rem;
+  color:var(--fg3);
+  font-weight:500;
+}
+.nav-item i{font-size:1.25rem;transition:all var(--transition)}
+.nav-item.active{color:var(--accent)}
+.nav-item.active i{transform:scale(1.15)}
+.nav-item::before{
+  content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%) scaleX(0);
+  width:20px;height:2px;background:var(--accent);border-radius:2px;
+  transition:transform var(--transition);
+}
+.nav-item.active::before{transform:translateX(-50%) scaleX(1)}
+
+/* ============================================
+   HOME PAGE - REELS FEED
+   ============================================ */
+.reels-container{
+  width:100%;
+  max-width:480px;
+  margin:0 auto;
+  position:relative;
+}
+.reel-item{
+  position:relative;
+  width:100%;
+  height:calc(100dvh - var(--nav-h));
+  overflow:hidden;
+  background:#000;
+}
+.reel-item video,.reel-item img{
+  width:100%;height:100%;
+  object-fit:cover;
+}
+.reel-item img{pointer-events:none}
+.reel-gradient{
+  position:absolute;bottom:0;left:0;right:0;
+  height:50%;
+  background:linear-gradient(to top,rgba(0,0,0,0.8) 0%,transparent 100%);
+  pointer-events:none;
+}
+.reel-top{
+  position:absolute;top:16px;left:16px;right:16px;
+  display:flex;align-items:center;gap:10px;
+  z-index:5;
+}
+.reel-creator-pic{
+  width:36px;height:36px;border-radius:50%;
+  object-fit:cover;border:2px solid #fff;
+  cursor:pointer;
+}
+.reel-creator-name{
+  color:#fff;font-weight:600;font-size:0.9rem;
+  text-shadow:0 1px 4px rgba(0,0,0,0.5);
+  cursor:pointer;
+}
+.reel-follow-btn{
+  margin-left:auto;
+  background:var(--accent);color:#fff;
+  padding:6px 16px;border-radius:20px;
+  font-size:0.75rem;font-weight:600;
+  transition:all var(--transition);
+}
+.reel-follow-btn.following{background:rgba(255,255,255,0.2);color:#fff}
+.reel-actions{
+  position:absolute;right:12px;bottom:100px;
+  display:flex;flex-direction:column;align-items:center;gap:18px;
+  z-index:5;
+}
+.reel-action{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  color:#fff;cursor:pointer;
+  transition:transform 0.2s;
+}
+.reel-action:active{transform:scale(0.85)}
+.reel-action i{font-size:1.4rem;text-shadow:0 1px 6px rgba(0,0,0,0.4)}
+.reel-action span{font-size:0.7rem;font-weight:500;text-shadow:0 1px 4px rgba(0,0,0,0.5)}
+.reel-action.liked i{color:var(--accent)}
+.reel-action.saved i{color:var(--warning)}
+.reel-info{
+  position:absolute;bottom:16px;left:16px;right:70px;
+  z-index:5;color:#fff;
+}
+.reel-caption{font-size:0.85rem;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.reel-caption .hashtag{color:var(--accent2);font-weight:500}
+.reel-meta{font-size:0.72rem;color:rgba(255,255,255,0.6);display:flex;gap:12px}
+.reel-play-indicator{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);
+  width:64px;height:64px;background:rgba(0,0,0,0.5);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.5rem;z-index:4;
+  transition:transform 0.2s ease;
+  pointer-events:none;
+}
+.reel-play-indicator.show{transform:translate(-50%,-50%) scale(1)}
+
+/* ============================================
+   UPLOAD PAGE
+   ============================================ */
+.upload-page{padding:16px;padding-bottom:24px}
+.upload-tabs{
+  display:flex;gap:4px;background:var(--input-bg);
+  border-radius:var(--radius);padding:4px;margin-bottom:20px;
+}
+.upload-tab{
+  flex:1;padding:10px;text-align:center;
+  border-radius:var(--radius-sm);font-weight:600;
+  font-size:0.85rem;transition:all var(--transition);color:var(--fg2);
+}
+.upload-tab.active{background:var(--accent);color:#fff}
+.upload-section{display:none}
+.upload-section.active{display:block}
+.upload-dropzone{
+  border:2px dashed var(--border);border-radius:var(--radius-lg);
+  padding:40px 20px;text-align:center;cursor:pointer;
+  transition:all var(--transition);margin-bottom:16px;
+  position:relative;overflow:hidden;
+}
+.upload-dropzone:hover,.upload-dropzone.dragover{border-color:var(--accent);background:var(--accent-bg)}
+.upload-dropzone i{font-size:2.5rem;color:var(--fg3);margin-bottom:12px;display:block}
+.upload-dropzone p{color:var(--fg2);font-size:0.85rem}
+.upload-dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-preview{
+  width:100%;max-height:300px;object-fit:contain;
+  border-radius:var(--radius);margin-bottom:16px;display:none;
+  background:var(--card);
+}
+.upload-preview.visible{display:block}
+.url-input-group{margin-bottom:16px}
+.url-input-group label{display:block;font-weight:600;font-size:0.85rem;margin-bottom:6px;color:var(--fg2)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-weight:600;font-size:0.85rem;margin-bottom:6px;color:var(--fg2)}
+.toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.toggle-row span{font-size:0.9rem;font-weight:500}
+.toggle{
+  width:46px;height:26px;background:var(--fg3);border-radius:13px;
+  position:relative;cursor:pointer;transition:background var(--transition);
+}
+.toggle.on{background:var(--accent)}
+.toggle::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:20px;height:20px;background:#fff;border-radius:50%;
+  transition:transform var(--transition);
+}
+.toggle.on::after{transform:translateX(20px)}
+.btn-primary{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-weight:700;font-size:1rem;
+  border-radius:var(--radius);margin-top:20px;
+  transition:all var(--transition);
+  position:relative;overflow:hidden;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,59,92,0.3)}
+.btn-primary:active{transform:scale(0.98)}
+.btn-primary:disabled{opacity:0.5;pointer-events:none}
+.upload-progress{
+  height:4px;background:var(--border);border-radius:2px;
+  margin-top:12px;overflow:hidden;display:none;
+}
+.upload-progress.visible{display:block}
+.upload-progress-bar{
+  height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:2px;width:0%;transition:width 0.3s;
+}
+
+/* ============================================
+   WALLET PAGE
+   ============================================ */
+.wallet-page{padding:16px;padding-bottom:24px}
+.wallet-card{
+  background:linear-gradient(135deg,#1a0a10,#2a0a1a,#0a0a1a);
+  border:1px solid rgba(255,59,92,0.2);
+  border-radius:var(--radius-lg);padding:24px;
+  margin-bottom:20px;position:relative;overflow:hidden;
+}
+[data-theme="light"] .wallet-card{
+  background:linear-gradient(135deg,#fff0f2,#fff5f7,#f0f5ff);
+  border-color:rgba(230,35,75,0.15);
+}
+.wallet-card::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:120px;height:120px;
+  background:radial-gradient(circle,rgba(255,59,92,0.2),transparent);
+  border-radius:50%;
+}
+.wallet-card .label{font-size:0.8rem;color:var(--fg2);margin-bottom:4px;font-weight:500}
+.wallet-card .amount{font-size:2.2rem;font-weight:900;letter-spacing:-1px}
+.wallet-card .amount .curr{font-size:1rem;font-weight:500;opacity:0.7}
+.wallet-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;
+}
+.wallet-stat{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;
+}
+.wallet-stat .ws-label{font-size:0.72rem;color:var(--fg2);font-weight:500;margin-bottom:4px}
+.wallet-stat .ws-value{font-size:1.15rem;font-weight:700}
+.wallet-actions{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;
+}
+.wallet-btn{
+  padding:14px;border-radius:var(--radius);font-weight:600;
+  font-size:0.85rem;display:flex;align-items:center;
+  justify-content:center;gap:8px;transition:all var(--transition);
+  border:1px solid var(--border);background:var(--card);
+}
+.wallet-btn:hover{border-color:var(--accent);color:var(--accent)}
+.wallet-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.section-title{font-size:1rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.txn-list{display:flex;flex-direction:column;gap:8px}
+.txn-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);
+}
+.txn-icon{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+}
+.txn-icon.credit{background:rgba(0,214,143,0.12);color:var(--success)}
+.txn-icon.debit{background:rgba(255,59,92,0.12);color:var(--danger)}
+.txn-icon.pending{background:rgba(255,170,0,0.12);color:var(--warning)}
+.txn-details{flex:1;min-width:0}
+.txn-details .txn-desc{font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.txn-details .txn-date{font-size:0.72rem;color:var(--fg2)}
+.txn-amount{font-weight:700;font-size:0.9rem;white-space:nowrap}
+.txn-amount.positive{color:var(--success)}
+.txn-amount.negative{color:var(--danger)}
+
+/* ============================================
+   REFERRAL PAGE
+   ============================================ */
+.referral-page{padding:16px;padding-bottom:24px}
+.referral-hero{
+  text-align:center;padding:30px 20px;
+  background:linear-gradient(135deg,var(--accent-bg),transparent);
+  border:1px solid rgba(255,59,92,0.15);
+  border-radius:var(--radius-lg);margin-bottom:20px;
+}
+.referral-hero .rh-icon{font-size:3rem;color:var(--accent);margin-bottom:12px}
+.referral-hero h2{font-size:1.4rem;font-weight:800;margin-bottom:6px}
+.referral-hero p{color:var(--fg2);font-size:0.85rem;margin-bottom:20px}
+.referral-code-box{
+  display:flex;gap:8px;max-width:320px;margin:0 auto 12px;
+}
+.referral-code-box input{
+  flex:1;text-align:center;font-weight:700;letter-spacing:2px;
+  font-size:1rem;text-transform:uppercase;
+}
+.referral-code-box button{
+  padding:0 16px;background:var(--accent);color:#fff;
+  border-radius:var(--radius-sm);font-weight:600;font-size:0.8rem;
+}
+.referral-link-box{
+  display:flex;gap:8px;max-width:320px;margin:0 auto;
+}
+.referral-link-box input{flex:1;font-size:0.78rem}
+.referral-link-box button{
+  padding:0 14px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-sm);font-size:0.8rem;color:var(--fg2);
+}
+.ref-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.ref-stat{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 10px;text-align:center;
+}
+.ref-stat .rs-val{font-size:1.3rem;font-weight:800}
+.ref-stat .rs-lbl{font-size:0.7rem;color:var(--fg2);margin-top:2px}
+.leaderboard-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:8px;
+}
+.leaderboard-item .lb-rank{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:0.8rem;flex-shrink:0;
+}
+.leaderboard-item:nth-child(1) .lb-rank{background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000}
+.leaderboard-item:nth-child(2) .lb-rank{background:linear-gradient(135deg,#c0c0c0,#a0a0a0);color:#000}
+.leaderboard-item:nth-child(3) .lb-rank{background:linear-gradient(135deg,#cd7f32,#a0522d);color:#fff}
+.leaderboard-item .lb-pic{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.leaderboard-item .lb-name{flex:1;font-weight:600;font-size:0.85rem}
+.leaderboard-item .lb-count{font-weight:700;font-size:0.85rem;color:var(--accent)}
+
+/* ============================================
+   PROFILE PAGE
+   ============================================ */
+.profile-page{padding-bottom:24px}
+.profile-cover{
+  width:100%;height:160px;object-fit:cover;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  position:relative;
+}
+.profile-cover-upload{
+  position:absolute;bottom:10px;right:10px;
+  width:32px;height:32px;background:rgba(0,0,0,0.5);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:0.8rem;cursor:pointer;
+}
+.profile-header-info{
+  padding:0 16px;position:relative;
+}
+.profile-avatar-wrap{
+  width:80px;height:80px;margin-top:-40px;
+  border-radius:50%;border:4px solid var(--bg);
+  position:relative;overflow:hidden;cursor:pointer;
+}
+.profile-avatar-wrap img{width:100%;height:100%;object-fit:cover}
+.profile-avatar-upload{
+  position:absolute;inset:0;background:rgba(0,0,0,0.4);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.2rem;opacity:0;transition:opacity var(--transition);
+}
+.profile-avatar-wrap:hover .profile-avatar-upload{opacity:1}
+.profile-name-row{
+  display:flex;align-items:center;gap:8px;margin-top:10px;
+}
+.profile-name-row h2{font-size:1.2rem;font-weight:800}
+.verified-badge{
+  width:20px;height:20px;background:var(--accent);
+  border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;font-size:0.6rem;
+}
+.profile-bio{color:var(--fg2);font-size:0.85rem;margin-top:6px;line-height:1.4}
+.profile-website{color:var(--accent);font-size:0.82rem;margin-top:4px;font-weight:500}
+.profile-stats-row{
+  display:flex;gap:20px;margin-top:14px;
+}
+.profile-stat-item{text-align:center}
+.profile-stat-item .ps-val{font-weight:800;font-size:1.05rem}
+.profile-stat-item .ps-lbl{font-size:0.72rem;color:var(--fg2)}
+.profile-actions{
+  display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;
+}
+.profile-actions .pa-btn{
+  flex:1;min-width:100px;padding:10px;
+  border-radius:var(--radius-sm);font-weight:600;font-size:0.82rem;
+  text-align:center;border:1px solid var(--border);background:var(--card);
+  transition:all var(--transition);
+}
+.profile-actions .pa-btn:hover{border-color:var(--accent);color:var(--accent)}
+.profile-actions .pa-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.profile-shortcuts{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  padding:16px;
+}
+.profile-shortcut{
+  display:flex;align-items:center;gap:10px;
+  padding:14px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);cursor:pointer;
+  transition:all var(--transition);
+}
+.profile-shortcut:hover{border-color:var(--accent)}
+.profile-shortcut i{font-size:1.2rem;color:var(--accent)}
+.profile-shortcut .psc-text{font-weight:600;font-size:0.85rem}
+.profile-shortcut .psc-sub{font-size:0.7rem;color:var(--fg2)}
+.profile-posts-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+  padding:0 2px;
+}
+.profile-post-thumb{
+  aspect-ratio:1;overflow:hidden;cursor:pointer;
+  position:relative;
+}
+.profile-post-thumb img,.profile-post-thumb video{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform 0.3s;
+}
+.profile-post-thumb:hover img,.profile-post-thumb:hover video{transform:scale(1.05)}
+.profile-post-thumb .ppt-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,0.3);
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  color:#fff;font-weight:700;font-size:0.85rem;
+  opacity:0;transition:opacity var(--transition);
+}
+.profile-post-thumb:hover .ppt-overlay{opacity:1}
+
+/* ============================================
+   MODALS
+   ============================================ */
+.modal-overlay{
+  position:fixed;inset:0;background:var(--overlay);
+  z-index:200;display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal-sheet{
+  width:100%;max-width:480px;max-height:80dvh;
+  background:var(--card);border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  padding:0;overflow:hidden;
+  transform:translateY(100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);
+}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{
+  width:36px;height:4px;background:var(--fg3);border-radius:2px;
+  margin:10px auto;
+}
+.modal-header{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-header h3{font-weight:700;font-size:1rem}
+.modal-header button{color:var(--fg2);font-size:1.2rem}
+.modal-body{padding:16px;overflow-y:auto;max-height:60dvh}
+.modal-center{
+  align-items:center !important;
+}
+.modal-center .modal-sheet{
+  border-radius:var(--radius-lg);margin:16px;
+  max-height:90dvh;
+}
+
+/* Comments */
+.comment-input-row{
+  display:flex;gap:8px;padding:12px 16px;
+  border-top:1px solid var(--border);
+  background:var(--card);
+}
+.comment-input-row input{flex:1}
+.comment-input-row button{
+  padding:0 16px;background:var(--accent);color:#fff;
+  border-radius:var(--radius-sm);font-weight:600;font-size:0.85rem;
+}
+.comment-item{
+  display:flex;gap:10px;margin-bottom:16px;
+}
+.comment-item .ci-pic{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.comment-item .ci-body{flex:1}
+.comment-item .ci-name{font-weight:700;font-size:0.82rem}
+.comment-item .ci-text{font-size:0.85rem;color:var(--fg2);margin-top:2px;line-height:1.3}
+.comment-item .ci-meta{font-size:0.7rem;color:var(--fg3);margin-top:4px;display:flex;gap:12px}
+.comment-item .ci-like{cursor:pointer;color:var(--fg3);font-size:0.75rem}
+.comment-item .ci-like.liked{color:var(--accent)}
+
+/* ============================================
+   TOAST
+   ============================================ */
+.toast-container{
+  position:fixed;top:calc(var(--header-h) + 8px);left:16px;right:16px;
+  z-index:300;display:flex;flex-direction:column;gap:8px;
+  pointer-events:none;
+}
+.toast{
+  padding:12px 16px;border-radius:var(--radius);
+  background:var(--glass);backdrop-filter:blur(16px);
+  border:1px solid var(--border);
+  font-size:0.85rem;font-weight:500;
+  display:flex;align-items:center;gap:10px;
+  animation:toastIn 0.3s ease,toastOut 0.3s ease 2.7s forwards;
+  pointer-events:auto;box-shadow:var(--shadow);
+}
+.toast i{font-size:1.1rem}
+.toast.success i{color:var(--success)}
+.toast.error i{color:var(--danger)}
+.toast.info i{color:var(--accent)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-10px)}}
+
+/* ============================================
+   LOADING SPINNER
+   ============================================ */
+.spinner{
+  width:32px;height:32px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-screen{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;z-index:999;transition:opacity 0.4s;
+}
+.loading-screen.hidden{opacity:0;pointer-events:none}
+.loading-screen .ls-logo{
+  font-size:2rem;font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.empty-state{
+  text-align:center;padding:60px 20px;color:var(--fg2);
+}
+.empty-state i{font-size:3rem;color:var(--fg3);margin-bottom:16px;display:block}
+.empty-state h3{font-size:1.1rem;font-weight:700;color:var(--fg);margin-bottom:6px}
+.empty-state p{font-size:0.85rem}
+
+/* ============================================
+   SHARE MENU
+   ============================================ */
+.share-options{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.share-opt{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;font-size:0.72rem;color:var(--fg2);
+}
+.share-opt .so-icon{
+  width:52px;height:52px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;transition:transform var(--transition);
+}
+.share-opt:active .so-icon{transform:scale(0.9)}
+
+/* ============================================
+   QR CODE
+   ============================================ */
+.qr-modal canvas{margin:0 auto;display:block}
+
+/* ============================================
+   ADMIN PANEL
+   ============================================ */
+.admin-layout{display:flex;height:100dvh}
+.admin-sidebar{
+  width:220px;background:var(--card);border-right:1px solid var(--border);
+  padding:16px 0;overflow-y:auto;flex-shrink:0;display:none;
+}
+@media(min-width:768px){.admin-sidebar{display:block}}
+.admin-sidebar .as-logo{
+  padding:0 16px 20px;font-weight:800;font-size:1.1rem;
+  border-bottom:1px solid var(--border);margin-bottom:12px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.admin-nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;font-size:0.85rem;font-weight:500;
+  color:var(--fg2);cursor:pointer;transition:all var(--transition);
+  border-left:3px solid transparent;
+}
+.admin-nav-item:hover{color:var(--fg);background:var(--accent-bg)}
+.admin-nav-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-bg)}
+.admin-nav-item i{width:18px;text-align:center}
+.admin-main{flex:1;overflow-y:auto;padding:20px}
+.admin-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;margin-bottom:16px;
+}
+.admin-card h3{font-weight:700;margin-bottom:12px;font-size:1rem}
+.admin-stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.admin-stat-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;
+}
+.admin-stat-card .asc-label{font-size:0.75rem;color:var(--fg2);margin-bottom:4px}
+.admin-stat-card .asc-val{font-size:1.6rem;font-weight:800}
+.admin-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+.admin-table th{
+  text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);
+  color:var(--fg2);font-weight:600;font-size:0.78rem;text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+.admin-table td{padding:10px 12px;border-bottom:1px solid var(--border)}
+.admin-table tr:hover td{background:var(--accent-bg)}
+.admin-badge{
+  display:inline-block;padding:2px 8px;border-radius:10px;
+  font-size:0.72rem;font-weight:600;
+}
+.admin-badge.success{background:rgba(0,214,143,0.15);color:var(--success)}
+.admin-badge.warning{background:rgba(255,170,0,0.15);color:var(--warning)}
+.admin-badge.danger{background:rgba(255,59,92,0.15);color:var(--danger)}
+.admin-btn{
+  padding:6px 14px;border-radius:var(--radius-sm);font-size:0.78rem;
+  font-weight:600;border:1px solid var(--border);background:var(--card);
+  transition:all var(--transition);cursor:pointer;
+}
+.admin-btn:hover{border-color:var(--accent);color:var(--accent)}
+.admin-btn.danger{border-color:var(--danger);color:var(--danger)}
+.admin-mobile-toggle{
+  display:block;padding:10px 16px;font-size:1.1rem;
+}
+@media(min-width:768px){.admin-mobile-toggle{display:none}}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skeleton{
+  background:linear-gradient(90deg,var(--border) 25%,var(--card2) 50%,var(--border) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:var(--radius-sm);
+}
+
+/* Theme toggle in header */
+.theme-toggle{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;transition:all var(--transition);cursor:pointer;
+}
+.theme-toggle:hover{background:var(--accent-bg)}
+
+/* Notification badge */
+.notif-badge{
+  position:absolute;top:2px;right:2px;
+  width:8px;height:8px;background:var(--accent);
+  border-radius:50%;border:2px solid var(--bg);
+}
+
+/* Report modal */
+.report-reasons{display:flex;flex-direction:column;gap:8px}
+.report-reason{
+  padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  cursor:pointer;transition:all var(--transition);font-size:0.85rem;
+}
+.report-reason:hover{border-color:var(--accent);background:var(--accent-bg)}
+.report-reason.selected{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:600}
+
+/* Mobile admin nav overlay */
+.admin-nav-overlay{
+  position:fixed;inset:0;background:var(--overlay);z-index:150;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.admin-nav-overlay.open{opacity:1;pointer-events:auto}
+
+/* Withdraw modal */
+.withdraw-form .form-group{margin-bottom:12px}
+.withdraw-form .min-note{font-size:0.72rem;color:var(--fg3);margin-top:4px}
+
+/* Edit profile modal */
+.edit-avatar-preview{
+  width:80px;height:80px;border-radius:50%;object-fit:cover;
+  margin:0 auto 16px;display:block;border:3px solid var(--border);
+}
 </style>
 </head>
 <body>
-<div class="app">
-<div class="atm"><div class="o"></div><div class="o"></div></div>
-<div class="pg" id="feed">
-<div class="tb"><div class="lg"><div class="dt"></div>InstaGram</div><div class="ta"><button onclick="toast('No notifications','in')"><i class="far fa-bell"></i></button><button onclick="toast('No messages','in')"><i class="far fa-paper-plane"></i></button></div></div>
-<div id="pFeed"><div class="ef"><i class="fas fa-spinner fa-spin"></i><p>Loading posts from database...</p></div></div>
+
+<!-- ============================================
+     LOADING SCREEN
+     ============================================ -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="ls-logo">ReelGram</div>
+  <div class="spinner"></div>
 </div>
-<nav class="bn" role="navigation">
-<a class="ni on" href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
-<a class="ni" href="wallet.html"><i class="fas fa-wallet"></i><span>Wallet</span></a>
-<a class="ni ub" href="upload.html"><div class="uw"><i class="fas fa-plus"></i></div><span>Upload</span></a>
-<a class="ni" href="referral.html"><i class="fas fa-gift"></i><span>Invite</span></a>
-<a class="ni" href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a>
-</nav>
-<div class="mov" id="mOv" onclick="clMod(event)"><div class="msh" id="mSh" onclick="event.stopPropagation()"><div class="mhd"></div><div id="mCtn"></div></div></div>
-<div class="tc" id="tCtn"></div>
+
+<!-- ============================================
+     TOAST CONTAINER
+     ============================================ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============================================
+     APP SHELL
+     ============================================ -->
+<div id="app">
+
+  <!-- Header -->
+  <header class="app-header" id="appHeader">
+    <div class="logo" id="headerLogo">ReelGram</div>
+    <span class="header-title" id="headerTitle" style="display:none"></span>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme"><i class="fas fa-moon"></i></button>
+      <button id="notifBtn" style="position:relative"><i class="fas fa-bell"></i><span class="notif-badge" id="notifBadge" style="display:none"></span></button>
+      <button id="adminBtn" style="display:none"><i class="fas fa-shield-halved"></i></button>
+    </div>
+  </header>
+
+  <!-- ===== HOME PAGE ===== -->
+  <div class="page active" id="page-home">
+    <div class="reels-container" id="reelsContainer"></div>
+  </div>
+
+  <!-- ===== UPLOAD PAGE ===== -->
+  <div class="page" id="page-upload">
+    <div class="upload-page" style="max-width:480px;margin:0 auto">
+      <div class="upload-tabs">
+        <button class="upload-tab active" data-tab="image"><i class="fas fa-image"></i> Image</button>
+        <button class="upload-tab" data-tab="video"><i class="fas fa-video"></i> Video</button>
+      </div>
+
+      <!-- Image Upload Section -->
+      <div class="upload-section active" id="uploadImageSection">
+        <div class="upload-dropzone" id="imageDropzone">
+          <i class="fas fa-cloud-arrow-up"></i>
+          <p>Tap to select an image</p>
+          <input type="file" accept="image/*" id="imageFileInput">
+        </div>
+        <div class="upload-preview" id="imagePreview"></div>
+        <div class="url-input-group">
+          <label>Or paste Image URL</label>
+          <input type="url" id="imageUrlInput" placeholder="https://example.com/image.jpg">
+        </div>
+        <div class="form-group">
+          <label>Caption</label>
+          <textarea id="imageCaption" placeholder="Write a caption..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Hashtags</label>
+          <input type="text" id="imageHashtags" placeholder="trending, viral, reels">
+        </div>
+        <div class="toggle-row">
+          <span>Visibility</span>
+          <div class="toggle on" id="imageVisibility" data-value="public"></div>
+        </div>
+        <div class="toggle-row">
+          <span>Comments</span>
+          <div class="toggle on" id="imageComments" data-value="on"></div>
+        </div>
+        <button class="btn-primary" id="postImageBtn">Post Image</button>
+        <div class="upload-progress" id="imageProgress"><div class="upload-progress-bar"></div></div>
+      </div>
+
+      <!-- Video Upload Section -->
+      <div class="upload-section" id="uploadVideoSection">
+        <div class="url-input-group">
+          <label>Thumbnail Image URL</label>
+          <input type="url" id="thumbUrlInput" placeholder="https://example.com/thumb.jpg">
+        </div>
+        <div class="upload-dropzone" id="thumbDropzone" style="margin-bottom:12px">
+          <i class="fas fa-image"></i>
+          <p>Or select thumbnail</p>
+          <input type="file" accept="image/*" id="thumbFileInput">
+        </div>
+        <div class="upload-preview" id="thumbPreview"></div>
+        <div class="upload-dropzone" id="videoDropzone">
+          <i class="fas fa-film"></i>
+          <p>Tap to select a video</p>
+          <input type="file" accept="video/*" id="videoFileInput">
+        </div>
+        <video class="upload-preview" id="videoPreview" controls></video>
+        <div class="url-input-group">
+          <label>Or paste Video URL</label>
+          <input type="url" id="videoUrlInput" placeholder="https://example.com/video.mp4">
+        </div>
+        <div class="form-group">
+          <label>Caption</label>
+          <textarea id="videoCaption" placeholder="Write a caption..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Hashtags</label>
+          <input type="text" id="videoHashtags" placeholder="trending, viral, reels">
+        </div>
+        <div class="toggle-row">
+          <span>Visibility</span>
+          <div class="toggle on" id="videoVisibility" data-value="public"></div>
+        </div>
+        <div class="toggle-row">
+          <span>Comments</span>
+          <div class="toggle on" id="videoComments" data-value="on"></div>
+        </div>
+        <button class="btn-primary" id="postVideoBtn">Post Video</button>
+        <div class="upload-progress" id="videoProgress"><div class="upload-progress-bar"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== WALLET PAGE ===== -->
+  <div class="page" id="page-wallet">
+    <div class="wallet-page" style="max-width:480px;margin:0 auto">
+      <div class="wallet-card">
+        <div class="label">Available Balance</div>
+        <div class="amount"><span class="curr">$</span><span id="walletBalance">0.00</span></div>
+        <div class="wallet-stats">
+          <div class="wallet-stat">
+            <div class="ws-label">Total Earnings</div>
+            <div class="ws-value" id="walletEarnings">$0.00</div>
+          </div>
+          <div class="wallet-stat">
+            <div class="ws-label">Pending</div>
+            <div class="ws-value" id="walletPending">$0.00</div>
+          </div>
+        </div>
+      </div>
+      <div class="wallet-actions">
+        <button class="wallet-btn primary" id="withdrawBtn"><i class="fas fa-arrow-up-from-bracket"></i> Withdraw</button>
+        <button class="wallet-btn" id="walletHistoryBtn"><i class="fas fa-clock-rotate-left"></i> History</button>
+      </div>
+      <div class="section-title"><i class="fas fa-arrow-right-arrow-left"></i> Recent Transactions</div>
+      <div class="txn-list" id="txnList"></div>
+    </div>
+  </div>
+
+  <!-- ===== REFERRAL PAGE ===== -->
+  <div class="page" id="page-referral">
+    <div class="referral-page" style="max-width:480px;margin:0 auto">
+      <div class="referral-hero">
+        <div class="rh-icon"><i class="fas fa-gift"></i></div>
+        <h2>Invite Friends, Earn Rewards</h2>
+        <p>Share your referral code and earn $0.50 for each friend who joins</p>
+        <div class="referral-code-box">
+          <input type="text" id="refCodeDisplay" readonly>
+          <button id="copyRefCodeBtn"><i class="fas fa-copy"></i></button>
+        </div>
+        <div class="referral-link-box">
+          <input type="text" id="refLinkDisplay" readonly>
+          <button id="copyRefLinkBtn"><i class="fas fa-copy"></i></button>
+        </div>
+      </div>
+      <div class="ref-stats">
+        <div class="ref-stat">
+          <div class="rs-val" id="refTotalCount">0</div>
+          <div class="rs-lbl">Total Referrals</div>
+        </div>
+        <div class="ref-stat">
+          <div class="rs-val" id="refEarnings">$0.00</div>
+          <div class="rs-lbl">Referral Earnings</div>
+        </div>
+        <div class="ref-stat">
+          <div class="rs-val" id="refActiveCount">0</div>
+          <div class="rs-lbl">Active</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:24px">
+        <button class="wallet-btn primary" style="flex:1" id="shareRefBtn"><i class="fas fa-share-nodes"></i> Share Invite</button>
+      </div>
+      <div class="section-title"><i class="fas fa-trophy"></i> Leaderboard</div>
+      <div id="leaderboardList"></div>
+      <div class="section-title" style="margin-top:20px"><i class="fas fa-users"></i> Referral History</div>
+      <div id="refHistoryList"></div>
+    </div>
+  </div>
+
+  <!-- ===== PROFILE PAGE ===== -->
+  <div class="page" id="page-profile">
+    <div class="profile-page">
+      <div class="profile-cover" id="profileCover">
+        <div class="profile-cover-upload" id="coverUploadBtn"><i class="fas fa-camera"></i></div>
+        <input type="file" accept="image/*" id="coverFileInput" style="display:none">
+      </div>
+      <div class="profile-header-info">
+        <div class="profile-avatar-wrap" id="avatarWrap">
+          <img id="profileAvatar" src="https://picsum.photos/seed/defaultavatar/200/200.jpg" alt="Avatar">
+          <div class="profile-avatar-upload"><i class="fas fa-camera"></i></div>
+          <input type="file" accept="image/*" id="avatarFileInput" style="display:none;position:absolute;inset:0;opacity:0;cursor:pointer">
+        </div>
+        <div class="profile-name-row">
+          <h2 id="profileName">User</h2>
+          <span class="verified-badge" id="verifiedBadge" style="display:none"><i class="fas fa-check"></i></span>
+        </div>
+        <div class="profile-bio" id="profileBio"></div>
+        <div class="profile-website" id="profileWebsite" style="display:none"></div>
+        <div class="profile-stats-row">
+          <div class="profile-stat-item"><div class="ps-val" id="profilePosts">0</div><div class="ps-lbl">Posts</div></div>
+          <div class="profile-stat-item"><div class="ps-val" id="profileFollowers">0</div><div class="ps-lbl">Followers</div></div>
+          <div class="profile-stat-item"><div class="ps-val" id="profileFollowing">0</div><div class="ps-lbl">Following</div></div>
+        </div>
+        <div class="profile-actions">
+          <button class="pa-btn primary" id="editProfileBtn"><i class="fas fa-pen"></i> Edit Profile</button>
+          <button class="pa-btn" id="shareProfileBtn"><i class="fas fa-share"></i> Share</button>
+          <button class="pa-btn" id="qrProfileBtn"><i class="fas fa-qrcode"></i> QR</button>
+        </div>
+      </div>
+      <div class="profile-shortcuts">
+        <div class="profile-shortcut" id="walletShortcut">
+          <i class="fas fa-wallet"></i>
+          <div><div class="psc-text">Wallet</div><div class="psc-sub" id="walletShortcutBal">$0.00</div></div>
+        </div>
+        <div class="profile-shortcut" id="referralShortcut">
+          <i class="fas fa-gift"></i>
+          <div><div class="psc-text">Referral</div><div class="psc-sub" id="refShortcutCount">0 referrals</div></div>
+        </div>
+      </div>
+      <div class="section-title" style="padding:0 16px;margin-bottom:12px"><i class="fas fa-grid-2"></i> Posts</div>
+      <div class="profile-posts-grid" id="profilePostsGrid"></div>
+      <div class="empty-state" id="profileEmptyState" style="display:none">
+        <i class="fas fa-camera-retro"></i>
+        <h3>No Posts Yet</h3>
+        <p>Share your first reel to get started</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN PAGE ===== -->
+  <div class="page" id="page-admin">
+    <div class="admin-layout">
+      <div class="admin-nav-overlay" id="adminNavOverlay"></div>
+      <aside class="admin-sidebar" id="adminSidebar">
+        <div class="as-logo">ReelGram Admin</div>
+        <div class="admin-nav-item active" data-admin="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</div>
+        <div class="admin-nav-item" data-admin="users"><i class="fas fa-users"></i> Users</div>
+        <div class="admin-nav-item" data-admin="posts"><i class="fas fa-images"></i> Posts</div>
+        <div class="admin-nav-item" data-admin="reels"><i class="fas fa-film"></i> Reels</div>
+        <div class="admin-nav-item" data-admin="comments"><i class="fas fa-comments"></i> Comments</div>
+        <div class="admin-nav-item" data-admin="reports"><i class="fas fa-flag"></i> Reports</div>
+        <div class="admin-nav-item" data-admin="wallet"><i class="fas fa-wallet"></i> Wallet</div>
+        <div class="admin-nav-item" data-admin="withdrawals"><i class="fas fa-money-bill-transfer"></i> Withdrawals</div>
+        <div class="admin-nav-item" data-admin="referrals"><i class="fas fa-gift"></i> Referrals</div>
+        <div class="admin-nav-item" data-admin="announcements"><i class="fas fa-bullhorn"></i> Announcements</div>
+        <div class="admin-nav-item" data-admin="ads"><i class="fas fa-rectangle-ad"></i> Advertisements</div>
+        <div class="admin-nav-item" data-admin="roles"><i class="fas fa-user-shield"></i> Roles</div>
+        <div class="admin-nav-item" data-admin="settings"><i class="fas fa-gear"></i> Settings</div>
+        <div class="admin-nav-item" data-admin="analytics"><i class="fas fa-chart-line"></i> Analytics</div>
+        <div class="admin-nav-item" data-admin="logs"><i class="fas fa-scroll"></i> Logs</div>
+        <div class="admin-nav-item" data-admin="backup"><i class="fas fa-database"></i> Backup</div>
+        <div class="admin-nav-item" data-admin="maintenance"><i class="fas fa-wrench"></i> Maintenance</div>
+      </aside>
+      <main class="admin-main" id="adminMain">
+        <button class="admin-mobile-toggle" id="adminMobileToggle"><i class="fas fa-bars"></i></button>
+        <!-- Admin content loaded dynamically -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-item active" data-page="home"><i class="fas fa-house"></i><span>Home</span></button>
+    <button class="nav-item" data-page="upload"><i class="fas fa-plus-circle"></i><span>Upload</span></button>
+    <button class="nav-item" data-page="wallet"><i class="fas fa-wallet"></i><span>Wallet</span></button>
+    <button class="nav-item" data-page="referral"><i class="fas fa-gift"></i><span>Referral</span></button>
+    <button class="nav-item" data-page="profile"><i class="fas fa-user"></i><span>Profile</span></button>
+  </nav>
 </div>
+
+<!-- ============================================
+     MODALS
+     ============================================ -->
+
+<!-- Comments Modal -->
+<div class="modal-overlay" id="commentsModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>Comments</h3><button onclick="closeModal('commentsModal')"><i class="fas fa-xmark"></i></button></div>
+    <div class="modal-body" id="commentsBody"></div>
+    <div class="comment-input-row">
+      <input type="text" id="commentInput" placeholder="Add a comment...">
+      <button id="postCommentBtn">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>Share</h3><button onclick="closeModal('shareModal')"><i class="fas fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="share-options">
+        <div class="share-opt" data-share="telegram"><div class="so-icon" style="background:#2AABEE;color:#fff"><i class="fab fa-telegram"></i></div>Telegram</div>
+        <div class="share-opt" data-share="whatsapp"><div class="so-icon" style="background:#25D366;color:#fff"><i class="fab fa-whatsapp"></i></div>WhatsApp</div>
+        <div class="share-opt" data-share="twitter"><div class="so-icon" style="background:#1DA1F2;color:#fff"><i class="fab fa-x-twitter"></i></div>X</div>
+        <div class="share-opt" data-share="copy"><div class="so-icon" style="background:var(--border);color:var(--fg)"><i class="fas fa-link"></i></div>Copy Link</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div class="modal-overlay modal-center" id="reportModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>Report</h3><button onclick="closeModal('reportModal')"><i class="fas fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="report-reasons" id="reportReasons">
+        <div class="report-reason" data-reason="spam">Spam</div>
+        <div class="report-reason" data-reason="nudity">Nudity or sexual content</div>
+        <div class="report-reason" data-reason="hate">Hate speech</div>
+        <div class="report-reason" data-reason="violence">Violence or harmful content</div>
+        <div class="report-reason" data-reason="copyright">Copyright violation</div>
+        <div class="report-reason" data-reason="other">Other</div>
+      </div>
+      <button class="btn-primary" id="submitReportBtn" style="margin-top:16px" disabled>Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div class="modal-overlay modal-center" id="withdrawModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>Withdraw</h3><button onclick="closeModal('withdrawModal')"><i class="fas fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="withdraw-form">
+        <div class="form-group">
+          <label>Amount ($)</label>
+          <input type="number" id="withdrawAmount" placeholder="0.00" min="1" step="0.01">
+          <div class="min-note">Minimum withdrawal: $10.00</div>
+        </div>
+        <div class="form-group">
+          <label>Method</label>
+          <select id="withdrawMethod">
+            <option value="usdt_trc20">USDT (TRC20)</option>
+            <option value="usdt_erc20">USDT (ERC20)</option>
+            <option value="bank">Bank Transfer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Wallet Address / Account Details</label>
+          <textarea id="withdrawAddress" placeholder="Enter your wallet address" rows="2"></textarea>
+        </div>
+        <button class="btn-primary" id="submitWithdrawBtn">Submit Withdrawal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay modal-center" id="editProfileModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>Edit Profile</h3><button onclick="closeModal('editProfileModal')"><i class="fas fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <img class="edit-avatar-preview" id="editAvatarPreview" src="https://picsum.photos/seed/defaultavatar/200/200.jpg" alt="">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="editUsername" placeholder="username">
+      </div>
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea id="editBio" placeholder="Tell us about yourself" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Website</label>
+        <input type="url" id="editWebsite" placeholder="https://yoursite.com">
+      </div>
+      <button class="btn-primary" id="saveProfileBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal-overlay modal-center" id="qrModal">
+  <div class="modal-sheet qr-modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>QR Code</h3><button onclick="closeModal('qrModal')"><i class="fas fa-xmark"></i></button></div>
+    <div class="modal-body" style="text-align:center">
+      <canvas id="qrCanvas"></canvas>
+      <p style="margin-top:12px;font-size:0.82rem;color:var(--fg2)">Scan to visit this profile</p>
+    </div>
+  </div>
+</div>
+
+<!-- Notifications Modal -->
+<div class="modal-overlay" id="notifModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>Notifications</h3><button onclick="closeModal('notifModal')"><i class="fas fa-xmark"></i></button></div>
+    <div class="modal-body" id="notifBody"></div>
+  </div>
+</div>
+
 <script>
-firebase.initializeApp({apiKey:"AIzaSyAmQxNPKANzO8hEng5pdpAR3t7DJtwkG7U",authDomain:"aibmodel.firebaseapp.com",databaseURL:"https://aibmodel-default-rtdb.firebaseio.com",projectId:"aibmodel",storageBucket:"aibmodel.firebasestorage.app",messagingSenderId:"572663832515",appId:"1:572663832515:web:3fea2dac685b9b5f646776"});
-const db=firebase.database(),$=id=>document.getElementById(id);
-const fmN=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'K':n.toString();
-const fmL=n=>n>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'K':n.toString();
-function toast(m,t='in'){const c=$('tCtn'),e=document.createElement('div');e.className='to '+t;e.innerHTML='<i class="fas fa-info-circle"></i> '+m;c.appendChild(e);setTimeout(()=>e.remove(),3000)}
-function opMod(){$('mOv').classList.add('sh')}
-function clMod(e){if(e&&e.target!==$('mOv'))return;$('mOv').classList.remove('sh')}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')clMod({target:$('mOv')})});
-function timeAgo(ts){if(!ts)return'';const d=Date.now()-ts,m=Math.floor(d/60000),h=Math.floor(d/3600000),dy=Math.floor(d/86400000);if(m<1)return'now';if(m<60)return m+'m';if(h<24)return h+'h';if(dy<7)return dy+'d';return new Date(ts).toLocaleDateString()}
+/* ============================================
+   INDEXEDDB DATABASE LAYER
+   (模拟 PHP+MySQL 后端，所有数据存储在浏览器 IndexedDB 中)
+   ============================================ */
+class DB {
+  constructor() {
+    this.dbName = 'ReelGramDB';
+    this.dbVersion = 3;
+    this.db = null;
+  }
 
-let UID='',CU={username:'',displayName:'',avatar:''};
+  /* 初始化数据库 */
+  init() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(this.dbName, this.dbVersion);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        const stores = [
+          { name: 'users', keyPath: 'id', indexes: [['telegram_id','telegram_id',{unique:false}],['session_id','session_id',{unique:false}]] },
+          { name: 'posts', keyPath: 'id', indexes: [['user_id','user_id',{unique:false}],['type','type',{unique:false}],['created_at','created_at',{unique:false}]] },
+          { name: 'comments', keyPath: 'id', indexes: [['post_id','post_id',{unique:false}],['user_id','user_id',{unique:false}]] },
+          { name: 'likes', keyPath: 'id', indexes: [['post_id','post_id',{unique:false}],['user_id','user_id',{unique:false}]] },
+          { name: 'saves', keyPath: 'id', indexes: [['post_id','post_id',{unique:false}],['user_id','user_id',{unique:false}]] },
+          { name: 'follows', keyPath: 'id', indexes: [['follower_id','follower_id',{unique:false}],['following_id','following_id',{unique:false}]] },
+          { name: 'transactions', keyPath: 'id', indexes: [['user_id','user_id',{unique:false}],['type','type',{unique:false}]] },
+          { name: 'withdrawals', keyPath: 'id', indexes: [['user_id','user_id',{unique:false}],['status','status',{unique:false}]] },
+          { name: 'referrals', keyPath: 'id', indexes: [['referrer_id','referrer_id',{unique:false}],['referred_id','referred_id',{unique:false}],['code','code',{unique:true}]] },
+          { name: 'reports', keyPath: 'id', indexes: [['post_id','post_id',{unique:false}],['user_id','user_id',{unique:false}],['status','status',{unique:false}]] },
+          { name: 'notifications', keyPath: 'id', indexes: [['user_id','user_id',{unique:false}],['read','read',{unique:false}]] },
+          { name: 'stats', keyPath: 'key' },
+          { name: 'settings', keyPath: 'key' },
+          { name: 'logs', keyPath: 'id', indexes: [['type','type',{unique:false}],['created_at','created_at',{unique:false}]] },
+          { name: 'announcements', keyPath: 'id' },
+          { name: 'ads', keyPath: 'id' },
+        ];
+        stores.forEach(s => {
+          if (!db.objectStoreNames.contains(s.name)) {
+            const store = db.createObjectStore(s.name, { keyPath: s.keyPath, autoIncrement: true });
+            s.indexes.forEach(idx => {
+              if (!store.indexNames.contains(idx[0])) store.createIndex(idx[0], idx[0], idx[2]);
+            });
+          }
+        });
+      };
+      req.onsuccess = (e) => { this.db = e.target.result; resolve(); };
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
 
-function registerUser(){
-  let sid=null;
-  try{sid=localStorage.getItem('igram_uid')}catch(e){}
-  if(sid){
-    UID=sid;
-    db.ref('users/'+UID).once('value').then(snap=>{
-      if(snap.exists()){
-        const u=snap.val();
-        CU={username:u.username||'user',displayName:u.displayName||'User',avatar:u.avatar||''};
-        loadHome();
-      } else {
-        createNewUser();
-      }
-    }).catch(()=>createNewUser());
-  } else {
-    createNewUser();
+  /* 通用事务辅助 */
+  _tx(store, mode) {
+    const tx = this.db.transaction(store, mode);
+    return tx.objectStore(store);
+  }
+
+  _promisify(req) {
+    return new Promise((resolve, reject) => {
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async add(store, data) {
+    return this._promisify(this._tx(store, 'readwrite').add(data));
+  }
+
+  async put(store, data) {
+    return this._promisify(this._tx(store, 'readwrite').put(data));
+  }
+
+  async get(store, key) {
+    return this._promisify(this._tx(store, 'readonly').get(key));
+  }
+
+  async getAll(store) {
+    return this._promisify(this._tx(store, 'readonly').getAll());
+  }
+
+  async getByIndex(store, indexName, value) {
+    return this._promisify(this._tx(store, 'readonly').index(indexName).getAll(value));
+  }
+
+  async getOneByIndex(store, indexName, value) {
+    return this._promisify(this._tx(store, 'readonly').index(indexName).get(value));
+  }
+
+  async delete(store, key) {
+    return this._promisify(this._tx(store, 'readwrite').delete(key));
+  }
+
+  async count(store) {
+    return this._promisify(this._tx(store, 'readonly').count());
+  }
+
+  async countByIndex(store, indexName, value) {
+    return this._promisify(this._tx(store, 'readonly').index(indexName).count(value));
+  }
+
+  /* 生成唯一ID */
+  genId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+  }
+
+  /* 生成推荐码 */
+  genRefCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return code;
   }
 }
 
-function createNewUser(){
-  UID='u_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);
-  const un='user_'+Math.random().toString(36).substr(2,6);
-  CU={username:un,displayName:'New User',avatar:''};
-  db.ref('users/'+UID).set({
-    username:un,
-    displayName:'New User',
-    avatar:'',
-    bio:'',
-    website:'',
-    createdAt: Date.now(),
-    lastSeen: Date.now(),
-    platform: detectPlatform()
-  });
-  db.ref('stats/totalUsers').transaction(v=>(v||0)+1);
-  db.ref('wallet/'+UID+'/balance').set(15);
-  db.ref('wallet/'+UID+'/transactions').push({
-    title:'Welcome Bonus',
-    amount:15,
-    type:'income',
-    icon:'fa-gift',
-    color:'var(--ok)',
-    timestamp: Date.now()
-  });
-  try{localStorage.setItem('igram_uid',UID)}catch(e){}
-  loadHome();
+/* ============================================
+   全局状态
+   ============================================ */
+const db = new DB();
+let currentUser = null;
+let currentPage = 'home';
+let currentReelIndex = 0;
+let reelsData = [];
+let activeVideoElements = [];
+let currentCommentPostId = null;
+let currentReportPostId = null;
+let selectedReportReason = null;
+let sharePostData = null;
+let isTelegram = false;
+let telegramUser = null;
+
+/* ============================================
+   工具函数
+   ============================================ */
+
+/* XSS 防护：转义 HTML */
+function esc(str) {
+  if (!str) return '';
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
 }
 
-function detectPlatform(){
-  const ua=navigator.userAgent||'';
-  if(/telegram/i.test(ua)) return 'Telegram';
-  if(/instagram/i.test(ua)) return 'Instagram';
-  if(/fb/i.test(ua)) return 'Facebook';
-  return 'Browser';
+/* 时间格式化 */
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  if (s < 2592000) return Math.floor(s / 86400) + 'd ago';
+  return new Date(ts).toLocaleDateString();
 }
 
-setInterval(()=>{
-  if(UID) db.ref('users/'+UID+'/lastSeen').set(Date.now());
-},60000);
-
-let posts=[],likedMap={},bmMap={};
-
-function loadHome(){
-  db.ref('likes/'+UID).on('value',snap=>{likedMap=snap.val()||{};renderFeed()});
-  db.ref('bookmarks/'+UID).on('value',snap=>{bmMap=snap.val()||{};renderFeed()});
-  db.ref('posts').on('value',snap=>{
-    const all=[];
-    snap.forEach(child=>{
-      if(child.val()) all.push(child.val());
-    });
-    all.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
-    posts=all;
-    renderFeed();
-  });
+/* 格式化数字 */
+function fmtNum(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toString();
 }
 
-function renderFeed(){
-  const f=$('pFeed');
-  if(!posts.length){
-    f.innerHTML='<div class="ef"><i class="fas fa-camera-retro"></i><h3>No Posts Yet</h3><p>Be the first to share something with the community.</p><a class="cb" href="upload.html"><i class="fas fa-plus" style="margin-right:8px"></i>Create Post</a></div>';
+/* 格式化金额 */
+function fmtMoney(n) {
+  return '$' + parseFloat(n || 0).toFixed(2);
+}
+
+/* 生成随机头像 */
+function randomAvatar(seed) {
+  return `https://picsum.photos/seed/${seed || Math.random().toString(36).substr(2,6)}/200/200.jpg`;
+}
+
+/* 生成随机封面图 */
+function randomCover(seed) {
+  return `https://picsum.photos/seed/${seed || Math.random().toString(36).substr(2,6)}/480/854.jpg`;
+}
+
+/* Toast 通知 */
+function toast(msg, type = 'info') {
+  const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${esc(msg)}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+/* 打开/关闭模态框 */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+/* 日志记录 */
+async function logActivity(type, detail) {
+  try {
+    await db.add('logs', { type, detail, user_id: currentUser?.id, created_at: Date.now() });
+  } catch(e) {}
+}
+
+/* 更新统计 */
+async function updateStat(key, delta = 1) {
+  try {
+    let stat = await db.get('stats', key);
+    if (!stat) { stat = { key, value: 0 }; }
+    stat.value = (stat.value || 0) + delta;
+    await db.put('stats', stat);
+  } catch(e) {}
+}
+
+async function getStat(key) {
+  try {
+    const s = await db.get('stats', key);
+    return s ? s.value : 0;
+  } catch(e) { return 0; }
+}
+
+/* 生成 QR Code（简易纯JS实现） */
+function drawQR(canvas, text) {
+  const ctx = canvas.getContext('2d');
+  const size = 200;
+  canvas.width = size;
+  canvas.height = size;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
+  /* 简易矩阵QR：用文本hash生成黑白方块 */
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash) + text.charCodeAt(i) | 0;
+  const modules = 25;
+  const cellSize = size / modules;
+  ctx.fillStyle = '#000000';
+  /* 绘制定位标记 */
+  function drawFinder(x, y) {
+    for (let r = 0; r < 7; r++) for (let c = 0; c < 7; c++) {
+      if (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) {
+        ctx.fillRect((x + c) * cellSize, (y + r) * cellSize, cellSize, cellSize);
+      }
+    }
+  }
+  drawFinder(0, 0);
+  drawFinder(modules - 7, 0);
+  drawFinder(0, modules - 7);
+  /* 用hash填充数据区域 */
+  let seed = Math.abs(hash);
+  for (let r = 0; r < modules; r++) for (let c = 0; c < modules; c++) {
+    if ((r < 8 && c < 8) || (r < 8 && c >= modules - 8) || (r >= modules - 8 && c < 8)) continue;
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    if (seed % 3 !== 0) ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+  }
+}
+
+/* ============================================
+   认证系统
+   ============================================ */
+async function authenticate() {
+  /* 检测 Telegram WebApp */
+  if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
+    isTelegram = true;
+    telegramUser = window.Telegram.WebApp.initDataUnsafe?.user || null;
+    if (telegramUser) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+      /* 查找或创建 Telegram 用户 */
+      let existing = null;
+      try { existing = await db.getOneByIndex('users', 'telegram_id', telegramUser.id.toString()); } catch(e) {}
+      if (existing) {
+        existing.last_online = Date.now();
+        existing.first_name = telegramUser.first_name || existing.first_name;
+        existing.last_name = telegramUser.last_name || existing.last_name;
+        existing.username = telegramUser.username || existing.username;
+        existing.premium = telegramUser.is_premium || false;
+        await db.put('users', existing);
+        currentUser = existing;
+      } else {
+        const refCode = db.genRefCode();
+        const userData = {
+          telegram_id: telegramUser.id.toString(),
+          username: telegramUser.username || 'user_' + telegramUser.id,
+          first_name: telegramUser.first_name || '',
+          last_name: telegramUser.last_name || '',
+          language: telegramUser.language_code || 'en',
+          premium: telegramUser.is_premium || false,
+          photo_url: telegramUser.photo_url || randomAvatar('tg' + telegramUser.id),
+          join_date: Date.now(),
+          last_online: Date.now(),
+          bio: '',
+          website: '',
+          cover_url: '',
+          balance: 0,
+          total_earnings: 0,
+          role: 'user',
+          verified: false,
+          type: 'telegram',
+          session_id: null
+        };
+        const uid = await db.add('users', userData);
+        currentUser = { ...userData, id: uid };
+        /* 创建推荐码 */
+        await db.add('referrals', { referrer_id: uid, referred_id: null, code: refCode, created_at: Date.now() });
+        await updateStat('total_users');
+        await updateStat('telegram_users');
+        await updateStat('today_users');
+        await logActivity('register', 'Telegram user registered: ' + currentUser.username);
+        /* 检查是否有推荐人 */
+        await checkReferralSignup(uid);
+      }
+      await updateStat('online_users');
+      await logActivity('login', 'Telegram login: ' + currentUser.username);
+      return;
+    }
+  }
+
+  /* 浏览器模式：自动创建/登录浏览器会话 */
+  isTelegram = false;
+  let sessionId = localStorage.getItem('rg_session');
+  if (sessionId) {
+    try {
+      let existing = await db.getOneByIndex('users', 'session_id', sessionId);
+      if (existing) {
+        existing.last_online = Date.now();
+        await db.put('users', existing);
+        currentUser = existing;
+        await updateStat('online_users');
+        await updateStat('returning_users');
+        await logActivity('login', 'Browser returning: ' + currentUser.username);
+        return;
+      }
+    } catch(e) {}
+  }
+
+  /* 新建浏览器用户 */
+  sessionId = db.genId();
+  localStorage.setItem('rg_session', sessionId);
+  const refCode = db.genRefCode();
+  const browserData = {
+    telegram_id: null,
+    username: 'browser_' + Math.random().toString(36).substr(2, 6),
+    first_name: 'Browser',
+    last_name: 'User',
+    language: navigator.language || 'en',
+    premium: false,
+    photo_url: randomAvatar('browser' + Date.now()),
+    join_date: Date.now(),
+    last_online: Date.now(),
+    bio: '',
+    website: '',
+    cover_url: '',
+    balance: 0,
+    total_earnings: 0,
+    role: 'user',
+    verified: false,
+    type: 'browser',
+    session_id: sessionId
+  };
+  const uid = await db.add('users', browserData);
+  currentUser = { ...browserData, id: uid };
+  await db.add('referrals', { referrer_id: uid, referred_id: null, code: refCode, created_at: Date.now() });
+  await updateStat('total_users');
+  await updateStat('browser_users');
+  await updateStat('today_users');
+  await updateStat('online_users');
+  await logActivity('register', 'Browser user registered: ' + currentUser.username);
+  await checkReferralSignup(uid);
+}
+
+/* 检查推荐注册 */
+async function checkReferralSignup(newUserId) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('ref');
+  if (ref) {
+    try {
+      const refEntries = await db.getByIndex('referrals', 'code', ref);
+      if (refEntries.length > 0) {
+        const referrerId = refEntries[0].referrer_id;
+        if (referrerId !== newUserId) {
+          await db.add('referrals', { referrer_id: referrerId, referred_id: newUserId, code: ref, created_at: Date.now(), earnings: 0.50 });
+          /* 给推荐人加钱 */
+          const referrer = await db.get('users', referrerId);
+          if (referrer) {
+            referrer.balance = (referrer.balance || 0) + 0.50;
+            referrer.total_earnings = (referrer.total_earnings || 0) + 0.50;
+            await db.put('users', referrer);
+            await db.add('transactions', { user_id: referrerId, type: 'credit', amount: 0.50, description: 'Referral bonus', created_at: Date.now() });
+            await db.add('notifications', { user_id: referrerId, type: 'referral', message: 'Someone joined using your referral code! +$0.50', read: false, created_at: Date.now() });
+          }
+        }
+      }
+    } catch(e) {}
+  }
+}
+
+/* ============================================
+   页面导航
+   ============================================ */
+function navigateTo(page) {
+  if (page === 'admin' && (!currentUser || currentUser.role !== 'admin')) {
+    toast('Access denied', 'error');
     return;
   }
-  f.innerHTML=posts.map(p=>{
-    const lk=!!likedMap[p.id],bk=!!bmMap[p.id];
-    const lc=p.likes+(lk?1:0);
-    const cObj=p.comments||{};
-    const cc=Object.keys(cObj).length;
-    const poster=p.posterName||p.username||'user';
-    const pav=p.posterAvatar||'';
-    const imgSrc=p.mediaType==='video'?(p.thumbnailUrl||''):p.mediaUrl;
-    return '<article class="pc"><div class="ph">'+
-      (pav?'<img class="pav" src="'+pav+'" alt="'+poster+'" loading="lazy">':'<div class="pav2">'+poster.charAt(0).toUpperCase()+'</div>')+
-      '<div class="pui"><div class="un">'+poster+'</div>'+(p.location?'<div class="lc">'+p.location+'</div>':'')+'</div>'+
-      '<button class="pmo" onclick="postMenu(\''+p.id+'\')"><i class="fas fa-ellipsis-h"></i></button></div>'+
-      '<div class="piw" ondblclick="dblLike(\''+p.id+'\')">'+
-      (p.mediaType==='video'?'<img src="'+imgSrc+'" alt="Video" loading="lazy"><div class="vb"><i class="fas fa-play"></i> Video</div>':'<img src="'+p.mediaUrl+'" alt="Post" loading="lazy">')+
-      '<i class="fas fa-heart dh" id="h-'+p.id+'"></i></div>'+
-      '<div class="pa"><div class="pl">'+
-        '<button class="'+(lk?'lk':'')+'" id="lb-'+p.id+'" onclick="togLike(\''+p.id+'\')"><i class="'+(lk?'fas':'far')+' fa-heart"></i></button>'+
-        '<button onclick="opComm(\''+p.id+'\')"><i class="far fa-comment"></i></button>'+
-        '<button onclick="shareP(\''+p.id+'\')"><i class="far fa-paper-plane"></i></button>'+
-      '</div>'+
-      '<button class="'+(bk?'bk':'')+'" id="bb-'+p.id+'" onclick="togBm(\''+p.id+'\')"><i class="'+(bk?'fas':'far')+' fa-bookmark"></i></button></div>'+
-      '<div class="plk" id="lk-'+p.id+'">'+fmL(lc)+' likes</div>'+
-      (p.caption?'<div class="pcp"><span class="cu">'+poster+'</span> '+p.caption+'</div>':'')+
-      (cc>0?'<div class="pcv" onclick="opComm(\''+p.id+'\')">View all '+cc+' comments</div>':'')+
-      '<div class="ptm">'+timeAgo(p.timestamp)+'</div></article>';
-  }).join('');
-}
-
-function togLike(pid){
-  likedMap[pid]=!likedMap[pid];
-  db.ref('likes/'+UID+'/'+pid).set(likedMap[pid]?true:null);
-  if(likedMap[pid]) db.ref('posts/'+pid+'/likes').transaction(v=>(v||0)+1);
-  else db.ref('posts/'+pid+'/likes').transaction(v=>Math.max(0,(v||0)-1));
-  const lk=likedMap[pid],btn=$('lb-'+pid),el=$('lk-'+pid);
-  if(!btn) return;
-  const ic=btn.querySelector('i');
-  if(lk){btn.classList.add('lk');ic.className='fas fa-heart';const ni=ic.cloneNode(true);btn.replaceChild(ni,ic)}
-  else{btn.classList.remove('lk');ic.className='far fa-heart'}
-  const p=posts.find(x=>x.id===pid);
-  el.textContent=fmL(p?(p.likes+(lk?1:0)):0)+' likes';
-  el.classList.add('fl');setTimeout(()=>el.classList.remove('fl'),500);
-}
-
-function dblLike(pid){
-  if(!likedMap[pid]){
-    likedMap[pid]=true;
-    db.ref('likes/'+UID+'/'+pid).set(true);
-    db.ref('posts/'+pid+'/likes').transaction(v=>(v||0)+1);
-    const btn=$('lb-'+pid);
-    if(btn){
-      btn.classList.add('lk');
-      const ic=btn.querySelector('i');
-      ic.className='fas fa-heart';
-      const ni=ic.cloneNode(true);
-      btn.replaceChild(ni,ic);
-    }
-    const p=posts.find(x=>x.id===pid);
-    const el=$('lk-'+pid);
-    if(el){el.textContent=fmL(p?(p.likes+1):0)+' likes';el.classList.add('fl');setTimeout(()=>el.classList.remove('fl'),500)}
-  }
-  const h=$('h-'+pid);
-  if(h){h.classList.remove('sh');void h.offsetWidth;h.classList.add('sh');setTimeout(()=>h.classList.remove('sh'),900)}
-}
-
-function togBm(pid){
-  bmMap[pid]=!bmMap[pid];
-  db.ref('bookmarks/'+UID+'/'+pid).set(bmMap[pid]?true:null);
-  const btn=$('bb-'+pid);if(!btn) return;
-  const ic=btn.querySelector('i');
-  if(bmMap[pid]){btn.classList.add('bk');ic.className='fas fa-bookmark'}
-  else{btn.classList.remove('bk');ic.className='far fa-bookmark'}
-  toast(bmMap[pid]?'Saved':'Removed','in');
-}
-
-function shareP(pid){
-  db.ref('posts/'+pid+'/shares').transaction(v=>(v||0)+1);
-  if(navigator.share){
-    const p=posts.find(x=>x.id===pid);
-    navigator.share({title:'Post',text:p?p.caption:''});
+  currentPage = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === page);
+  });
+  /* 更新 header */
+  const logo = document.getElementById('headerLogo');
+  const title = document.getElementById('headerTitle');
+  if (page === 'home') {
+    logo.style.display = ''; title.style.display = 'none';
+  } else if (page === 'admin') {
+    logo.style.display = 'none'; title.style.display = ''; title.textContent = 'Admin Panel';
+    document.getElementById('bottomNav').style.display = 'none';
+    document.getElementById('appHeader').style.display = 'none';
+    loadAdminSection('dashboard');
   } else {
-    toast('Link copied','su');
+    logo.style.display = 'none'; title.style.display = '';
+    const titles = { upload: 'New Post', wallet: 'Wallet', referral: 'Referral', profile: 'Profile' };
+    title.textContent = titles[page] || '';
+  }
+  if (page !== 'admin') {
+    document.getElementById('bottomNav').style.display = '';
+    document.getElementById('appHeader').style.display = '';
+  }
+  /* 页面特定加载 */
+  if (page === 'home') loadReels();
+  if (page === 'wallet') loadWallet();
+  if (page === 'referral') loadReferral();
+  if (page === 'profile') loadProfile();
+}
+
+/* ============================================
+   HOME PAGE - REELS FEED
+   ============================================ */
+
+/* 生成示例数据（首次启动时） */
+async function seedData() {
+  const count = await db.count('posts');
+  if (count > 0) return;
+
+  const creators = [
+    { name: 'alex_reels', first: 'Alex', last: 'Morgan' },
+    { name: 'sara.creates', first: 'Sara', last: 'Chen' },
+    { name: 'mike_visuals', first: 'Mike', last: 'Johnson' },
+    { name: 'luna.art', first: 'Luna', last: 'Park' },
+    { name: 'dev.dan', first: 'Dan', last: 'Williams' },
+    { name: 'nina_style', first: 'Nina', last: 'Garcia' },
+    { name: 'jay.films', first: 'Jay', last: 'Patel' },
+    { name: 'emma.daily', first: 'Emma', last: 'Taylor' },
+  ];
+
+  const captions = [
+    'Golden hour never disappoints #goldenhour #photography',
+    'City lights and late nights #cityvibes #nightlife',
+    'Creating something from nothing #art #creative',
+    'The little things matter most #mindfulness #peace',
+    'Adventure awaits around every corner #travel #explore',
+    'Good food, good mood #foodie #delicious',
+    'Behind the scenes of today shoot #bts #content',
+    'Sunset views that take your breath away #sunset #nature',
+    'Street photography is my therapy #street #urban',
+    'New skills, new possibilities #learning #growth',
+    'Minimalism at its finest #minimal #design',
+    'Life is short, make it sweet #lifestyle #vibes',
+    'Dancing through the weekend #dance #weekend',
+    'Coding late into the night #dev #programming',
+    'Morning routines that actually work #morning #productivity',
+  ];
+
+  for (let i = 0; i < creators.length; i++) {
+    const c = creators[i];
+    const userData = {
+      telegram_id: null,
+      username: c.name,
+      first_name: c.first,
+      last_name: c.last,
+      language: 'en',
+      premium: i < 3,
+      photo_url: randomAvatar(c.name),
+      join_date: Date.now() - (8 - i) * 86400000,
+      last_online: Date.now() - Math.floor(Math.random() * 3600000),
+      bio: 'Content creator | ' + c.first,
+      website: 'https://' + c.name.replace('.', '') + '.com',
+      cover_url: randomCover(c.name + 'cover'),
+      balance: Math.floor(Math.random() * 5000) / 100,
+      total_earnings: Math.floor(Math.random() * 10000) / 100,
+      role: i === 0 ? 'admin' : 'user',
+      verified: i < 4,
+      type: 'seed',
+      session_id: null
+    };
+    const uid = await db.add('users', userData);
+    await db.add('referrals', { referrer_id: uid, referred_id: null, code: db.genRefCode(), created_at: Date.now() });
+    await updateStat('total_users');
+
+    /* 每个创作者发2-3个帖子 */
+    const postCount = 2 + Math.floor(Math.random() * 2);
+    for (let j = 0; j < postCount; j++) {
+      const isVideo = Math.random() > 0.4;
+      const caption = captions[(i * 3 + j) % captions.length];
+      const postData = {
+        user_id: uid,
+        type: isVideo ? 'video' : 'image',
+        media_url: isVideo ? null : randomCover(c.name + j),
+        video_url: isVideo ? 'https://www.w3schools.com/html/mov_bbb.mp4' : null,
+        thumbnail_url: isVideo ? randomCover(c.name + j + 'thumb') : null,
+        caption: caption,
+        hashtags: caption.match(/#\w+/g)?.join(', ') || '',
+        visibility: 'public',
+        comments_enabled: true,
+        view_count: Math.floor(Math.random() * 50000),
+        like_count: Math.floor(Math.random() * 5000),
+        comment_count: Math.floor(Math.random() * 200),
+        created_at: Date.now() - (postCount - j) * 3600000 * (2 + Math.floor(Math.random() * 12))
+      };
+      const pid = await db.add('posts', postData);
+      /* 添加一些评论 */
+      const commentCount = 2 + Math.floor(Math.random() * 5);
+      for (let k = 0; k < commentCount; k++) {
+        const commenterIdx = (i + k + 1) % creators.length;
+        await db.add('comments', {
+          post_id: pid,
+          user_id: null,
+          username: creators[commenterIdx].name,
+          user_pic: randomAvatar(creators[commenterIdx].name),
+          text: ['Amazing content!', 'Love this vibe', 'So good', 'Keep it up!', 'Incredible shot!', 'This is fire', 'Need more of this', 'Absolutely stunning'][k % 8],
+          like_count: Math.floor(Math.random() * 50),
+          created_at: postData.created_at + (k + 1) * 60000
+        });
+      }
+    }
   }
 }
 
-function opComm(pid){
-  const p=posts.find(x=>x.id===pid);
-  if(!p) return;
-  const cObj=p.comments||{};
-  const cc=Object.values(cObj);
-  let h=cc.map(c=>
-    '<div style="display:flex;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd)">'+
-    '<div style="width:30px;height:30px;border-radius:50%;background:var(--bge);display:flex;align-items:center;justify-content:center;color:var(--fm);font-size:12px;font-weight:700;flex-shrink:0">'+(c.username||'u').charAt(0).toUpperCase()+'</div>'+
-    '<div style="flex:1"><span style="font-weight:600;font-size:12px">'+(c.username||'user')+'</span><span style="font-size:12px;color:var(--fm);margin-left:5px">'+(c.text||'')+'</span></div></div>'
-  ).join('');
-  if(!cc.length) h='<div style="text-align:center;padding:28px;color:var(--fd);font-size:13px">No comments yet.</div>';
-  $('mCtn').innerHTML=
-    '<div class="mtl">Comments ('+cc.length+')</div>'+
-    '<div style="max-height:280px;overflow-y:auto">'+h+'</div>'+
-    '<div style="display:flex;gap:8px;margin-top:14px;align-items:center">'+
-    '<div style="width:30px;height:30px;border-radius:50%;background:var(--bge);display:flex;align-items:center;justify-content:center;color:var(--fm);font-size:12px;font-weight:700;flex-shrink:0">'+CU.username.charAt(0).toUpperCase()+'</div>'+
-    '<input id="cmInp" type="text" placeholder="Add a comment..." style="flex:1;padding:9px 12px;background:var(--bgc);border:1px solid var(--bd);border-radius:var(--rs);color:var(--fg);font-size:13px;font-family:Outfit,sans-serif;outline:none">'+
-    '<button onclick="addComm(\''+pid+'\')" style="background:none;border:none;color:var(--ac);font-weight:700;font-size:13px;cursor:pointer;padding:6px">Post</button></div>';
-  opMod();
+/* 加载 Reels */
+async function loadReels() {
+  if (reelsData.length > 0) return; // 已加载
+  const posts = await db.getAll('posts');
+  reelsData = posts.sort((a, b) => b.created_at - a.created_at);
+
+  if (reelsData.length === 0) {
+    document.getElementById('reelsContainer').innerHTML = `
+      <div class="empty-state" style="height:calc(100dvh - var(--nav-h) - var(--header-h));display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <i class="fas fa-film"></i>
+        <h3>No Reels Yet</h3>
+        <p>Be the first to share something amazing</p>
+      </div>`;
+    return;
+  }
+
+  renderReels();
 }
 
-function addComm(pid){
-  const inp=$('cmInp'),txt=inp.value.trim();
-  if(!txt) return;
-  db.ref('posts/'+pid+'/comments').push({username:CU.username,text:txt,timestamp:Date.now()});
-  inp.value='';
-  opComm(pid);
-  toast('Comment posted','su');
+async function loadMoreReels() {
+  /* 在真实应用中这里会从服务器分页加载 */
 }
 
-function postMenu(pid){
-  $('mCtn').innerHTML=
-    '<div class="mtl">Options</div>'+
-    '<div class="mo" onclick="toast(\'Link copied\',\'su\');clMod({target:$(\'mOv\')})"><i class="far fa-link" style="color:var(--ac)"></i><span>Copy Link</span></div>'+
-    '<div class="mo" onclick="toast(\'Shared\',\'su\');clMod({target:$(\'mOv\')})"><i class="fas fa-share" style="color:var(--ac)"></i><span>Share</span></div>'+
-    '<div class="mo dn2" onclick="toast(\'Reported\',\'er\');clMod({target:$(\'mOv\')})"><i class="fas fa-flag"></i><span>Report</span></div>';
-  opMod();
+function renderReels() {
+  const container = document.getElementById('reelsContainer');
+  container.innerHTML = '';
+  reelsData.forEach((post, idx) => {
+    const el = document.createElement('div');
+    el.className = 'reel-item';
+    el.dataset.index = idx;
+    const mediaHtml = post.type === 'video'
+      ? `<video src="${esc(post.video_url)}" loop playsinline preload="metadata" muted poster="${esc(post.thumbnail_url || '')}"></video>`
+      : `<img src="${esc(post.media_url)}" alt="${esc(post.caption)}" loading="lazy">`;
+
+    const hashtags = post.hashtags ? post.hashtags.split(',').map(h => `<span class="hashtag">${esc(h.trim())}</span>`).join(' ') : '';
+
+    el.innerHTML = `
+      ${mediaHtml}
+      <div class="reel-gradient"></div>
+      <div class="reel-play-indicator" id="playInd${idx}"><i class="fas fa-play"></i></div>
+      <div class="reel-top">
+        <img class="reel-creator-pic" src="${esc(post.user_pic || randomAvatar('user' + post.user_id))}" alt="" onclick="viewCreator(${post.user_id})">
+        <span class="reel-creator-name" onclick="viewCreator(${post.user_id})">${esc(post.username || 'user')}</span>
+        <button class="reel-follow-btn" data-uid="${post.user_id}" onclick="toggleFollow(this,${post.user_id})">Follow</button>
+      </div>
+      <div class="reel-actions">
+        <div class="reel-action" onclick="toggleLike(this,${post.id})" data-post="${post.id}">
+          <i class="far fa-heart"></i><span id="likeCount${post.id}">${fmtNum(post.like_count || 0)}</span>
+        </div>
+        <div class="reel-action" onclick="openComments(${post.id})">
+          <i class="far fa-comment"></i><span>${fmtNum(post.comment_count || 0)}</span>
+        </div>
+        <div class="reel-action" onclick="openShare(${post.id})">
+          <i class="far fa-paper-plane"></i><span>Share</span>
+        </div>
+        <div class="reel-action" onclick="toggleSave(this,${post.id})" data-post="${post.id}">
+          <i class="far fa-bookmark"></i><span>Save</span>
+        </div>
+        <div class="reel-action" onclick="openReport(${post.id})">
+          <i class="fas fa-flag"></i><span>Report</span>
+        </div>
+      </div>
+      <div class="reel-info">
+        <div class="reel-caption">${esc(post.caption)} ${hashtags}</div>
+        <div class="reel-meta">
+          <span><i class="fas fa-eye"></i> ${fmtNum(post.view_count || 0)}</span>
+          <span>${timeAgo(post.created_at)}</span>
+        </div>
+      </div>`;
+    container.appendChild(el);
+  });
+
+  /* 设置滚动观察 */
+  setupReelObserver();
+  /* 检查已点赞/已保存状态 */
+  checkLikeSaveStates();
 }
 
-registerUser();
+function setupReelObserver() {
+  const container = document.getElementById('reelsContainer');
+  const items = container.querySelectorAll('.reel-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = parseInt(entry.target.dataset.index);
+        currentReelIndex = idx;
+        playReel(idx);
+      } else {
+        const idx = parseInt(entry.target.dataset.index);
+        pauseReel(idx);
+      }
+    });
+  }, { threshold: 0.6 });
+
+  items.forEach(item => observer.observe(item));
+
+  /* 点击暂停/播放 */
+  items.forEach(item => {
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('.reel-action') || e.target.closest('.reel-follow-btn') ||
+          e.target.closest('.reel-creator-pic') || e.target.closest('.reel-creator-name')) return;
+      const idx = parseInt(item.dataset.index);
+      togglePlayPause(idx);
+    });
+  });
+}
+
+function playReel(idx) {
+  const reel = document.querySelectorAll('.reel-item')[idx];
+  if (!reel) return;
+  const video = reel.querySelector('video');
+  if (video) {
+    video.play().catch(() => {});
+    /* 增加浏览量 */
+    incrementView(reelsData[idx]?.id);
+  }
+}
+
+function pauseReel(idx) {
+  const reel = document.querySelectorAll('.reel-item')[idx];
+  if (!reel) return;
+  const video = reel.querySelector('video');
+  if (video) video.pause();
+}
+
+function togglePlayPause(idx) {
+  const reel = document.querySelectorAll('.reel-item')[idx];
+  if (!reel) return;
+  const video = reel.querySelector('video');
+  if (!video) return;
+  const ind = document.getElementById('playInd' + idx);
+  if (video.paused) {
+    video.play().catch(() => {});
+    ind.classList.remove('show');
+  } else {
+    video.pause();
+    ind.classList.add('show');
+    setTimeout(() => ind.classList.remove('show'), 600);
+  }
+}
+
+async function incrementView(postId) {
+  if (!postId) return;
+  try {
+    const post = await db.get('posts', postId);
+    if (post) {
+      post.view_count = (post.view_count || 0) + 1;
+      await db.put('posts', post);
+    }
+  } catch(e) {}
+}
+
+/* 点赞 */
+async function toggleLike(el, postId) {
+  if (!currentUser) return;
+  try {
+    const existing = await db.getByIndex('likes', 'post_id', postId);
+    const userLike = existing.find(l => l.user_id === currentUser.id);
+    if (userLike) {
+      await db.delete('likes', userLike.id);
+      el.classList.remove('liked');
+      el.querySelector('i').className = 'far fa-heart';
+      const post = await db.get('posts', postId);
+      if (post) { post.like_count = Math.max(0, (post.like_count || 1) - 1); await db.put('posts', post); }
+      document.getElementById('likeCount' + postId).textContent = fmtNum(post?.like_count || 0);
+    } else {
+      await db.add('likes', { post_id: postId, user_id: currentUser.id, created_at: Date.now() });
+      el.classList.add('liked');
+      el.querySelector('i').className = 'fas fa-heart';
+      el.style.transform = 'scale(1.3)';
+      setTimeout(() => el.style.transform = '', 200);
+      const post = await db.get('posts', postId);
+      if (post) { post.like_count = (post.like_count || 0) + 1; await db.put('posts', post); }
+      document.getElementById('likeCount' + postId).textContent = fmtNum(post?.like_count || 0);
+      /* 通知作者 */
+      if (post && post.user_id !== currentUser.id) {
+        await db.add('notifications', { user_id: post.user_id, type: 'like', message: `${currentUser.username} liked your post`, read: false, created_at: Date.now() });
+      }
+    }
+  } catch(e) {}
+}
+
+async function checkLikeSaveStates() {
+  if (!currentUser) return;
+  try {
+    const likes = await db.getByIndex('likes', 'user_id', currentUser.id);
+    const saves = await db.getByIndex('saves', 'user_id', currentUser.id);
+    const likedPostIds = new Set(likes.map(l => l.post_id));
+    const savedPostIds = new Set(saves.map(s => s.post_id));
+
+    document.querySelectorAll('.reel-action[data-post]').forEach(el => {
+      const pid = parseInt(el.dataset.post);
+      const icon = el.querySelector('i');
+      if (icon.classList.contains('fa-heart') && likedPostIds.has(pid)) {
+        el.classList.add('liked');
+        icon.className = 'fas fa-heart';
+      }
+      if (icon.classList.contains('fa-bookmark') && savedPostIds.has(pid)) {
+        el.classList.add('saved');
+        icon.className = 'fas fa-bookmark';
+      }
+    });
+  } catch(e) {}
+}
+
+/* 保存 */
+async function toggleSave(el, postId) {
+  if (!currentUser) return;
+  try {
+    const existing = await db.getByIndex('saves', 'post_id', postId);
+    const userSave = existing.find(s => s.user_id === currentUser.id);
+    if (userSave) {
+      await db.delete('saves', userSave.id);
+      el.classList.remove('saved');
+      el.querySelector('i').className = 'far fa-bookmark';
+      toast('Removed from saved', 'info');
+    } else {
+      await db.add('saves', { post_id: postId, user_id: currentUser.id, created_at: Date.now() });
+      el.classList.add('saved');
+      el.querySelector('i').className = 'fas fa-bookmark';
+      toast('Saved to collection', 'success');
+    }
+  } catch(e) {}
+}
+
+/* 关注 */
+async function toggleFollow(btn, userId) {
+  if (!currentUser || userId === currentUser.id) return;
+  try {
+    const existing = await db.getByIndex('follows', 'follower_id', currentUser.id);
+    const isFollowing = existing.find(f => f.following_id === userId);
+    if (isFollowing) {
+      await db.delete('follows', isFollowing.id);
+      btn.textContent = 'Follow';
+      btn.classList.remove('following');
+    } else {
+      await db.add('follows', { follower_id: currentUser.id, following_id: userId, created_at: Date.now() });
+      btn.textContent = 'Following';
+      btn.classList.add('following');
+      const targetUser = await db.get('users', userId);
+      if (targetUser) {
+        await db.add('notifications', { user_id: userId, type: 'follow', message: `${currentUser.username} started following you`, read: false, created_at: Date.now() });
+      }
+    }
+  } catch(e) {}
+}
+
+/* 评论 */
+async function openComments(postId) {
+  currentCommentPostId = postId;
+  const body = document.getElementById('commentsBody');
+  body.innerHTML = '<div style="text-align:center;padding:20px"><div class="spinner"></div></div>';
+  openModal('commentsModal');
+
+  try {
+    const comments = await db.getByIndex('comments', 'post_id', postId);
+    comments.sort((a, b) => a.created_at - b.created_at);
+    if (comments.length === 0) {
+      body.innerHTML = '<div class="empty-state" style="padding:40px 20px"><i class="fas fa-comment-slash"></i><h3>No comments yet</h3><p>Be the first to comment</p></div>';
+      return;
+    }
+    body.innerHTML = comments.map(c => `
+      <div class="comment-item">
+        <img class="ci-pic" src="${esc(c.user_pic || randomAvatar('comment' + c.id))}" alt="">
+        <div class="ci-body">
+          <span class="ci-name">${esc(c.username || 'user')}</span>
+          <div class="ci-text">${esc(c.text)}</div>
+          <div class="ci-meta">
+            <span>${timeAgo(c.created_at)}</span>
+            <span class="ci-like" onclick="likeComment(this,${c.id})"><i class="far fa-heart"></i> ${c.like_count || 0}</span>
+            <span style="cursor:pointer">Reply</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    body.innerHTML = '<div class="empty-state"><p>Failed to load comments</p></div>';
+  }
+}
+
+async function postComment() {
+  if (!currentUser || !currentCommentPostId) return;
+  const input = document.getElementById('commentInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  try {
+    await db.add('comments', {
+      post_id: currentCommentPostId,
+      user_id: currentUser.id,
+      username: currentUser.username,
+      user_pic: currentUser.photo_url,
+      text: text,
+      like_count: 0,
+      created_at: Date.now()
+    });
+    const post = await db.get('posts', currentCommentPostId);
+    if (post) {
+      post.comment_count = (post.comment_count || 0) + 1;
+      await db.put('posts', post);
+      if (post.user_id !== currentUser.id) {
+        await db.add('notifications', { user_id: post.user_id, type: 'comment', message: `${currentUser.username} commented: "${text.substring(0, 50)}"`, read: false, created_at: Date.now() });
+      }
+    }
+    toast('Comment posted', 'success');
+    openComments(currentCommentPostId);
+  } catch(e) {
+    toast('Failed to post comment', 'error');
+  }
+}
+
+async function likeComment(el, commentId) {
+  if (!currentUser) return;
+  if (el.classList.contains('liked')) return;
+  el.classList.add('liked');
+  el.innerHTML = '<i class="fas fa-heart"></i> ' + (parseInt(el.textContent.trim()) + 1);
+  try {
+    const c = await db.get('comments', commentId);
+    if (c) { c.like_count = (c.like_count || 0) + 1; await db.put('comments', c); }
+  } catch(e) {}
+}
+
+/* 分享 */
+function openShare(postId) {
+  sharePostData = reelsData.find(p => p.id === postId);
+  openModal('shareModal');
+}
+
+/* 举报 */
+function openReport(postId) {
+  currentReportPostId = postId;
+  selectedReportReason = null;
+  document.querySelectorAll('.report-reason').forEach(r => r.classList.remove('selected'));
+  document.getElementById('submitReportBtn').disabled = true;
+  openModal('reportModal');
+}
+
+/* 查看创作者 */
+function viewCreator(userId) {
+  toast('Viewing profile of user ' + userId, 'info');
+}
+
+/* ============================================
+   UPLOAD PAGE
+   ============================================ */
+let uploadState = {
+  imageFile: null,
+  imageUrl: '',
+  thumbFile: null,
+  thumbUrl: '',
+  videoFile: null,
+  videoUrl: ''
+};
+
+/* 标签切换 */
+document.querySelectorAll('.upload-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.upload-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.upload-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(tab.dataset.tab === 'image' ? 'uploadImageSection' : 'uploadVideoSection').classList.add('active');
+  });
+});
+
+/* Toggle 开关 */
+document.querySelectorAll('.toggle').forEach(t => {
+  t.addEventListener('click', () => {
+    t.classList.toggle('on');
+    t.dataset.value = t.classList.contains('on') ? 'on' : 'off';
+    if (t.id.includes('Visibility')) t.dataset.value = t.classList.contains('on') ? 'public' : 'private';
+  });
+});
+
+/* 图片文件选择 */
+document.getElementById('imageFileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  uploadState.imageFile = file;
+  uploadState.imageUrl = '';
+  document.getElementById('imageUrlInput').value = '';
+  const preview = document.getElementById('imagePreview');
+  preview.src = URL.createObjectURL(file);
+  preview.classList.add('visible');
+});
+
+/* 图片URL输入 */
+document.getElementById('imageUrlInput').addEventListener('input', (e) => {
+  const url = e.target.value.trim();
+  uploadState.imageUrl = url;
+  uploadState.imageFile = null;
+  const preview = document.getElementById('imagePreview');
+  if (url) {
+    preview.src = url;
+    preview.classList.add('visible');
+    preview.onerror = () => preview.classList.remove('visible');
+  } else {
+    preview.classList.remove('visible');
+  }
+});
+
+/* 缩略图文件 */
+document.getElementById('thumbFileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  uploadState.thumbFile = file;
+  uploadState.thumbUrl = '';
+  document.getElementById('thumbUrlInput').value = '';
+  const preview = document.getElementById('thumbPreview');
+  preview.src = URL.createObjectURL(file);
+  preview.classList.add('visible');
+});
+
+/* 缩略图URL */
+document.getElementById('thumbUrlInput').addEventListener('input', (e) => {
+  const url = e.target.value.trim();
+  uploadState.thumbUrl = url;
+  uploadState.thumbFile = null;
+  const preview = document.getElementById('thumbPreview');
+  if (url) {
+    preview.src = url;
+    preview.classList.add('visible');
+    preview.onerror = () => preview.classList.remove('visible');
+  } else {
+    preview.classList.remove('visible');
+  }
+});
+
+/* 视频文件 */
+document.getElementById('videoFileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  uploadState.videoFile = file;
+  uploadState.videoUrl = '';
+  document.getElementById('videoUrlInput').value = '';
+  const preview = document.getElementById('videoPreview');
+  preview.src = URL.createObjectURL(file);
+  preview.classList.add('visible');
+});
+
+/* 视频URL */
+document.getElementById('videoUrlInput').addEventListener('input', (e) => {
+  const url = e.target.value.trim();
+  uploadState.videoUrl = url;
+  uploadState.videoFile = null;
+  const preview = document.getElementById('videoPreview');
+  if (url) {
+    preview.src = url;
+    preview.classList.add('visible');
+    preview.onerror = () => preview.classList.remove('visible');
+  } else {
+    preview.classList.remove('visible');
+  }
+});
+
+/* 拖拽效果 */
+['imageDropzone', 'thumbDropzone', 'videoDropzone'].forEach(id => {
+  const dz = document.getElementById(id);
+  if (!dz) return;
+  dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('dragover'); });
+});
+
+/* 发布图片 */
+document.getElementById('postImageBtn').addEventListener('click', async () => {
+  if (!uploadState.imageFile && !uploadState.imageUrl) { toast('Please select or paste an image', 'error'); return; }
+  const btn = document.getElementById('postImageBtn');
+  const progress = document.getElementById('imageProgress');
+  const bar = progress.querySelector('.upload-progress-bar');
+  btn.disabled = true;
+  progress.classList.add('visible');
+
+  /* 模拟上传进度 */
+  for (let p = 0; p <= 90; p += 10) {
+    bar.style.width = p + '%';
+    await new Promise(r => setTimeout(r, 100));
+  }
+
+  try {
+    const mediaUrl = uploadState.imageFile ? URL.createObjectURL(uploadState.imageFile) : uploadState.imageUrl;
+    const caption = document.getElementById('imageCaption').value.trim();
+    const hashtags = document.getElementById('imageHashtags').value.trim();
+    const visibility = document.getElementById('imageVisibility').dataset.value;
+    const commentsEnabled = document.getElementById('imageComments').dataset.value === 'on';
+
+    const postData = {
+      user_id: currentUser.id,
+      type: 'image',
+      media_url: mediaUrl,
+      video_url: null,
+      thumbnail_url: null,
+      caption: caption,
+      hashtags: hashtags,
+      visibility: visibility,
+      comments_enabled: commentsEnabled,
+      view_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      username: currentUser.username,
+      user_pic: currentUser.photo_url,
+      created_at: Date.now()
+    };
+    await db.add('posts', postData);
+    bar.style.width = '100%';
+    await new Promise(r => setTimeout(r, 300));
+    toast('Image posted successfully', 'success');
+    await logActivity('upload', 'Image posted');
+
+    /* 重置表单 */
+    uploadState.imageFile = null;
+    uploadState.imageUrl = '';
+    document.getElementById('imageFileInput').value = '';
+    document.getElementById('imageUrlInput').value = '';
+    document.getElementById('imageCaption').value = '';
+    document.getElementById('imageHashtags').value = '';
+    document.getElementById('imagePreview').classList.remove('visible');
+
+    /* 刷新 feeds */
+    reelsData = [];
+    if (currentPage === 'home') loadReels();
+  } catch(e) {
+    toast('Failed to post image', 'error');
+  }
+  btn.disabled = false;
+  progress.classList.remove('visible');
+  bar.style.width = '0%';
+});
+
+/* 发布视频 */
+document.getElementById('postVideoBtn').addEventListener('click', async () => {
+  if (!uploadState.videoFile && !uploadState.videoUrl) { toast('Please select or paste a video', 'error'); return; }
+  const btn = document.getElementById('postVideoBtn');
+  const progress = document.getElementById('videoProgress');
+  const bar = progress.querySelector('.upload-progress-bar');
+  btn.disabled = true;
+  progress.classList.add('visible');
+
+  for (let p = 0; p <= 90; p += 5) {
+    bar.style.width = p + '%';
+    await new Promise(r => setTimeout(r, 120));
+  }
+
+  try {
+    const videoUrl = uploadState.videoFile ? URL.createObjectURL(uploadState.videoFile) : uploadState.videoUrl;
+    const thumbUrl = uploadState.thumbFile ? URL.createObjectURL(uploadState.thumbFile) : (uploadState.thumbUrl || randomCover('vid' + Date.now()));
+    const caption = document.getElementById('videoCaption').value.trim();
+    const hashtags = document.getElementById('videoHashtags').value.trim();
+    const visibility = document.getElementById('videoVisibility').dataset.value;
+    const commentsEnabled = document.getElementById('videoComments').dataset.value === 'on';
+
+    const postData = {
+      user_id: currentUser.id,
+      type: 'video',
+      media_url: null,
+      video_url: videoUrl,
+      thumbnail_url: thumbUrl,
+      caption: caption,
+      hashtags: hashtags,
+      visibility: visibility,
+      comments_enabled: commentsEnabled,
+      view_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      username: currentUser.username,
+      user_pic: currentUser.photo_url,
+      created_at: Date.now()
+    };
+    await db.add('posts', postData);
+    bar.style.width = '100%';
+    await new Promise(r => setTimeout(r, 300));
+    toast('Video posted successfully', 'success');
+    await logActivity('upload', 'Video posted');
+
+    uploadState = { imageFile: null, imageUrl: '', thumbFile: null, thumbUrl: '', videoFile: null, videoUrl: '' };
+    document.getElementById('thumbFileInput').value = '';
+    document.getElementById('thumbUrlInput').value = '';
+    document.getElementById('videoFileInput').value = '';
+    document.getElementById('videoUrlInput').value = '';
+    document.getElementById('videoCaption').value = '';
+    document.getElementById('videoHashtags').value = '';
+    document.getElementById('thumbPreview').classList.remove('visible');
+    document.getElementById('videoPreview').classList.remove('visible');
+
+    reelsData = [];
+    if (currentPage === 'home') loadReels();
+  } catch(e) {
+    toast('Failed to post video', 'error');
+  }
+  btn.disabled = false;
+  progress.classList.remove('visible');
+  bar.style.width = '0%';
+});
+
+/* ============================================
+   WALLET PAGE
+   ============================================ */
+async function loadWallet() {
+  if (!currentUser) return;
+  try {
+    const user = await db.get('users', currentUser.id);
+    if (user) currentUser = user;
+
+    document.getElementById('walletBalance').textContent = parseFloat(currentUser.balance || 0).toFixed(2);
+    document.getElementById('walletEarnings').textContent = fmtMoney(currentUser.total_earnings);
+
+    const withdrawals = await db.getByIndex('withdrawals', 'user_id', currentUser.id);
+    const pending = withdrawals.filter(w => w.status === 'pending').reduce((s, w) => s + (w.amount || 0), 0);
+    document.getElementById('walletPending').textContent = fmtMoney(pending);
+
+    /* 交易记录 */
+    const txns = await db.getByIndex('transactions', 'user_id', currentUser.id);
+    txns.sort((a, b) => b.created_at - a.created_at);
+    const txnList = document.getElementById('txnList');
+
+    if (txns.length === 0) {
+      txnList.innerHTML = '<div class="empty-state" style="padding:30px"><i class="fas fa-receipt"></i><h3>No transactions</h3><p>Your transaction history will appear here</p></div>';
+      return;
+    }
+
+    txnList.innerHTML = txns.slice(0, 20).map(t => {
+      const isCredit = t.type === 'credit';
+      return `
+        <div class="txn-item">
+          <div class="txn-icon ${isCredit ? 'credit' : 'debit'}"><i class="fas fa-${isCredit ? 'arrow-down' : 'arrow-up'}"></i></div>
+          <div class="txn-details">
+            <div class="txn-desc">${esc(t.description)}</div>
+            <div class="txn-date">${timeAgo(t.created_at)}</div>
+          </div>
+          <div class="txn-amount ${isCredit ? 'positive' : 'negative'}">${isCredit ? '+' : '-'}${fmtMoney(t.amount)}</div>
+        </div>`;
+    }).join('');
+  } catch(e) {}
+}
+
+/* 提现 */
+document.getElementById('withdrawBtn').addEventListener('click', () => {
+  document.getElementById('withdrawAmount').value = '';
+  document.getElementById('withdrawAddress').value = '';
+  openModal('withdrawModal');
+});
+
+document.getElementById('submitWithdrawBtn').addEventListener('click', async () => {
+  const amount = parseFloat(document.getElementById('withdrawAmount').value);
+  const method = document.getElementById('withdrawMethod').value;
+  const address = document.getElementById('withdrawAddress').value.trim();
+
+  if (!amount || amount < 10) { toast('Minimum withdrawal is $10.00', 'error'); return; }
+  if (amount > (currentUser.balance || 0)) { toast('Insufficient balance', 'error'); return; }
+  if (!address) { toast('Please enter your wallet address', 'error'); return; }
+
+  try {
+    currentUser.balance -= amount;
+    await db.put('users', currentUser);
+    await db.add('withdrawals', { user_id: currentUser.id, amount: amount, method: method, address: address, status: 'pending', created_at: Date.now() });
+    await db.add('transactions', { user_id: currentUser.id, type: 'debit', amount: amount, description: `Withdrawal via ${method}`, created_at: Date.now() });
+    await logActivity('withdraw', `Withdrawal request: ${fmtMoney(amount)} via ${method}`);
+    toast('Withdrawal submitted successfully', 'success');
+    closeModal('withdrawModal');
+    loadWallet();
+  } catch(e) {
+    toast('Failed to submit withdrawal', 'error');
+  }
+});
+
+/* ============================================
+   REFERRAL PAGE
+   ============================================ */
+async function loadReferral() {
+  if (!currentUser) return;
+  try {
+    /* 获取推荐码 */
+    const refEntries = await db.getByIndex('referrals', 'referrer_id', currentUser.id);
+    const myCode = refEntries.find(r => !r.referred_id);
+    const code = myCode ? myCode.code : 'N/A';
+    document.getElementById('refCodeDisplay').value = code;
+
+    const baseUrl = window.location.origin + window.location.pathname;
+    document.getElementById('refLinkDisplay').value = baseUrl + '?ref=' + code;
+
+    /* 统计 */
+    const referrals = refEntries.filter(r => r.referred_id);
+    document.getElementById('refTotalCount').textContent = referrals.length;
+    const totalEarnings = referrals.reduce((s, r) => s + (r.earnings || 0), 0);
+    document.getElementById('refEarnings').textContent = fmtMoney(totalEarnings);
+    document.getElementById('refActiveCount').textContent = referrals.length;
+
+    /* 排行榜 */
+    const allUsers = await db.getAll('users');
+    const userRefCounts = {};
+    for (const u of allUsers) {
+      const refs = await db.getByIndex('referrals', 'referrer_id', u.id);
+      userRefCounts[u.id] = refs.filter(r => r.referred_id).length;
+    }
+    const sorted = allUsers.filter(u => userRefCounts[u.id] > 0).sort((a, b) => userRefCounts[b.id] - userRefCounts[a.id]).slice(0, 10);
+    const lbList = document.getElementById('leaderboardList');
+    if (sorted.length === 0) {
+      lbList.innerHTML = '<div class="empty-state" style="padding:30px"><p>No referrals yet</p></div>';
+    } else {
+      lbList.innerHTML = sorted.map((u, i) => `
+        <div class="leaderboard-item">
+          <div class="lb-rank">${i + 1}</div>
+          <img class="lb-pic" src="${esc(u.photo_url)}" alt="">
+          <span class="lb-name">${esc(u.username)}</span>
+          <span class="lb-count">${userRefCounts[u.id]}</span>
+        </div>`).join('');
+    }
+
+    /* 推荐历史 */
+    const histList = document.getElementById('refHistoryList');
+    if (referrals.length === 0) {
+      histList.innerHTML = '<div class="empty-state" style="padding:30px"><p>No referral history</p></div>';
+    } else {
+      histList.innerHTML = referrals.map(async r => {
+        const referred = r.referred_id ? await db.get('users', r.referred_id) : null;
+        return `<div class="txn-item">
+          <div class="txn-icon credit"><i class="fas fa-user-plus"></i></div>
+          <div class="txn-details">
+            <div class="txn-desc">${esc(referred?.username || 'Unknown')}</div>
+            <div class="txn-date">${timeAgo(r.created_at)}</div>
+          </div>
+          <div class="txn-amount positive">+${fmtMoney(r.earnings || 0)}</div>
+        </div>`;
+      });
+      /* 等待所有 Promise */
+      const htmls = await Promise.all(referrals.map(async r => {
+        const referred = r.referred_id ? await db.get('users', r.referred_id) : null;
+        return `<div class="txn-item">
+          <div class="txn-icon credit"><i class="fas fa-user-plus"></i></div>
+          <div class="txn-details">
+            <div class="txn-desc">${esc(referred?.username || 'Unknown')}</div>
+            <div class="txn-date">${timeAgo(r.created_at)}</div>
+          </div>
+          <div class="txn-amount positive">+${fmtMoney(r.earnings || 0)}</div>
+        </div>`;
+      }));
+      histList.innerHTML = htmls.join('');
+    }
+  } catch(e) {}
+}
+
+/* 复制推荐码 */
+document.getElementById('copyRefCodeBtn').addEventListener('click', () => {
+  const code = document.getElementById('refCodeDisplay').value;
+  navigator.clipboard.writeText(code).then(() => toast('Referral code copied', 'success')).catch(() => toast('Failed to copy', 'error'));
+});
+
+document.getElementById('copyRefLinkBtn').addEventListener('click', () => {
+  const link = document.getElementById('refLinkDisplay').value;
+  navigator.clipboard.writeText(link).then(() => toast('Referral link copied', 'success')).catch(() => toast('Failed to copy', 'error'));
+});
+
+/* 分享邀请 */
+document.getElementById('shareRefBtn').addEventListener('click', () => {
+  const link = document.getElementById('refLinkDisplay').value;
+  if (isTelegram && window.Telegram?.WebApp) {
+    window.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent('Join me on ReelGram!'));
+  } else if (navigator.share) {
+    navigator.share({ title: 'Join ReelGram', url: link, text: 'Join me on ReelGram!' }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(link).then(() => toast('Link copied to clipboard', 'success'));
+  }
+});
+
+/* ============================================
+   PROFILE PAGE
+   ============================================ */
+async function loadProfile() {
+  if (!currentUser) return;
+  try {
+    const user = await db.get('users', currentUser.id);
+    if (user) currentUser = user;
+
+    document.getElementById('profileAvatar').src = currentUser.photo_url || randomAvatar('user');
+    document.getElementById('profileName').textContent = currentUser.username || 'User';
+    document.getElementById('profileBio').textContent = currentUser.bio || '';
+    document.getElementById('verifiedBadge').style.display = currentUser.verified ? 'inline-flex' : 'none';
+
+    const webEl = document.getElementById('profileWebsite');
+    if (currentUser.website) { webEl.textContent = currentUser.website; webEl.style.display = ''; }
+    else { webEl.style.display = 'none'; }
+
+    if (currentUser.cover_url) {
+      document.getElementById('profileCover').style.backgroundImage = `url(${esc(currentUser.cover_url)})`;
+      document.getElementById('profileCover').style.backgroundSize = 'cover';
+      document.getElementById('profileCover').style.backgroundPosition = 'center';
+    }
+
+    /* 统计 */
+    const posts = await db.getByIndex('posts', 'user_id', currentUser.id);
+    const followers = await db.getByIndex('follows', 'following_id', currentUser.id);
+    const following = await db.getByIndex('follows', 'follower_id', currentUser.id);
+    document.getElementById('profilePosts').textContent = posts.length;
+    document.getElementById('profileFollowers').textContent = followers.length;
+    document.getElementById('profileFollowing').textContent = following.length;
+
+    /* 快捷方式 */
+    document.getElementById('walletShortcutBal').textContent = fmtMoney(currentUser.balance);
+    const refEntries = await db.getByIndex('referrals', 'referrer_id', currentUser.id);
+    const refCount = refEntries.filter(r => r.referred_id).length;
+    document.getElementById('refShortcutCount').textContent = refCount + ' referrals';
+
+    /* 帖子网格 */
+    const grid = document.getElementById('profilePostsGrid');
+    const empty = document.getElementById('profileEmptyState');
+    posts.sort((a, b) => b.created_at - a.created_at);
+    if (posts.length === 0) {
+      grid.innerHTML = '';
+      empty.style.display = '';
+    } else {
+      empty.style.display = 'none';
+      grid.innerHTML = posts.map(p => {
+        const thumb = p.thumbnail_url || p.media_url || randomCover('post' + p.id);
+        return `<div class="profile-post-thumb">
+          <img src="${esc(thumb)}" alt="" loading="lazy">
+          <div class="ppt-overlay">
+            <span><i class="fas fa-heart"></i> ${fmtNum(p.like_count || 0)}</span>
+            <span><i class="fas fa-comment"></i> ${fmtNum(p.comment_count || 0)}</span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  } catch(e) {}
+}
+
+/* 编辑资料 */
+document.getElementById('editProfileBtn').addEventListener('click', () => {
+  document.getElementById('editUsername').value = currentUser.username || '';
+  document.getElementById('editBio').value = currentUser.bio || '';
+  document.getElementById('editWebsite').value = currentUser.website || '';
+  document.getElementById('editAvatarPreview').src = currentUser.photo_url || randomAvatar('user');
+  openModal('editProfileModal');
+});
+
+document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+  const username = document.getElementById('editUsername').value.trim();
+  const bio = document.getElementById('editBio').value.trim();
+  const website = document.getElementById('editWebsite').value.trim();
+  if (!username) { toast('Username is required', 'error'); return; }
+  try {
+    currentUser.username = username;
+    currentUser.bio = bio;
+    currentUser.website = website;
+    await db.put('users', currentUser);
+    toast('Profile updated', 'success');
+    closeModal('editProfileModal');
+    loadProfile();
+    await logActivity('profile_update', 'Profile updated');
+  } catch(e) {
+    toast('Failed to update profile', 'error');
+  }
+});
+
+/* 头像上传 */
+document.getElementById('avatarFileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  try {
+    currentUser.photo_url = url;
+    await db.put('users', currentUser);
+    document.getElementById('profileAvatar').src = url;
+    toast('Avatar updated', 'success');
+  } catch(e) { toast('Failed to update avatar', 'error'); }
+});
+
+/* 封面上传 */
+document.getElementById('coverUploadBtn').addEventListener('click', () => {
+  document.getElementById('coverFileInput').click();
+});
+document.getElementById('coverFileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  try {
+    currentUser.cover_url = url;
+    await db.put('users', currentUser);
+    const cover = document.getElementById('profileCover');
+    cover.style.backgroundImage = `url(${url})`;
+    cover.style.backgroundSize = 'cover';
+    cover.style.backgroundPosition = 'center';
+    toast('Cover updated', 'success');
+  } catch(e) { toast('Failed to update cover', 'error'); }
+});
+
+/* 分享资料 */
+document.getElementById('shareProfileBtn').addEventListener('click', () => {
+  const url = window.location.origin + window.location.pathname;
+  if (navigator.share) {
+    navigator.share({ title: currentUser.username + ' on ReelGram', url: url }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(url).then(() => toast('Profile link copied', 'success'));
+  }
+});
+
+/* QR 码 */
+document.getElementById('qrProfileBtn').addEventListener('click', () => {
+  const url = window.location.origin + window.location.pathname + '?u=' + (currentUser.username || '');
+  drawQR(document.getElementById('qrCanvas'), url);
+  openModal('qrModal');
+});
+
+/* 快捷方式 */
+document.getElementById('walletShortcut').addEventListener('click', () => navigateTo('wallet'));
+document.getElementById('referralShortcut').addEventListener('click', () => navigateTo('referral'));
+
+/* ============================================
+   MODAL 事件绑定
+   ============================================ */
+
+/* 评论提交 */
+document.getElementById('postCommentBtn').addEventListener('click', postComment);
+document.getElementById('commentInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') postComment(); });
+
+/* 举报原因选择 */
+document.querySelectorAll('.report-reason').forEach(r => {
+  r.addEventListener('click', () => {
+    document.querySelectorAll('.report-reason').forEach(x => x.classList.remove('selected'));
+    r.classList.add('selected');
+    selectedReportReason = r.dataset.reason;
+    document.getElementById('submitReportBtn').disabled = false;
+  });
+});
+
+document.getElementById('submitReportBtn').addEventListener('click', async () => {
+  if (!selectedReportReason || !currentReportPostId || !currentUser) return;
+  try {
+    await db.add('reports', { post_id: currentReportPostId, user_id: currentUser.id, reason: selectedReportReason, status: 'pending', created_at: Date.now() });
+    toast('Report submitted', 'success');
+    closeModal('reportModal');
+    await logActivity('report', `Reported post ${currentReportPostId}: ${selectedReportReason}`);
+  } catch(e) { toast('Failed to submit report', 'error'); }
+});
+
+/* 分享选项 */
+document.querySelectorAll('.share-opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const type = opt.dataset.share;
+    const url = window.location.origin + window.location.pathname;
+    const text = sharePostData ? (sharePostData.caption || 'Check this out!') : 'Check out ReelGram!';
+    if (type === 'telegram') {
+      if (isTelegram && window.Telegram?.WebApp) {
+        window.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text));
+      } else {
+        window.open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text), '_blank');
+      }
+    } else if (type === 'whatsapp') {
+      window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank');
+    } else if (type === 'twitter') {
+      window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url), '_blank');
+    } else if (type === 'copy') {
+      navigator.clipboard.writeText(url).then(() => toast('Link copied', 'success'));
+    }
+    closeModal('shareModal');
+  });
+});
+
+/* 通知 */
+document.getElementById('notifBtn').addEventListener('click', async () => {
+  if (!currentUser) return;
+  const body = document.getElementById('notifBody');
+  body.innerHTML = '<div style="text-align:center;padding:20px"><div class="spinner"></div></div>';
+  openModal('notifModal');
+  try {
+    const notifs = await db.getByIndex('notifications', 'user_id', currentUser.id);
+    notifs.sort((a, b) => b.created_at - a.created_at);
+    if (notifs.length === 0) {
+      body.innerHTML = '<div class="empty-state" style="padding:30px"><i class="fas fa-bell-slash"></i><h3>No notifications</h3></div>';
+    } else {
+      body.innerHTML = notifs.slice(0, 30).map(n => {
+        const icons = { like: 'fa-heart', comment: 'fa-comment', follow: 'fa-user-plus', referral: 'fa-gift' };
+        const colors = { like: 'var(--accent)', comment: 'var(--accent2)', follow: 'var(--success)', referral: 'var(--warning)' };
+        return `<div class="txn-item" style="${n.read ? 'opacity:0.6' : ''}">
+          <div class="txn-icon" style="background:${colors[n.type] || 'var(--fg3)'}20;color:${colors[n.type] || 'var(--fg3)'}"><i class="fas ${icons[n.type] || 'fa-bell'}"></i></div>
+          <div class="txn-details">
+            <div class="txn-desc" style="font-weight:400;font-size:0.82rem">${esc(n.message)}</div>
+            <div class="txn-date">${timeAgo(n.created_at)}</div>
+          </div>
+        </div>`;
+      }).join('');
+      /* 标记为已读 */
+      for (const n of notifs) { if (!n.read) { n.read = true; await db.put('notifications', n); } }
+      document.getElementById('notifBadge').style.display = 'none';
+    }
+  } catch(e) { body.innerHTML = '<p>Failed to load notifications</p>'; }
+});
+
+/* 检查未读通知 */
+async function checkUnreadNotifs() {
+  if (!currentUser) return;
+  try {
+    const notifs = await db.getByIndex('notifications', 'user_id', currentUser.id);
+    const unread = notifs.filter(n => !n.read);
+    document.getElementById('notifBadge').style.display = unread.length > 0 ? '' : 'none';
+  } catch(e) {}
+}
+
+/* 关闭模态框：点击遮罩 */
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); });
+});
+
+/* ============================================
+   主题切换
+   ============================================ */
+function setTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem('rg_theme', theme);
+  const icon = document.querySelector('#themeToggle i');
+  icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.setHeaderColor(theme === 'dark' ? '#050505' : '#f5f5f5');
+    window.Telegram.WebApp.setBackgroundColor(theme === 'dark' ? '#050505' : '#f5f5f5');
+  }
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.dataset.theme;
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+/* ============================================
+   ADMIN PANEL
+   ============================================ */
+document.getElementById('adminBtn').addEventListener('click', () => navigateTo('admin'));
+
+/* 返回按钮（从admin返回app） */
+function adminBack() {
+  navigateTo('home');
+}
+
+/* 管理面板侧边栏 */
+document.querySelectorAll('.admin-nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.admin-nav-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    loadAdminSection(item.dataset.admin);
+    /* 移动端关闭侧边栏 */
+    document.getElementById('adminSidebar').style.display = '';
+    document.getElementById('adminNavOverlay').classList.remove('open');
+  });
+});
+
+document.getElementById('adminMobileToggle').addEventListener('click', () => {
+  const sb = document.getElementById('adminSidebar');
+  sb.style.display = 'block';
+  sb.style.position = 'fixed';
+  sb.style.zIndex = '160';
+  sb.style.top = '0';
+  sb.style.left = '0';
+  sb.style.bottom = '0';
+  document.getElementById('adminNavOverlay').classList.add('open');
+});
+
+document.getElementById('adminNavOverlay').addEventListener('click', () => {
+  const sb = document.getElementById('adminSidebar');
+  sb.style.display = '';
+  sb.style.position = '';
+  sb.style.zIndex = '';
+  sb.style.top = '';
+  sb.style.left = '';
+  sb.style.bottom = '';
+  document.getElementById('adminNavOverlay').classList.remove('open');
+});
+
+async function loadAdminSection(section) {
+  const main = document.getElementById('adminMain');
+  const toggle = document.getElementById('adminMobileToggle');
+  let html = toggle.outerHTML;
+
+  switch(section) {
+    case 'dashboard': {
+      const totalUsers = await getStat('total_users');
+      const tgUsers = await getStat('telegram_users');
+      const brUsers = await getStat('browser_users');
+      const onlineUsers = await getStat('online_users');
+      const todayUsers = await getStat('today_users');
+      const totalPosts = await db.count('posts');
+      const totalComments = await db.count('comments');
+      const totalReports = await db.count('reports');
+      const pendingReports = await db.countByIndex('reports', 'status', 'pending');
+      html += `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <h2 style="font-size:1.3rem;font-weight:800">Dashboard</h2>
+          <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+        </div>
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card"><div class="asc-label">Total Users</div><div class="asc-val">${totalUsers}</div></div>
+          <div class="admin-stat-card"><div class="asc-label">Telegram Users</div><div class="asc-val">${tgUsers}</div></div>
+          <div class="admin-stat-card"><div class="asc-label">Browser Users</div><div class="asc-val">${brUsers}</div></div>
+          <div class="admin-stat-card"><div class="asc-label">Online Users</div><div class="asc-val">${onlineUsers}</div></div>
+          <div class="admin-stat-card"><div class="asc-label">Today's Users</div><div class="asc-val">${todayUsers}</div></div>
+          <div class="admin-stat-card"><div class="asc-label">Total Posts</div><div class="asc-val">${totalPosts}</div></div>
+          <div class="admin-stat-card"><div class="asc-label">Total Comments</div><div class="asc-val">${totalComments}</div></div>
+          <div class="admin-stat-card"><div class="asc-label">Pending Reports</div><div class="asc-val" style="color:var(--warning)">${pendingReports}</div></div>
+        </div>`;
+      break;
+    }
+    case 'users': {
+      const users = await db.getAll('users');
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Users (${users.length})</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card" style="overflow-x:auto"><table class="admin-table">
+        <tr><th>User</th><th>Type</th><th>Role</th><th>Joined</th><th>Actions</th></tr>
+        ${users.map(u => `<tr>
+          <td><div style="display:flex;align-items:center;gap:8px"><img src="${esc(u.photo_url)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover"><div><div style="font-weight:600">${esc(u.username)}</div><div style="font-size:0.72rem;color:var(--fg2)">${esc(u.first_name)} ${esc(u.last_name)}</div></div></div></td>
+          <td><span class="admin-badge ${u.type === 'telegram' ? 'success' : 'warning'}">${u.type}</span></td>
+          <td><span class="admin-badge ${u.role === 'admin' ? 'danger' : 'success'}">${u.role}</span></td>
+          <td style="font-size:0.8rem;color:var(--fg2)">${new Date(u.join_date).toLocaleDateString()}</td>
+          <td><button class="admin-btn" onclick="adminToggleRole(${u.id},'${u.role}')">${u.role === 'admin' ? 'Demote' : 'Promote'}</button></td>
+        </tr>`).join('')}
+      </table></div>`;
+      break;
+    }
+    case 'posts': case 'reels': {
+      const posts = await db.getAll('posts');
+      const filtered = section === 'reels' ? posts.filter(p => p.type === 'video') : posts;
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">${section === 'reels' ? 'Reels' : 'Posts'} (${filtered.length})</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card" style="overflow-x:auto"><table class="admin-table">
+        <tr><th>Preview</th><th>Author</th><th>Type</th><th>Views</th><th>Likes</th><th>Date</th><th>Actions</th></tr>
+        ${filtered.map(p => `<tr>
+          <td><img src="${esc(p.thumbnail_url || p.media_url || '')}" style="width:48px;height:48px;object-fit:cover;border-radius:6px"></td>
+          <td style="font-weight:600">${esc(p.username || 'Unknown')}</td>
+          <td><span class="admin-badge ${p.type === 'video' ? 'warning' : 'success'}">${p.type}</span></td>
+          <td>${fmtNum(p.view_count || 0)}</td>
+          <td>${fmtNum(p.like_count || 0)}</td>
+          <td style="font-size:0.8rem;color:var(--fg2)">${timeAgo(p.created_at)}</td>
+          <td><button class="admin-btn danger" onclick="adminDeletePost(${p.id})"><i class="fas fa-trash"></i></button></td>
+        </tr>`).join('')}
+      </table></div>`;
+      break;
+    }
+    case 'comments': {
+      const comments = await db.getAll('comments');
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Comments (${comments.length})</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card" style="overflow-x:auto"><table class="admin-table">
+        <tr><th>User</th><th>Comment</th><th>Post ID</th><th>Date</th><th>Actions</th></tr>
+        ${comments.slice(0, 50).map(c => `<tr>
+          <td style="font-weight:600">${esc(c.username)}</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.text)}</td>
+          <td style="font-size:0.8rem">${c.post_id}</td>
+          <td style="font-size:0.8rem;color:var(--fg2)">${timeAgo(c.created_at)}</td>
+          <td><button class="admin-btn danger" onclick="adminDeleteComment(${c.id})"><i class="fas fa-trash"></i></button></td>
+        </tr>`).join('')}
+      </table></div>`;
+      break;
+    }
+    case 'reports': {
+      const reports = await db.getAll('reports');
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Reports (${reports.length})</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card" style="overflow-x:auto"><table class="admin-table">
+        <tr><th>Post ID</th><th>Reason</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+        ${reports.map(r => `<tr>
+          <td>${r.post_id}</td>
+          <td>${esc(r.reason)}</td>
+          <td><span class="admin-badge ${r.status === 'pending' ? 'warning' : r.status === 'resolved' ? 'success' : 'danger'}">${r.status}</span></td>
+          <td style="font-size:0.8rem;color:var(--fg2)">${timeAgo(r.created_at)}</td>
+          <td>
+            ${r.status === 'pending' ? `<button class="admin-btn" onclick="adminResolveReport(${r.id},'resolved')">Resolve</button><button class="admin-btn danger" onclick="adminResolveReport(${r.id},'dismissed')">Dismiss</button>` : '-'}
+          </td>
+        </tr>`).join('')}
+      </table></div>`;
+      break;
+    }
+    case 'wallet': {
+      const txns = await db.getAll('transactions');
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">All Transactions (${txns.length})</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card" style="overflow-x:auto"><table class="admin-table">
+        <tr><th>User ID</th><th>Type</th><th>Amount</th><th>Description</th><th>Date</th></tr>
+        ${txns.slice(0, 50).map(t => `<tr>
+          <td>${t.user_id}</td>
+          <td><span class="admin-badge ${t.type === 'credit' ? 'success' : 'danger'}">${t.type}</span></td>
+          <td style="font-weight:700">${t.type === 'credit' ? '+' : '-'}${fmtMoney(t.amount)}</td>
+          <td>${esc(t.description)}</td>
+          <td style="font-size:0.8rem;color:var(--fg2)">${timeAgo(t.created_at)}</td>
+        </tr>`).join('')}
+      </table></div>`;
+      break;
+    }
+    case 'withdrawals': {
+      const wds = await db.getAll('withdrawals');
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Withdrawals (${wds.length})</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card" style="overflow-x:auto"><table class="admin-table">
+        <tr><th>User ID</th><th>Amount</th><th>Method</th><th>Address</th><th>Status</th><th>Actions</th></tr>
+        ${wds.map(w => `<tr>
+          <td>${w.user_id}</td>
+          <td style="font-weight:700">${fmtMoney(w.amount)}</td>
+          <td>${esc(w.method)}</td>
+          <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.8rem">${esc(w.address)}</td>
+          <td><span class="admin-badge ${w.status === 'pending' ? 'warning' : w.status === 'completed' ? 'success' : 'danger'}">${w.status}</span></td>
+          <td>${w.status === 'pending' ? `<button class="admin-btn" onclick="adminProcessWithdrawal(${w.id},'completed')">Approve</button><button class="admin-btn danger" onclick="adminProcessWithdrawal(${w.id},'rejected')">Reject</button>` : '-'}</td>
+        </tr>`).join('')}
+      </table></div>`;
+      break;
+    }
+    case 'referrals': {
+      const refs = await db.getAll('referrals');
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Referrals (${refs.length})</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card" style="overflow-x:auto"><table class="admin-table">
+        <tr><th>Code</th><th>Referrer ID</th><th>Referred ID</th><th>Earnings</th><th>Date</th></tr>
+        ${refs.map(r => `<tr>
+          <td style="font-weight:700;letter-spacing:1px">${esc(r.code)}</td>
+          <td>${r.referrer_id}</td>
+          <td>${r.referred_id || '-'}</td>
+          <td>${fmtMoney(r.earnings || 0)}</td>
+          <td style="font-size:0.8rem;color:var(--fg2)">${timeAgo(r.created_at)}</td>
+        </tr>`).join('')}
+      </table></div>`;
+      break;
+    }
+    case 'announcements': {
+      const anns = await db.getAll('announcements');
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Announcements</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card">
+        <div class="form-group"><label>Title</label><input type="text" id="annTitle" placeholder="Announcement title"></div>
+        <div class="form-group"><label>Message</label><textarea id="annMessage" placeholder="Write announcement..." rows="3"></textarea></div>
+        <button class="btn-primary" style="max-width:200px" onclick="adminPostAnnouncement()">Post Announcement</button>
+      </div>
+      <div style="margin-top:16px">${anns.map(a => `<div class="admin-card"><div style="font-weight:700;margin-bottom:4px">${esc(a.title)}</div><div style="font-size:0.85rem;color:var(--fg2);margin-bottom:8px">${esc(a.message)}</div><div style="font-size:0.72rem;color:var(--fg3)">${timeAgo(a.created_at)}</div></div>`).join('')}</div>`;
+      break;
+    }
+    case 'ads': {
+      const ads = await db.getAll('ads');
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Advertisements</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card">
+        <div class="form-group"><label>Ad Title</label><input type="text" id="adTitle" placeholder="Ad title"></div>
+        <div class="form-group"><label>Ad Image URL</label><input type="url" id="adImageUrl" placeholder="https://..."></div>
+        <div class="form-group"><label>Link URL</label><input type="url" id="adLinkUrl" placeholder="https://..."></div>
+        <div class="toggle-row" style="border:none"><span>Active</span><div class="toggle on" id="adActiveToggle" data-value="on"></div></div>
+        <button class="btn-primary" style="max-width:200px" onclick="adminCreateAd()">Create Ad</button>
+      </div>
+      <div style="margin-top:16px">${ads.map(a => `<div class="admin-card" style="display:flex;align-items:center;gap:12px">
+        <img src="${esc(a.image_url)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px">
+        <div style="flex:1"><div style="font-weight:700">${esc(a.title)}</div><div style="font-size:0.72rem;color:var(--fg2)">${esc(a.link_url)}</div><span class="admin-badge ${a.active ? 'success' : 'danger'}">${a.active ? 'Active' : 'Inactive'}</span></div>
+        <button class="admin-btn danger" onclick="adminDeleteAd(${a.id})"><i class="fas fa-trash"></i></button>
+      </div>`).join('')}</div>`;
+      break;
+    }
+    case 'roles': {
+      const users = await db.getAll('users');
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Role Management</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card" style="overflow-x:auto"><table class="admin-table">
+        <tr><th>User</th><th>Current Role</th><th>Verified</th><th>Actions</th></tr>
+        ${users.map(u => `<tr>
+          <td style="font-weight:600">${esc(u.username)}</td>
+          <td><span class="admin-badge ${u.role === 'admin' ? 'danger' : 'success'}">${u.role}</span></td>
+          <td><span class="admin-badge ${u.verified ? 'success' : 'warning'}">${u.verified ? 'Yes' : 'No'}</span></td>
+          <td style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="admin-btn" onclick="adminToggleRole(${u.id},'${u.role}')">${u.role === 'admin' ? 'Demote' : 'Promote'}</button>
+            <button class="admin-btn" onclick="adminToggleVerified(${u.id},${u.verified})">${u.verified ? 'Unverify' : 'Verify'}</button>
+          </td>
+        </tr>`).join('')}
+      </table></div>`;
+      break;
+    }
+    case 'settings': {
+      let maintSetting = await db.get('settings', 'maintenance_mode');
+      const isMaint = maintSetting ? maintSetting.value : false;
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Settings</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card">
+        <div class="toggle-row" style="border:none;margin-bottom:16px">
+          <div><div style="font-weight:600">Maintenance Mode</div><div style="font-size:0.78rem;color:var(--fg2)">When enabled, only admins can access the app</div></div>
+          <div class="toggle ${isMaint ? 'on' : ''}" id="maintToggle" onclick="adminToggleMaintenance()"></div>
+        </div>
+      </div>
+      <div class="admin-card">
+        <h3>App Info</h3>
+        <p style="font-size:0.85rem;color:var(--fg2);line-height:1.6">
+          <strong>App Name:</strong> ReelGram<br>
+          <strong>Version:</strong> 1.0.0<br>
+          <strong>Storage:</strong> IndexedDB (Client-side)<br>
+          <strong>Platform:</strong> Telegram WebApp + Browser
+        </p>
+      </div>`;
+      break;
+    }
+    case 'analytics': {
+      const totalUsers = await getStat('total_users');
+      const totalPosts = await db.count('posts');
+      const totalComments = await db.count('comments');
+      const totalLikes = await db.count('likes');
+      const posts = await db.getAll('posts');
+      const totalViews = posts.reduce((s, p) => s + (p.view_count || 0), 0);
+      const totalPostLikes = posts.reduce((s, p) => s + (p.like_count || 0), 0);
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Analytics</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card"><div class="asc-label">Total Views</div><div class="asc-val">${fmtNum(totalViews)}</div></div>
+        <div class="admin-stat-card"><div class="asc-label">Total Likes</div><div class="asc-val">${fmtNum(totalPostLikes)}</div></div>
+        <div class="admin-stat-card"><div class="asc-label">Engagement Rate</div><div class="asc-val">${totalViews > 0 ? ((totalPostLikes / totalViews) * 100).toFixed(1) : 0}%</div></div>
+        <div class="admin-stat-card"><div class="asc-label">Posts per User</div><div class="asc-val">${totalUsers > 0 ? (totalPosts / totalUsers).toFixed(1) : 0}</div></div>
+        <div class="admin-stat-card"><div class="asc-label">Comments per Post</div><div class="asc-val">${totalPosts > 0 ? (totalComments / totalPosts).toFixed(1) : 0}</div></div>
+        <div class="admin-stat-card"><div class="asc-label">Likes per Post</div><div class="asc-val">${totalPosts > 0 ? (totalPostLikes / totalPosts).toFixed(1) : 0}</div></div>
+      </div>
+      <div class="admin-card" style="margin-top:16px">
+        <h3>Posts by Type</h3>
+        <div style="display:flex;gap:16px;margin-top:12px">
+          <div style="flex:1;background:var(--accent-bg);border-radius:var(--radius);padding:16px;text-align:center">
+            <div style="font-size:1.5rem;font-weight:800;color:var(--accent)">${posts.filter(p => p.type === 'image').length}</div>
+            <div style="font-size:0.8rem;color:var(--fg2)">Images</div>
+          </div>
+          <div style="flex:1;background:rgba(255,170,0,0.1);border-radius:var(--radius);padding:16px;text-align:center">
+            <div style="font-size:1.5rem;font-weight:800;color:var(--warning)">${posts.filter(p => p.type === 'video').length}</div>
+            <div style="font-size:0.8rem;color:var(--fg2)">Videos</div>
+          </div>
+        </div>
+      </div>`;
+      break;
+    }
+    case 'logs': {
+      const logs = await db.getAll('logs');
+      logs.sort((a, b) => b.created_at - a.created_at);
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Activity Logs (${logs.length})</h2>
+        <div style="display:flex;gap:8px">
+          <button class="admin-btn danger" onclick="adminClearLogs()"><i class="fas fa-trash"></i> Clear</button>
+          <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+        </div>
+      </div>
+      <div class="admin-card" style="overflow-x:auto"><table class="admin-table">
+        <tr><th>Type</th><th>Detail</th><th>User ID</th><th>Date</th></tr>
+        ${logs.slice(0, 100).map(l => `<tr>
+          <td><span class="admin-badge ${l.type === 'error' ? 'danger' : 'success'}">${esc(l.type)}</span></td>
+          <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.detail)}</td>
+          <td style="font-size:0.8rem">${l.user_id || '-'}</td>
+          <td style="font-size:0.8rem;color:var(--fg2)">${timeAgo(l.created_at)}</td>
+        </tr>`).join('')}
+      </table></div>`;
+      break;
+    }
+    case 'backup': {
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Database Backup</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card">
+        <h3>Export Database</h3>
+        <p style="font-size:0.85rem;color:var(--fg2);margin-bottom:16px">Download a JSON backup of all data stored in IndexedDB.</p>
+        <button class="btn-primary" style="max-width:200px" onclick="adminExportBackup()"><i class="fas fa-download"></i> Export Backup</button>
+      </div>
+      <div class="admin-card" style="margin-top:16px">
+        <h3>Import Database</h3>
+        <p style="font-size:0.85rem;color:var(--fg2);margin-bottom:16px">Restore data from a JSON backup file. This will overwrite existing data.</p>
+        <input type="file" id="importBackupFile" accept=".json" style="max-width:300px;margin-bottom:12px">
+        <br><button class="btn-primary" style="max-width:200px" onclick="adminImportBackup()"><i class="fas fa-upload"></i> Import Backup</button>
+      </div>`;
+      break;
+    }
+    case 'maintenance': {
+      let maintSetting = await db.get('settings', 'maintenance_mode');
+      const isMaint = maintSetting ? maintSetting.value : false;
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2 style="font-size:1.3rem;font-weight:800">Maintenance Mode</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div>
+      <div class="admin-card">
+        <div class="toggle-row" style="border:none;margin-bottom:16px">
+          <div><div style="font-weight:600;font-size:1.1rem">Maintenance Mode</div><div style="font-size:0.85rem;color:var(--fg2);margin-top:4px">When enabled, regular users will see a maintenance page. Only admins can access the app.</div></div>
+          <div class="toggle ${isMaint ? 'on' : ''}" onclick="adminToggleMaintenance()"></div>
+        </div>
+        <div style="margin-top:16px;padding:16px;background:var(--bg2);border-radius:var(--radius-sm);font-size:0.85rem;color:var(--fg2)">
+          <strong>Current Status:</strong> <span style="color:${isMaint ? 'var(--warning)' : 'var(--success)'}">${isMaint ? 'ENABLED' : 'DISABLED'}</span>
+        </div>
+      </div>`;
+      break;
+    }
+    default:
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h2 style="font-size:1.3rem;font-weight:800">${section}</h2>
+        <button class="admin-btn" onclick="adminBack()"><i class="fas fa-arrow-left"></i> Back to App</button>
+      </div><div class="admin-card"><p>Section: ${section}</p></div>`;
+  }
+
+  main.innerHTML = html;
+  /* 重新绑定 toggle 事件 */
+  main.querySelectorAll('.toggle').forEach(t => {
+    if (!t.onclick) {
+      t.addEventListener('click', () => {
+        t.classList.toggle('on');
+        t.dataset.value = t.classList.contains('on') ? 'on' : 'off';
+      });
+    }
+  });
+}
+
+/* Admin 操作函数 */
+async function adminToggleRole(userId, currentRole) {
+  try {
+    const user = await db.get('users', userId);
+    if (user) {
+      user.role = currentRole === 'admin' ? 'user' : 'admin';
+      await db.put('users', user);
+      toast(`User role changed to ${user.role}`, 'success');
+      await logActivity('admin', `Changed role of ${user.username} to ${user.role}`);
+      /* 刷新当前 admin section */
+      const activeSection = document.querySelector('.admin-nav-item.active')?.dataset.admin;
+      if (activeSection) loadAdminSection(activeSection);
+      if (userId === currentUser.id) {
+        document.getElementById('adminBtn').style.display = user.role === 'admin' ? '' : 'none';
+      }
+    }
+  } catch(e) { toast('Failed to change role', 'error'); }
+}
+
+async function adminToggleVerified(userId, currentVerified) {
+  try {
+    const user = await db.get('users', userId);
+    if (user) {
+      user.verified = !currentVerified;
+      await db.put('users', user);
+      toast(`Verification ${user.verified ? 'granted' : 'removed'}`, 'success');
+      await logActivity('admin', `${user.verified ? 'Verified' : 'Unverified'} ${user.username}`);
+      const activeSection = document.querySelector('.admin-nav-item.active')?.dataset.admin;
+      if (activeSection) loadAdminSection(activeSection);
+    }
+  } catch(e) { toast('Failed to update verification', 'error'); }
+}
+
+async function adminDeletePost(postId) {
+  try {
+    await db.delete('posts', postId);
+    /* 同时删除相关评论、点赞、保存 */
+    const comments = await db.getByIndex('comments', 'post_id', postId);
+    for (const c of comments) await db.delete('comments', c.id);
+    const likes = await db.getByIndex('likes', 'post_id', postId);
+    for (const l of likes) await db.delete('likes', l.id);
+    const saves = await db.getByIndex('saves', 'post_id', postId);
+    for (const s of saves) await db.delete('saves', s.id);
+    toast('Post deleted', 'success');
+    await logActivity('admin', `Deleted post ${postId}`);
+    reelsData = reelsData.filter(p => p.id !== postId);
+    const activeSection = document.querySelector('.admin-nav-item.active')?.dataset.admin;
+    if (activeSection) loadAdminSection(activeSection);
+  } catch(e) { toast('Failed to delete post', 'error'); }
+}
+
+async function adminDeleteComment(commentId) {
+  try {
+    await db.delete('comments', commentId);
+    toast('Comment deleted', 'success');
+    await logActivity('admin', `Deleted comment ${commentId}`);
+    const activeSection = document.querySelector('.admin-nav-item.active')?.dataset.admin;
+    if (activeSection) loadAdminSection(activeSection);
+  } catch(e) { toast('Failed to delete comment', 'error'); }
+}
+
+async function adminResolveReport(reportId, status) {
+  try {
+    const report = await db.get('reports', reportId);
+    if (report) { report.status = status; await db.put('reports', report); }
+    toast(`Report ${status}`, 'success');
+    await logActivity('admin', `Report ${reportId} ${status}`);
+    loadAdminSection('reports');
+  } catch(e) { toast('Failed to resolve report', 'error'); }
+}
+
+async function adminProcessWithdrawal(withdrawalId, status) {
+  try {
+    const wd = await db.get('withdrawals', withdrawalId);
+    if (wd) {
+      wd.status = status;
+      await db.put('withdrawals', wd);
+      if (status === 'rejected') {
+        /* 退回余额 */
+        const user = await db.get('users', wd.user_id);
+        if (user) { user.balance += wd.amount; await db.put('users', user); }
+      }
+      toast(`Withdrawal ${status}`, 'success');
+      await logActivity('admin', `Withdrawal ${withdrawalId} ${status}`);
+      loadAdminSection('withdrawals');
+    }
+  } catch(e) { toast('Failed to process withdrawal', 'error'); }
+}
+
+async function adminPostAnnouncement() {
+  const title = document.getElementById('annTitle')?.value.trim();
+  const message = document.getElementById('annMessage')?.value.trim();
+  if (!title || !message) { toast('Please fill in all fields', 'error'); return; }
+  try {
+    await db.add('announcements', { title, message, created_at: Date.now() });
+    /* 通知所有用户 */
+    const users = await db.getAll('users');
+    for (const u of users) {
+      await db.add('notifications', { user_id: u.id, type: 'announcement', message: `${title}: ${message}`, read: false, created_at: Date.now() });
+    }
+    toast('Announcement posted', 'success');
+    await logActivity('admin', `Posted announcement: ${title}`);
+    loadAdminSection('announcements');
+  } catch(e) { toast('Failed to post announcement', 'error'); }
+}
+
+async function adminCreateAd() {
+  const title = document.getElementById('adTitle')?.value.trim();
+  const imageUrl = document.getElementById('adImageUrl')?.value.trim();
+  const linkUrl = document.getElementById('adLinkUrl')?.value.trim();
+  const active = document.getElementById('adActiveToggle')?.classList.contains('on');
+  if (!title || !imageUrl) { toast('Please fill in title and image URL', 'error'); return; }
+  try {
+    await db.add('ads', { title, image_url: imageUrl, link_url: linkUrl, active, created_at: Date.now() });
+    toast('Ad created', 'success');
+    await logActivity('admin', `Created ad: ${title}`);
+    loadAdminSection('ads');
+  } catch(e) { toast('Failed to create ad', 'error'); }
+}
+
+async function adminDeleteAd(adId) {
+  try {
+    await db.delete('ads', adId);
+    toast('Ad deleted', 'success');
+    loadAdminSection('ads');
+  } catch(e) { toast('Failed to delete ad', 'error'); }
+}
+
+async function adminToggleMaintenance() {
+  try {
+    let setting = await db.get('settings', 'maintenance_mode');
+    const newVal = setting ? !setting.value : true;
+    await db.put('settings', { key: 'maintenance_mode', value: newVal });
+    toast(`Maintenance mode ${newVal ? 'enabled' : 'disabled'}`, 'success');
+    await logActivity('admin', `Maintenance mode ${newVal ? 'enabled' : 'disabled'}`);
+    const activeSection = document.querySelector('.admin-nav-item.active')?.dataset.admin;
+    if (activeSection) loadAdminSection(activeSection);
+  } catch(e) { toast('Failed to toggle maintenance mode', 'error'); }
+}
+
+async function adminClearLogs() {
+  try {
+    const logs = await db.getAll('logs');
+    for (const l of logs) await db.delete('logs', l.id);
+    toast('Logs cleared', 'success');
+    loadAdminSection('logs');
+  } catch(e) { toast('Failed to clear logs', 'error'); }
+}
+
+async function adminExportBackup() {
+  try {
+    const stores = ['users','posts','comments','likes','saves','follows','transactions','withdrawals','referrals','reports','notifications','stats','settings','logs','announcements','ads'];
+    const backup = {};
+    for (const store of stores) {
+      backup[store] = await db.getAll(store);
+    }
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reelgram_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Backup exported', 'success');
+    await logActivity('admin', 'Database backup exported');
+  } catch(e) { toast('Failed to export backup', 'error'); }
+}
+
+async function adminImportBackup() {
+  const fileInput = document.getElementById('importBackupFile');
+  if (!fileInput || !fileInput.files[0]) { toast('Please select a backup file', 'error'); return; }
+  try {
+    const text = await fileInput.files[0].text();
+    const backup = JSON.parse(text);
+    const stores = Object.keys(backup);
+    for (const store of stores) {
+      /* 清除现有数据 */
+      const existing = await db.getAll(store);
+      for (const item of existing) await db.delete(store, item.id);
+      /* 导入备份数据 */
+      for (const item of backup[store]) {
+        await db.put(store, item);
+      }
+    }
+    toast('Backup imported successfully', 'success');
+    await logActivity('admin', 'Database backup imported');
+    /* 刷新 */
+    reelsData = [];
+    loadAdminSection('backup');
+  } catch(e) { toast('Failed to import backup: ' + e.message, 'error'); }
+}
+
+/* ============================================
+   底部导航事件
+   ============================================ */
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const page = item.dataset.page;
+    if (page) navigateTo(page);
+  });
+});
+
+/* ============================================
+   CSRF 保护令牌（模拟）
+   ============================================ */
+function generateCSRFToken() {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
+}
+let csrfToken = generateCSRFToken();
+
+/* ============================================
+   频率限制（模拟）
+   ============================================ */
+const rateLimiter = {};
+function checkRateLimit(action, limit = 10, windowMs = 60000) {
+  const now = Date.now();
+  if (!rateLimiter[action]) rateLimiter[action] = [];
+  rateLimiter[action] = rateLimiter[action].filter(t => now - t < windowMs);
+  if (rateLimiter[action].length >= limit) return false;
+  rateLimiter[action].push(now);
+  return true;
+}
+
+/* ============================================
+   维护模式检查
+   ============================================ */
+async function checkMaintenance() {
+  try {
+    const setting = await db.get('settings', 'maintenance_mode');
+    if (setting && setting.value && (!currentUser || currentUser.role !== 'admin')) {
+      document.getElementById('app').innerHTML = `
+        <div style="height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;background:var(--bg)">
+          <i class="fas fa-wrench" style="font-size:3rem;color:var(--fg3);margin-bottom:20px"></i>
+          <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:8px">Under Maintenance</h2>
+          <p style="color:var(--fg2);max-width:300px">We're performing some improvements. Please check back shortly.</p>
+        </div>`;
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+/* ============================================
+   应用初始化
+   ============================================ */
+async function initApp() {
+  try {
+    /* 初始化数据库 */
+    await db.init();
+
+    /* 认证 */
+    await authenticate();
+
+    /* 检查维护模式 */
+    if (await checkMaintenance()) {
+      document.getElementById('loadingScreen').classList.add('hidden');
+      return;
+    }
+
+    /* 种子数据 */
+    await seedData();
+
+    /* 加载主题 */
+    const savedTheme = localStorage.getItem('rg_theme') || 'dark';
+    setTheme(savedTheme);
+
+    /* 显示管理按钮 */
+    if (currentUser && currentUser.role === 'admin') {
+      document.getElementById('adminBtn').style.display = '';
+    }
+
+    /* 检查未读通知 */
+    await checkUnreadNotifs();
+
+    /* 加载首页 */
+    navigateTo('home');
+
+    /* 隐藏加载屏 */
+    setTimeout(() => {
+      document.getElementById('loadingScreen').classList.add('hidden');
+    }, 500);
+
+    /* 更新在线状态 */
+    setInterval(async () => {
+      if (currentUser) {
+        try {
+          currentUser.last_online = Date.now();
+          await db.put('users', currentUser);
+        } catch(e) {}
+      }
+    }, 30000);
+
+    /* 定期检查通知 */
+    setInterval(checkUnreadNotifs, 10000);
+
+  } catch(e) {
+    console.error('Init error:', e);
+    document.getElementById('loadingScreen').innerHTML = `
+      <i class="fas fa-exclamation-triangle" style="font-size:3rem;color:var(--danger);margin-bottom:16px"></i>
+      <h2 style="font-weight:700;margin-bottom:8px">Failed to Initialize</h2>
+      <p style="color:var(--fg2);text-align:center;max-width:300px">Please ensure your browser supports IndexedDB and try again.</p>
+      <button class="btn-primary" style="max-width:200px;margin-top:20px" onclick="location.reload()">Retry</button>`;
+  }
+}
+
+/* 启动应用 */
+initApp();
 </script>
 </body>
 </html>
