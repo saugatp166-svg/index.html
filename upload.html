@@ -9,572 +9,155 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-  :root{--bg:#0a0e14;--bg2:#111820;--bg-card:#151d28;--bg-el:#1a2332;--fg:#e8edf3;--fg-m:#6b7d94;--fg-d:#3d4f63;--accent:#00d4aa;--accent-glow:rgba(0,212,170,.25);--accent-dk:#00a885;--danger:#ff4757;--warn:#ffa502;--ok:#2ed573;--border:rgba(255,255,255,.06);--glass:rgba(17,24,32,.85);--r:14px;--rs:8px;--rf:9999px;--tr:.3s cubic-bezier(.4,0,.2,1)}
-  *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
-  .app{max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
-  .bg-atm{position:fixed;top:0;left:50%;transform:translateX(-50%);max-width:430px;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
-  .bg-atm .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.1;animation:orbF 12s ease-in-out infinite}
-  .bg-atm .orb:nth-child(1){width:250px;height:250px;background:var(--accent);top:-60px;right:-40px}
-  .bg-atm .orb:nth-child(2){width:180px;height:180px;background:#ff6b6b;bottom:80px;left:-30px;opacity:.05;animation-delay:-4s}
-  @keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.1)}66%{transform:translate(-15px,20px) scale(.95)}}
-  .page{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;z-index:1;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .page::-webkit-scrollbar{display:none}
-  .top-bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-  .top-bar .back-btn{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;padding:4px 8px 4px 0;transition:var(--tr)}
-  .top-bar .back-btn:hover{color:var(--accent)}
-  .logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
-  .top-actions button{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;transition:var(--tr)}
-  .top-actions button:hover{color:var(--accent)}
-
-  /* Type selector */
-  .type-sel{display:flex;margin:16px 18px 0;gap:8px}
-  .type-btn{flex:1;padding:12px;border-radius:var(--r);background:var(--bg-card);border:2px solid var(--border);color:var(--fg-m);font-size:14px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;gap:8px}
-  .type-btn:hover{border-color:var(--fg-d)}
-  .type-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
-  .type-btn i{font-size:18px}
-
-  /* Method tabs */
-  .method-tabs{display:flex;margin:16px 18px 0;gap:0;background:var(--bg-card);border-radius:var(--rs);padding:3px;border:1px solid var(--border)}
-  .method-tab{flex:1;padding:10px;text-align:center;background:none;border:none;color:var(--fg-d);font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;border-radius:6px;transition:var(--tr)}
-  .method-tab.active{background:var(--accent);color:#000}
-
-  /* Upload zone */
-  .upload-zone{margin:16px 18px;border:2px dashed var(--fg-d);border-radius:var(--r);padding:36px 20px;text-align:center;transition:var(--tr);cursor:pointer;position:relative;overflow:hidden}
-  .upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:var(--accent-glow)}
-  .upload-zone i{font-size:44px;color:var(--fg-d);margin-bottom:10px;display:block;transition:var(--tr)}
-  .upload-zone:hover i,.upload-zone.dragover i{color:var(--accent)}
-  .upload-zone p{color:var(--fg-m);font-size:14px}
-  .upload-zone .sub{font-size:12px;color:var(--fg-d);margin-top:6px}
-  .upload-zone input[type="file"]{display:none}
-
-  /* URL input */
-  .url-section{margin:16px 18px 0;display:none}
-  .url-section.show{display:block}
-  .form-group{margin-bottom:14px}
-  .form-group label{display:block;font-size:12px;font-weight:600;color:var(--fg-m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-  .form-input{width:100%;padding:12px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rs);color:var(--fg);font-size:14px;font-family:'Outfit',sans-serif;outline:none;transition:var(--tr);resize:none}
-  .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-  .form-input::placeholder{color:var(--fg-d)}
-
-  /* Preview */
-  .preview-box{margin:16px 18px 0;display:none;border-radius:var(--r);overflow:hidden;position:relative;background:var(--bg-card);border:1px solid var(--border)}
-  .preview-box.show{display:block}
-  .preview-box img,.preview-box video{width:100%;max-height:320px;object-fit:contain;display:block;background:#000}
-  .preview-box .rm-btn{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
-  .preview-box .rm-btn:hover{background:var(--danger)}
-  .preview-label{padding:8px 12px;font-size:11px;color:var(--fg-m);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
-
-  /* Thumbnail row for video */
-  .thumb-row{margin:12px 18px 0;display:none}
-  .thumb-row.show{display:flex;gap:12px;align-items:flex-start}
-  .thumb-preview{width:100px;height:100px;border-radius:var(--rs);overflow:hidden;flex-shrink:0;background:var(--bg-card);border:1px solid var(--border)}
-  .thumb-preview img{width:100%;height:100%;object-fit:cover}
-  .thumb-preview .rm-thumb{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
-  /* Filters */
-  .filter-row{display:flex;gap:10px;padding:16px 18px 0;overflow-x:auto;scrollbar-width:none}
-  .filter-row::-webkit-scrollbar{display:none}
-  .filter-chip{flex-shrink:0;padding:8px 18px;border-radius:var(--rf);background:var(--bg-card);border:1px solid var(--border);color:var(--fg-m);font-size:13px;font-family:'Outfit',sans-serif;cursor:pointer;transition:var(--tr);font-weight:500}
-  .filter-chip:hover{border-color:var(--accent);color:var(--fg)}
-  .filter-chip.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
-
-  /* Form details */
-  .detail-form{padding:16px 18px}
-  .char-count{text-align:right;font-size:11px;color:var(--fg-d);margin-top:4px}
-  .char-count.warn{color:var(--warn)}
-  .char-count.over{color:var(--danger)}
-
-  /* Publish */
-  .publish-wrap{padding:0 18px 32px}
-  .btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent-dk));color:#000;font-size:15px;font-weight:700;font-family:'Outfit',sans-serif;border:none;border-radius:var(--r);cursor:pointer;transition:var(--tr);position:relative;overflow:hidden}
-  .btn-primary:hover{box-shadow:0 4px 20px rgba(0,212,170,.3);transform:translateY(-1px)}
-  .btn-primary:active{transform:scale(.98)}
-  .btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
-
-  /* Loading overlay */
-  .loading-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none;transition:opacity .3s ease}
-  .loading-ov.show{opacity:1;pointer-events:all}
-  .spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loading-ov p{font-size:15px;color:var(--fg-m)}
-
-  /* Toast */
-  .toast-c{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;max-width:400px;width:calc(100% - 36px)}
-  .toast{padding:14px 18px;border-radius:var(--rs);font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;margin-bottom:8px;animation:tIn .35s ease,tOut .35s ease 2.5s forwards;box-shadow:0 8px 32px rgba(0,0,0,.4)}
-  .toast.success{background:#0d2818;border:1px solid rgba(46,213,115,.3);color:var(--ok)}
-  .toast.error{background:#2d0f13;border:1px solid rgba(255,71,87,.3);color:var(--danger)}
-  .toast.info{background:#0d1f2d;border:1px solid rgba(0,212,170,.3);color:var(--accent)}
-  @keyframes tIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes tOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-20px)}}
-
-  .fade-up{opacity:0;transform:translateY(16px);animation:fadeU .5s ease forwards}
-  @keyframes fadeU{to{opacity:1;transform:translateY(0)}}
-  .fade-up:nth-child(2){animation-delay:.06s}
-  .fade-up:nth-child(3){animation-delay:.12s}
-  @media(min-width:431px){.app{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
-  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+:root{--bg:#0a0e14;--bg2:#111820;--bgc:#151d28;--bge:#1a2332;--fg:#e8edf3;--fm:#6b7d94;--fd:#3d4f63;--ac:#00d4aa;--acg:rgba(0,212,170,.25);--acd:#00a885;--dn:#ff4757;--wn:#ffa502;--ok:#2ed573;--bd:rgba(255,255,255,.06);--gl:rgba(17,24,32,.88);--r:14px;--rs:8px;--rf:9999px;--t:.3s cubic-bezier(.4,0,.2,1)}
+*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+.app{max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
+.atm{position:fixed;top:0;left:50%;transform:translateX(-50%);max-width:430px;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.atm .o{position:absolute;border-radius:50%;filter:blur(80px);animation:of 12s ease-in-out infinite}
+.atm .o:nth-child(1){width:220px;height:220px;background:var(--ac);top:-60px;right:-40px;opacity:.08}
+@keyframes of{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.1)}66%{transform:translate(-15px,20px) scale(.95)}}
+.pg{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;z-index:1;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.pg::-webkit-scrollbar{display:none}
+.tb{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--gl);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.bb{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;padding:4px 8px 4px 0;transition:var(--t)}
+.bb:hover{color:var(--ac)}
+.lg{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
+.tys{display:flex;margin:14px 16px 0;gap:7px}
+.tyb{flex:1;padding:11px;border-radius:var(--r);background:var(--bgc);border:2px solid var(--bd);color:var(--fm);font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:7px}
+.tyb:hover{border-color:var(--fg)}.tyb.on{border-color:var(--ac);color:var(--ac);background:var(--acg)}
+.ts{display:flex;margin:12px 16px 0;gap:0;background:var(--bgc);border-radius:var(--rs);padding:3px;border:1px solid var(--bd)}
+.tt{flex:1;padding:9px;text-align:center;background:none;border:none;color:var(--fm);font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;border-radius:5px;transition:var(--t)}
+.tt.on{background:var(--ac);color:#000}
+.upz{margin:14px 16px 0;border:2px dashed var(--fd);border-radius:var(--r);padding:32px 18px;text-align:center;transition:var(--t);cursor:pointer}
+.upz:hover,.upz.dg{border-color:var(--ac);background:var(--acg)}
+.upz i{font-size:42px;color:var(--fd);margin-bottom:8px;display:block;transition:var(--t)}
+.upz:hover i,.upz.dg i{color:var(--ac)}
+.upz p{color:var(--fm);font-size:13px}.upz .su{font-size:11px;color:var(--fd);margin-top:4px}
+.upz input{display:none}
+.us{margin:14px 16px 0;display:none}.us.sh{display:block}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:11px;font-weight:600;color:var(--fm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.fi{width:100%;padding:11px 14px;background:var(--bgc);border:1px solid var(--bd);border-radius:var(--rs);color:var(--fg);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:var(--t);resize:none}
+.fi:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acg)}.fi::placeholder{color:var(--fd)}
+.pb{margin:14px 16px 0;display:none;border-radius:var(--r);overflow:hidden;position:relative;background:var(--bgc);border:1px solid var(--bd)}
+.pb.sh{display:block}
+.pb img,.pb video{width:100%;max-height:280px;object-fit:contain;display:block;background:#000}
+.pb .rb{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t)}
+.pb .rb:hover{background:var(--dn)}
+.plb{padding:6px 10px;font-size:10px;color:var(--fm);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.tr{margin:10px 16px 0;display:none;align-items:flex-start;gap:10px}.tr.sh{display:flex}
+.tp{width:90px;height:90px;border-radius:var(--rs);overflow:hidden;flex-shrink:0;background:var(--bgc);border:1px solid var(--bd);position:relative}
+.tp img{width:100%;height:100%;object-fit:cover}
+.fr{display:flex;gap:8px;padding:14px 16px 0;overflow-x:auto;scrollbar-width:none}.fr::-webkit-scrollbar{display:none}
+.fc{flex-shrink:0;padding:7px 16px;border-radius:var(--rf);background:var(--bgc);border:1px solid var(--bd);color:var(--fm);font-size:12px;font-family:'Outfit',sans-serif;cursor:pointer;transition:var(--t);font-weight:500}
+.fc:hover{border-color:var(--ac);color:var(--fg)}.fc.on{background:var(--ac);color:#000;border-color:var(--ac);font-weight:600}
+.df{padding:14px 16px}
+.cc{text-align:right;font-size:10px;color:var(--fd);margin-top:3px}.cc.wr{color:var(--wn)}.cc.ov{color:var(--dn)}
+.pw{padding:0 16px 28px}
+.bp{width:100%;padding:13px;background:linear-gradient(135deg,var(--ac),var(--acd));color:#000;font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;border:none;border-radius:var(--r);cursor:pointer;transition:var(--t)}
+.bp:hover{box-shadow:0 4px 18px rgba(0,212,170,.3);transform:translateY(-1px)}.bp:active{transform:scale(.98)}.bp:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+.lov{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.lov.sh{opacity:1;pointer-events:all}
+.spn{width:44px;height:44px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spi .8s linear infinite}
+@keyframes spi{to{transform:rotate(360deg)}}
+.lov p{font-size:14px;color:var(--fm)}
+.pbw{width:180px;height:4px;background:var(--bd);border-radius:4px;overflow:hidden}
+.pbf{height:100%;background:var(--ac);border-radius:4px;width:0%;transition:width .2s ease}
+.tc{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:9999;max-width:390px;width:calc(100% - 32px)}
+.to{padding:12px 16px;border-radius:var(--rs);font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:6px;animation:ti .3s ease,to2 .3s ease 2.5s forwards;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.to.su{background:#0d2818;border:1px solid rgba(46,213,115,.3);color:var(--ok)}
+.to.er{background:#2d0f13;border:1px solid rgba(255,71,87,.3);color:var(--dn)}
+.to.in{background:#0d1f2d;border:1px solid rgba(0,212,170,.3);color:var(--ac)}
+@keyframes ti{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes to2{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-18px)}}
+@media(min-width:431px){.app{border-left:1px solid var(--bd);border-right:1px solid var(--bd)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="bg-atm"><div class="orb"></div><div class="orb"></div></div>
-
-  <div class="page">
-    <div class="top-bar">
-      <button class="back-btn" onclick="goBack()" aria-label="Back"><i class="fas fa-arrow-left"></i></button>
-      <div class="logo">New Post</div>
-      <div class="top-actions"><button onclick="resetAll()" aria-label="Close"><i class="fas fa-times"></i></button></div>
-    </div>
-
-    <!-- Step 1: Select Type -->
-    <div class="type-sel fade-up">
-      <button class="type-btn active" data-type="image" onclick="selectType('image')">
-        <i class="fas fa-image"></i> Image
-      </button>
-      <button class="type-btn" data-type="video" onclick="selectType('video')">
-        <i class="fas fa-video"></i> Video
-      </button>
-    </div>
-
-    <!-- Step 2: Method (URL or Direct Upload) -->
-    <div class="method-tabs fade-up" id="methodTabs">
-      <button class="method-tab active" data-method="direct" onclick="selectMethod('direct')">
-        <i class="fas fa-upload"></i> Direct Upload
-      </button>
-      <button class="method-tab" data-method="url" onclick="selectMethod('url')">
-        <i class="fas fa-link"></i> From URL
-      </button>
-    </div>
-
-    <!-- Direct Upload Zone -->
-    <div class="upload-zone fade-up" id="uploadZone">
-      <i class="fas fa-cloud-upload-alt"></i>
-      <p>Tap to select or drag here</p>
-      <div class="sub" id="uploadHint">JPG, PNG, WEBP up to 10MB</div>
-      <input type="file" id="fileInput" accept="image/*,video/*">
-    </div>
-
-    <!-- URL Inputs -->
-    <div class="url-section" id="urlSection">
-      <div class="form-group" id="mediaUrlGroup">
-        <label id="mediaUrlLabel">Image URL</label>
-        <input class="form-input" id="mediaUrlInput" type="url" placeholder="https://example.com/photo.jpg">
-      </div>
-      <!-- Video thumbnail URL (only for video type) -->
-      <div class="form-group" id="thumbUrlGroup" style="display:none">
-        <label>Thumbnail Image URL</label>
-        <input class="form-input" id="thumbUrlInput" type="url" placeholder="https://example.com/thumbnail.jpg">
-      </div>
-      <button style="padding:10px 24px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rs);color:var(--fg);font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:var(--tr)" onclick="previewFromUrl()" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-        <i class="fas fa-eye" style="margin-right:6px"></i>Preview
-      </button>
-    </div>
-
-    <!-- Video: Thumbnail direct upload (shown only for video + direct method) -->
-    <div class="thumb-row" id="thumbUploadRow">
-      <div style="flex:1">
-        <div class="form-group" style="margin-bottom:8px">
-          <label style="font-size:11px;color:var(--fg-m);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:6px;display:block">Thumbnail Image</label>
-          <div style="display:flex;gap:8px">
-            <div class="upload-zone" id="thumbZone" style="margin:0;padding:16px;flex:1;border-width:1px;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center">
-              <i class="fas fa-image" style="font-size:24px;margin-bottom:4px"></i>
-              <p style="font-size:12px;margin:0">Select thumbnail</p>
-              <input type="file" id="thumbFileInput" accept="image/*" style="display:none">
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="thumb-preview" id="thumbPreview" style="display:none;position:relative">
-        <img id="thumbPreviewImg" src="" alt="Thumb">
-      </div>
-    </div>
-
-    <!-- Main Preview -->
-    <div class="preview-box" id="previewBox">
-      <div class="preview-label" id="previewLabel">Preview</div>
-      <div id="previewContent"></div>
-      <button class="rm-btn" onclick="removeMainPreview()" aria-label="Remove"><i class="fas fa-times"></i></button>
-    </div>
-
-    <!-- Filters (image only) -->
-    <div class="filter-row" id="filterRow" style="display:none">
-      <button class="filter-chip active" data-filter="none">Normal</button>
-      <button class="filter-chip" data-filter="grayscale(100%)">B&W</button>
-      <button class="filter-chip" data-filter="sepia(80%)">Sepia</button>
-      <button class="filter-chip" data-filter="contrast(140%)">Vivid</button>
-      <button class="filter-chip" data-filter="saturate(180%)">Saturated</button>
-      <button class="filter-chip" data-filter="brightness(110%) contrast(90%)">Soft</button>
-      <button class="filter-chip" data-filter="hue-rotate(30deg)">Warm</button>
-      <button class="filter-chip" data-filter="hue-rotate(180deg)">Cool</button>
-    </div>
-
-    <!-- Details Form -->
-    <div class="detail-form" id="detailForm" style="display:none">
-      <div class="form-group">
-        <label for="captionInput">Caption</label>
-        <textarea class="form-input" id="captionInput" rows="3" placeholder="Write a caption..." maxlength="500"></textarea>
-        <div class="char-count" id="charCount">0 / 500</div>
-      </div>
-      <div class="form-group">
-        <label for="tagsInput">Tags</label>
-        <input class="form-input" id="tagsInput" type="text" placeholder="#photography #nature">
-      </div>
-      <div class="form-group">
-        <label for="locationInput">Location</label>
-        <input class="form-input" id="locationInput" type="text" placeholder="Add a location...">
-      </div>
-    </div>
-
-    <!-- Publish -->
-    <div class="publish-wrap" id="publishWrap" style="display:none">
-      <button class="btn-primary" id="publishBtn" disabled onclick="publishPost()">
-        <i class="fas fa-paper-plane" style="margin-right:8px"></i>Publish Post
-      </button>
-    </div>
-    <div style="height:20px"></div>
-  </div>
-
-  <!-- Loading Overlay -->
-  <div class="loading-ov" id="loadingOv">
-    <div class="spinner"></div>
-    <p id="loadingText">Publishing your post...</p>
-  </div>
-
-  <div class="toast-c" id="toastC"></div>
+<div class="atm"><div class="o"></div></div>
+<div class="pg">
+<div class="tb"><button class="bb" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i></button><div class="lg">New Post</div><div class="ta"><button onclick="clrPrev();window.location.href='index.html'" style="background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer"><i class="fas fa-times"></i></button></div></div>
+<div class="tys"><button class="tyb on" data-ty="image" onclick="selTy('image')"><i class="fas fa-image"></i> Image</button><button class="tyb" data-ty="video" onclick="selTy('video')"><i class="fas fa-video"></i> Video</button></div>
+<div class="ts"><button class="tt on" data-mt="direct" onclick="selMt('direct')"><i class="fas fa-upload"></i> Direct Upload</button><button class="tt" data-mt="url" onclick="selMt('url')"><i class="fas fa-link"></i> From URL</button></div>
+<div class="upz" id="upZone"><i class="fas fa-cloud-upload-alt"></i><p>Tap to select or drag here</p><div class="su" id="upHint">JPG, PNG, WEBP up to 10MB</div><input type="file" id="fInp" accept="image/*"></div>
+<div class="us" id="urlSec"><div class="fg"><label id="mUrlLbl">Image URL</label><input class="fi" id="mUrlInp" type="url" placeholder="https://example.com/photo.jpg"></div><div class="fg" id="tUrlGrp" style="display:none"><label>Thumbnail Image URL</label><input class="fi" id="tUrlInp" type="url" placeholder="https://example.com/thumbnail.jpg"></div><button style="padding:9px 20px;background:var(--bgc);border:1px solid var(--bd);border-radius:var(--rs);color:var(--fg);font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:var(--t)" onclick="prevUrl()"><i class="fas fa-eye" style="margin-right:5px"></i>Preview & Use URL</button></div>
+<div class="tr" id="tUpRow"><div style="flex:1"><div class="fg" style="margin-bottom:6px"><label style="font-size:10px;color:var(--fm);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:5px;display:block">Thumbnail</label><div class="upz" id="tZone" style="margin:0;padding:14px;border-width:1px;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center"><i class="fas fa-image" style="font-size:22px;margin-bottom:3px"></i><p style="font-size:11px;margin:0">Select thumbnail</p><input type="file" id="tFInp" accept="image/*" style="display:none"></div></div></div><div class="tp" id="tPrev" style="display:none"><img id="tPrevImg" src="" alt="Thumb"></div></div>
+<div class="pb" id="prevBox"><div class="plb" id="prevLbl">Preview</div><div id="prevCtn"></div><button class="rb" onclick="rmPrev()"><i class="fas fa-times"></i></button></div>
+<div class="fr" id="fRow" style="display:none"><button class="fc on" data-fl="none">Normal</button><button class="fc" data-fl="grayscale(100%)">B&W</button><button class="fc" data-fl="sepia(80%)">Sepia</button><button class="fc" data-fl="contrast(140%)">Vivid</button><button class="fc" data-fl="saturate(180%)">Saturated</button><button class="fc" data-fl="brightness(110%) contrast(90%)">Soft</button><button class="fc" data-fl="hue-rotate(30deg)">Warm</button><button class="fc" data-fl="hue-rotate(180deg)">Cool</button></div>
+<div class="df" id="detForm" style="display:none"><div class="fg"><label>Caption</label><textarea class="fi" id="capInp" rows="3" placeholder="Write a caption..." maxlength="500"></textarea><div class="cc" id="chCt">0 / 500</div></div><div class="fg"><label>Tags</label><input class="fi" id="tagInp" type="text" placeholder="#photography #nature"></div><div class="fg"><label>Location</label><input class="fi" id="locInp" type="text" placeholder="Add a location..."></div></div>
+<div class="pw" id="pubWrap" style="display:none"><button class="bp" id="pubBtn" disabled onclick="pubPost()"><i class="fas fa-paper-plane" style="margin-right:7px"></i>Publish Post</button></div>
+<div style="height:16px"></div>
 </div>
-
+<div class="lov" id="ldOv"><div class="spn"></div><p id="ldTxt">Publishing...</p><div class="pbw" id="prWrap"><div class="pbf" id="prFill"></div></div></div>
+<div class="tc" id="tCtn"></div>
+</div>
 <script>
-/* ── Firebase Config ── */
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const USER_ID = "user_alex_morgan";
-const currentUser = { username:'alex_morgan', displayName:'Alex Morgan', avatar:'https://picsum.photos/seed/myprofile/200/200.jpg' };
+firebase.initializeApp({apiKey:"AIzaSyAmQxNPKANzO8hEng5pdpAR3t7DJtwkG7U",authDomain:"aibmodel.firebaseapp.com",databaseURL:"https://aibmodel-default-rtdb.firebaseio.com",projectId:"aibmodel",storageBucket:"aibmodel.firebasestorage.app",messagingSenderId:"572663832515",appId:"1:572663832515:web:3fea2dac685b9b5f646776"});
+const db=firebase.database(),CC="dxdcjxigq",CP="Coinxdrop",$=id=>document.getElementById(id);
+function toast(m,t='in'){const c=$('tCtn'),e=document.createElement('div');e.className='to '+t;const i={su:'fa-check-circle',er:'fa-exclamation-circle',in:'fa-info-circle'};e.innerHTML='<i class="fas '+(i[t]||i.in)+'"></i> '+m;c.appendChild(e);setTimeout(()=>e.remove(),3000)}
 
-/* ── State ── */
-let uploadType = 'image'; // 'image' | 'video'
-let uploadMethod = 'direct'; // 'direct' | 'url'
-let mainFile = null;
-let mainUrl = '';
-let thumbFile = null;
-let thumbUrl = '';
-let currentFilter = 'none';
-
-/* ── Type Selection ── */
-function selectType(type) {
-  uploadType = type;
-  document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
-
-  const hint = document.getElementById('uploadHint');
-  const fileInput = document.getElementById('fileInput');
-  const thumbUploadRow = document.getElementById('thumbUploadRow');
-  const thumbUrlGroup = document.getElementById('thumbUrlGroup');
-  const mediaUrlLabel = document.getElementById('mediaUrlLabel');
-  const filterRow = document.getElementById('filterRow');
-
-  if (type === 'image') {
-    hint.textContent = 'JPG, PNG, WEBP up to 10MB';
-    fileInput.accept = 'image/*';
-    thumbUploadRow.classList.remove('show');
-    thumbUploadRow.style.display = 'none';
-    thumbUrlGroup.style.display = 'none';
-    mediaUrlLabel.textContent = 'Image URL';
-    filterRow.style.display = uploadMethod === 'direct' && mainFile ? 'flex' : 'none';
-  } else {
-    hint.textContent = 'MP4, MOV, WEBM up to 50MB';
-    fileInput.accept = 'video/*';
-    mediaUrlLabel.textContent = 'Video URL';
-    if (uploadMethod === 'direct') {
-      thumbUploadRow.style.display = 'flex';
-      thumbUploadRow.classList.add('show');
-    } else {
-      thumbUploadRow.style.display = 'none';
-      thumbUploadRow.classList.remove('show');
-      thumbUrlGroup.style.display = 'block';
-    }
-    filterRow.style.display = 'none';
-  }
-  clearPreviews();
-  updatePublish();
+let UID='',CU={username:'',displayName:'',avatar:''};
+function genId(){return 'u_'+Date.now()+'_'+Math.random().toString(36).substr(2,9)}
+function initUser(){
+  let sid=null;try{sid=localStorage.getItem('igram_uid')}catch(e){}
+  if(sid){UID=sid;db.ref('users/'+UID).once('value').then(s=>{if(s.exists()){const u=s.val();CU={username:u.username||'user',displayName:u.displayName||'User',avatar:u.avatar||''}}else createNew()}).catch(()=>createNew())}else createNew()
+}
+function createNew(){
+  UID=genId();const un='user_'+Math.random().toString(36).substr(2,6);CU={username:un,displayName:'New User',avatar:''};
+  db.ref('users/'+UID).set({username:un,displayName:'New User',avatar:'',createdAt:Date.now(),lastSeen:Date.now()});
+  db.ref('stats/totalUsers').transaction(v=>(v||0)+1);db.ref('wallet/'+UID+'/balance').set(15);
+  db.ref('wallet/'+UID+'/transactions').push({title:'Welcome Bonus',amount:15,type:'income',icon:'fa-gift',color:'var(--ok)',timestamp:Date.now()});
+  try{localStorage.setItem('igram_uid',UID)}catch(e){}
 }
 
-/* ── Method Selection ── */
-function selectMethod(method) {
-  uploadMethod = method;
-  document.querySelectorAll('.method-tab').forEach(t => t.classList.toggle('active', t.dataset.method === method));
+let uTy='image',uMt='direct',mFile=null,mUrl='',tFile=null,tUrl='',cFlt='none';
+function selTy(ty){uTy=ty;document.querySelectorAll('.tyb').forEach(b=>b.classList.toggle('on',b.dataset.ty===ty));const h=$('upHint'),fi=$('fInp'),tr=$('tUpRow'),tg=$('tUrlGrp'),ml=$('mUrlLbl');
+if(ty==='image'){h.textContent='JPG, PNG, WEBP up to 10MB';fi.accept='image/*';tr.classList.remove('sh');tr.style.display='none';tg.style.display='none';ml.textContent='Image URL'}
+else{h.textContent='MP4, MOV, WEBM up to 50MB';fi.accept='video/*';ml.textContent='Video URL';if(uMt==='direct'){tr.style.display='flex';tr.classList.add('sh')}else{tr.style.display='none';tr.classList.remove('sh');tg.style.display='block'}}
+clrPrev();upPub()}
+function selMt(mt){uMt=mt;document.querySelectorAll('.tt').forEach(t=>t.classList.toggle('on',t.dataset.mt===mt));
+if(mt==='direct'){$('upZone').style.display='block';$('urlSec').classList.remove('sh');if(uTy==='video'){$('tUpRow').style.display='flex';$('tUpRow').classList.add('sh')}}
+else{$('upZone').style.display='none';$('urlSec').classList.add('sh');$('tUpRow').style.display='none';$('tUpRow').classList.remove('sh');if(uTy==='video')$('tUrlGrp').style.display='block'}
+clrPrev();upPub()}
 
-  const zone = document.getElementById('uploadZone');
-  const urlSec = document.getElementById('urlSection');
+const upZ=$('upZone'),fIn=$('fInp');
+upZ.onclick=()=>fIn.click();
+upZ.ondragover=e=>{e.preventDefault();upZ.classList.add('dg')};
+upZ.ondragleave=()=>upZ.classList.remove('dg');
+upZ.ondrop=e=>{e.preventDefault();upZ.classList.remove('dg');if(e.dataTransfer.files[0])hMF(e.dataTransfer.files[0])};
+fIn.onchange=()=>{if(fIn.files[0])hMF(fIn.files[0])};
+function hMF(f){const isI=f.type.startsWith('image/'),isV=f.type.startsWith('video/');if(!isI&&!isV){toast('Unsupported','er');return}if(isV&&uTy!=='video')selTy('video');if(isI&&uTy!=='image')selTy('image');mFile=f;mUrl='';const r=new FileReader();r.onload=e=>shPrev(e.target.result,isV?'video':'image');r.readAsDataURL(f)}
 
-  if (method === 'direct') {
-    zone.style.display = 'block';
-    urlSec.classList.remove('show');
-    if (uploadType === 'video') {
-      document.getElementById('thumbUploadRow').style.display = 'flex';
-      document.getElementById('thumbUploadRow').classList.add('show');
-    }
-  } else {
-    zone.style.display = 'none';
-    urlSec.classList.add('show');
-    document.getElementById('thumbUploadRow').style.display = 'none';
-    document.getElementById('thumbUploadRow').classList.remove('show');
-    if (uploadType === 'video') {
-      document.getElementById('thumbUrlGroup').style.display = 'block';
-    }
-  }
-  clearPreviews();
-  updatePublish();
+ $('tZone').onclick=e=>{e.stopPropagation();$('tFInp').click()};
+ $('tFInp').onchange=function(){if(this.files[0]){tFile=this.files[0];tUrl='';const r=new FileReader();r.onload=e=>{$('tPrevImg').src=e.target.result;$('tPrev').style.display='block'};r.readAsDataURL(tFile);upPub()}};
+function prevUrl(){const u=$('mUrlInp').value.trim();if(!u){toast('Enter a URL','er');return}mUrl=u;mFile=null;shPrev(u,uTy==='video'?'video':'image');if(uTy==='video'){const tu=$('tUrlInp').value.trim();if(tu){tUrl=tu;tFile=null;$('tPrevImg').src=tu;$('tPrev').style.display='block'}}upPub()}
+function shPrev(src,type){$('prevLbl').textContent=type==='video'?'Video Preview':'Image Preview';$('prevCtn').innerHTML=type==='video'?'<video src="'+src+'" controls style="width:100%;max-height:280px;background:#000;display:block"></video>':'<img src="'+src+'" alt="Preview" id="prevImg" style="width:100%;max-height:280px;object-fit:contain;display:block;background:#000">';$('prevBox').classList.add('sh');$('detForm').style.display='block';$('pubWrap').style.display='block';if(type==='image')$('fRow').style.display='flex';upPub()}
+function rmPrev(){$('prevBox').classList.remove('sh');$('detForm').style.display='none';$('pubWrap').style.display='none';$('fRow').style.display='none';mFile=null;mUrl='';fIn.value='';$('mUrlInp').value='';upPub()}
+function clrPrev(){$('prevBox').classList.remove('sh');$('detForm').style.display='none';$('pubWrap').style.display='none';$('fRow').style.display='none';$('tPrev').style.display='none';mFile=null;mUrl='';tFile=null;tUrl='';fIn.value='';$('tFInp').value='';$('mUrlInp').value='';$('tUrlInp').value='';$('capInp').value='';$('chCt').textContent='0 / 500';$('chCt').className='cc';cFlt='none';document.querySelectorAll('.fc').forEach(c=>c.classList.remove('on'));document.querySelector('.fc[data-fl="none"]').classList.add('on')}
+document.querySelectorAll('.fc').forEach(c=>c.onclick=()=>{document.querySelectorAll('.fc').forEach(x=>x.classList.remove('on'));c.classList.add('on');cFlt=c.dataset.fl;const img=$('prevImg');if(img)img.style.filter=cFlt==='none'?'':cFlt});
+ $('capInp').oninput=function(){const l=this.value.length,c=$('chCt');c.textContent=l+' / 500';c.className='cc';if(l>450)c.classList.add('wr');if(l>=500)c.classList.add('ov')};
+function upPub(){$('pubBtn').disabled=!((mFile||mUrl)&&(uTy==='image'||tFile||tUrl))}
+function upCloud(file){return new Promise((res,rej)=>{const fd=new FormData();fd.append('file',file);fd.append('upload_preset',CP);const xhr=new XMLHttpRequest();xhr.open('POST','https://api.cloudinary.com/v1_1/'+CC+'/auto/upload');xhr.upload.onprogress=e=>{if(e.lengthComputable){const p=Math.round(e.loaded/e.total*100);const f=$('prFill');if(f)f.style.width=p+'%'}};xhr.onload=()=>{if(xhr.status===200)res(JSON.parse(xhr.responseText).secure_url);else rej(new Error('Upload failed'))};xhr.onerror=()=>rej(new Error('Network error'));xhr.send(fd)})}
+
+async function pubPost(){
+  const hm=mFile||mUrl,ht=uTy==='image'||tFile||tUrl;if(!hm||!ht)return;
+  const lo=$('ldOv'),lt=$('ldTxt'),pw=$('prWrap'),pf=$('prFill');
+  lo.classList.add('sh');pw.style.display='block';pf.style.width='0%';
+  let fmu=mUrl,ftu=tUrl;
+  try{
+    if(mFile&&!mUrl){lt.textContent='Uploading to cloud...';fmu=await upCloud(mFile);pf.style.width='60%'}else if(mUrl){pf.style.width='50%'}
+    if(uTy==='video'&&tFile&&!tUrl){lt.textContent='Uploading thumbnail...';ftu=await upCloud(tFile);pf.style.width='80%'}
+    if(uTy==='image')ftu='';lt.textContent='Saving...';pf.style.width='90%';
+    const pid='post_'+Date.now();
+    await db.ref('posts/'+pid).set({id:pid,userId:UID,username:CU.username,posterName:CU.displayName||CU.username,posterAvatar:CU.avatar||'',location:$('locInp').value.trim(),mediaType:uTy,mediaUrl:fmu,thumbnailUrl:ftu,caption:$('capInp').value.trim(),tags:$('tagInp').value.trim(),filter:uTy==='image'?cFlt:'none',likes:0,views:0,shares:0,comments:{},timestamp:Date.now()});
+    db.ref('stats/totalPosts').transaction(v=>(v||0)+1);
+    pf.style.width='100%';lo.classList.remove('sh');pw.style.display='none';
+    toast('Published!','su');clrPrev();setTimeout(()=>window.location.href='index.html',600);
+  }catch(e){lo.classList.remove('sh');pw.style.display='none';toast('Failed: '+e.message,'er')}
 }
-
-/* ── Direct Upload: File Selection ── */
-const uploadZone = document.getElementById('uploadZone');
-const fileInput = document.getElementById('fileInput');
-
-uploadZone.addEventListener('click', () => fileInput.click());
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('dragover');
-  const f = e.dataTransfer.files[0];
-  if (f) handleMainFile(f);
-});
-fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleMainFile(fileInput.files[0]); });
-
-function handleMainFile(file) {
-  const isImage = file.type.startsWith('image/');
-  const isVideo = file.type.startsWith('video/');
-  if (!isImage && !isVideo) { showToast('Unsupported file type', 'error'); return; }
-
-  // Auto-switch type if mismatch
-  if (isVideo && uploadType !== 'video') selectType('video');
-  if (isImage && uploadType !== 'image') selectType('image');
-
-  mainFile = file;
-  mainUrl = '';
-  const reader = new FileReader();
-  reader.onload = e => {
-    showMainPreview(e.target.result, isVideo ? 'video' : 'image');
-  };
-  reader.readAsDataURL(file);
-}
-
-/* ── Thumbnail file (video direct) ── */
-const thumbZone = document.getElementById('thumbZone');
-const thumbFileInput = document.getElementById('thumbFileInput');
-thumbZone.addEventListener('click', () => thumbFileInput.click());
-thumbFileInput.addEventListener('change', () => {
-  if (thumbFileInput.files[0]) {
-    thumbFile = thumbFileInput.files[0];
-    thumbUrl = '';
-    const reader = new FileReader();
-    reader.onload = e => {
-      document.getElementById('thumbPreviewImg').src = e.target.result;
-      document.getElementById('thumbPreview').style.display = 'block';
-    };
-    reader.readAsDataURL(thumbFile);
-  }
-});
-
-/* ── URL Preview ── */
-function previewFromUrl() {
-  const url = document.getElementById('mediaUrlInput').value.trim();
-  if (!url) { showToast('Please enter a URL', 'error'); return; }
-
-  mainUrl = url;
-  mainFile = null;
-
-  const mediaType = uploadType === 'video' ? 'video' : 'image';
-  showMainPreview(url, mediaType);
-
-  // Handle thumbnail URL for video
-  if (uploadType === 'video') {
-    const tUrl = document.getElementById('thumbUrlInput').value.trim();
-    if (tUrl) {
-      thumbUrl = tUrl;
-      thumbFile = null;
-      document.getElementById('thumbPreviewImg').src = tUrl;
-      document.getElementById('thumbPreview').style.display = 'block';
-    }
-  }
-  updatePublish();
-}
-
-/* ── Preview Display ── */
-function showMainPreview(src, type) {
-  const box = document.getElementById('previewBox');
-  const content = document.getElementById('previewContent');
-  const label = document.getElementById('previewLabel');
-
-  label.textContent = type === 'video' ? 'Video Preview' : 'Image Preview';
-
-  if (type === 'video') {
-    content.innerHTML = `<video src="${src}" controls style="width:100%;max-height:320px;background:#000;display:block"></video>`;
-  } else {
-    content.innerHTML = `<img src="${src}" alt="Preview" id="previewImg" style="width:100%;max-height:320px;object-fit:contain;display:block;background:#000">`;
-  }
-
-  box.classList.add('show');
-  document.getElementById('detailForm').style.display = 'block';
-  document.getElementById('publishWrap').style.display = 'block';
-
-  if (type === 'image') {
-    document.getElementById('filterRow').style.display = 'flex';
-  }
-
-  updatePublish();
-}
-
-function removeMainPreview() {
-  document.getElementById('previewBox').classList.remove('show');
-  document.getElementById('detailForm').style.display = 'none';
-  document.getElementById('publishWrap').style.display = 'none';
-  document.getElementById('filterRow').style.display = 'none';
-  mainFile = null;
-  mainUrl = '';
-  fileInput.value = '';
-  document.getElementById('mediaUrlInput').value = '';
-  updatePublish();
-}
-
-function clearPreviews() {
-  document.getElementById('previewBox').classList.remove('show');
-  document.getElementById('detailForm').style.display = 'none';
-  document.getElementById('publishWrap').style.display = 'none';
-  document.getElementById('filterRow').style.display = 'none';
-  document.getElementById('thumbPreview').style.display = 'none';
-  mainFile = null; mainUrl = '';
-  thumbFile = null; thumbUrl = '';
-  fileInput.value = '';
-  thumbFileInput.value = '';
-  document.getElementById('mediaUrlInput').value = '';
-  document.getElementById('thumbUrlInput').value = '';
-  document.getElementById('captionInput').value = '';
-  document.getElementById('charCount').textContent = '0 / 500';
-  document.getElementById('charCount').className = 'char-count';
-  currentFilter = 'none';
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-  document.querySelector('.filter-chip[data-filter="none"]').classList.add('active');
-}
-
-/* ── Filters ── */
-document.querySelectorAll('.filter-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    currentFilter = chip.dataset.filter;
-    const img = document.getElementById('previewImg');
-    if (img) img.style.filter = currentFilter === 'none' ? '' : currentFilter;
-  });
-});
-
-/* ── Caption ── */
-document.getElementById('captionInput').addEventListener('input', function() {
-  const len = this.value.length;
-  const cc = document.getElementById('charCount');
-  cc.textContent = `${len} / 500`;
-  cc.className = 'char-count';
-  if (len > 450) cc.classList.add('warn');
-  if (len >= 500) cc.classList.add('over');
-});
-
-/* ── Publish Button State ── */
-function updatePublish() {
-  const hasMedia = mainFile || mainUrl;
-  const hasThumb = uploadType === 'image' || thumbFile || thumbUrl;
-  document.getElementById('publishBtn').disabled = !(hasMedia && hasThumb);
-}
-
-/* ── Publish ── */
-async function publishPost() {
-  const hasMedia = mainFile || mainUrl;
-  const hasThumb = uploadType === 'image' || thumbFile || thumbUrl;
-  if (!hasMedia || !hasThumb) return;
-
-  const loadingOv = document.getElementById('loadingOv');
-  const loadingText = document.getElementById('loadingText');
-  loadingOv.classList.add('show');
-
-  // Determine final URLs
-  let finalMediaUrl = mainUrl;
-  let finalThumbUrl = thumbUrl;
-
-  // For direct file uploads, we store as base64 data URL in Firebase
-  // (In production, you'd upload to Firebase Storage instead)
-  if (mainFile && !mainUrl) {
-    loadingText.textContent = 'Uploading media...';
-    finalMediaUrl = await readFileAsDataURL(mainFile);
-  }
-  if (uploadType === 'video' && thumbFile && !thumbUrl) {
-    loadingText.textContent = 'Uploading thumbnail...';
-    finalThumbUrl = await readFileAsDataURL(thumbFile);
-  }
-  if (uploadType === 'image') {
-    finalThumbUrl = '';
-  }
-
-  loadingText.textContent = 'Publishing...';
-
-  const postId = 'post_' + Date.now();
-  const postData = {
-    id: postId,
-    username: currentUser.username,
-    avatar: currentUser.avatar,
-    location: document.getElementById('locationInput').value.trim() || '',
-    mediaType: uploadType,
-    mediaUrl: finalMediaUrl,
-    thumbnailUrl: finalThumbUrl,
-    caption: document.getElementById('captionInput').value.trim() || '',
-    tags: document.getElementById('tagsInput').value.trim() || '',
-    filter: uploadType === 'image' ? currentFilter : 'none',
-    likes: 0,
-    comments: [],
-    time: 'now',
-    timestamp: Date.now(),
-    userId: USER_ID
-  };
-
-  try {
-    await db.ref('posts/' + postId).set(postData);
-    loadingOv.classList.remove('show');
-    showToast('Post published successfully!', 'success');
-    setTimeout(() => { window.location.href = 'index.html'; }, 800);
-  } catch (err) {
-    loadingOv.classList.remove('show');
-    showToast('Failed to publish: ' + err.message, 'error');
-  }
-}
-
-function readFileAsDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-/* ── Navigation ── */
-function goBack() { window.location.href = 'index.html'; }
-function resetAll() { clearPreviews(); goBack(); }
-
-/* ── Toast ── */
-function showToast(msg, type = 'info') {
-  const c = document.getElementById('toastC'), t = document.createElement('div');
-  t.className = 'toast ' + type;
-  const icons = { success:'fa-check-circle', error:'fa-exclamation-circle', info:'fa-info-circle' };
-  t.innerHTML = `<i class="fas ${icons[type]||icons.info}"></i> ${msg}`;
-  c.appendChild(t); setTimeout(() => t.remove(), 3000);
-}
+initUser();
 </script>
 </body>
 </html>
