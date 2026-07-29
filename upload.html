@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Upload - InstaGram</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e14;--bg2:#111820;--bgc:#151d28;--bge:#1a2332;--fg:#e8edf3;--fm:#6b7d94;--fd:#3d4f63;--ac:#00d4aa;--acg:rgba(0,212,170,.25);--dn:#ff4757;--ok:#2ed573;--bd:rgba(255,255,255,.06);--gl:rgba(17,24,32,.88);--r:14px;--rs:8px;--rf:9999px;--t:.3s cubic-bezier(.4,0,.2,1)}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+.app{max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
+.atm{position:fixed;top:0;left:50%;transform:translateX(-50%);max-width:430px;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.atm .o{position:absolute;border-radius:50%;filter:blur(80px);animation:of 12s ease-in-out infinite}
+.atm .o:nth-child(1){width:200px;height:200px;background:var(--ac);top:-50px;right:-30px;opacity:.07}
+@keyframes of{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.1)}66%{transform:translate(-15px,20px) scale(.95)}}
+.pg{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;z-index:1;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.pg::-webkit-scrollbar{display:none}
+.tb{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--gl);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.bb{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;padding:4px 8px 4px 0;transition:var(--t)}.bb:hover{color:var(--ac)}
+.lg{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
+.tys{display:flex;margin:14px 16px 0;gap:7px}
+.tyb{flex:1;padding:11px;border-radius:var(--r);background:var(--bgc);border:2px solid var(--bd);color:var(--fm);font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:7px}
+.tyb:hover{border-color:var(--fg)}.tyb.on{border-color:var(--ac);color:var(--ac);background:var(--acg)}
+.ts{display:flex;margin:12px 16px 0;gap:0;background:var(--bgc);border-radius:var(--rs);padding:3px;border:1px solid var(--bd)}
+.tt{flex:1;padding:9px;text-align:center;background:none;border:none;color:var(--fm);font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;border-radius:5px;transition:var(--t)}
+.tt.on{background:var(--ac);color:#000}
+.upz{margin:14px 16px 0;border:2px dashed var(--fd);border-radius:var(--r);padding:32px 18px;text-align:center;transition:var(--t);cursor:pointer}
+.upz:hover,.upz.dg{border-color:var(--ac);background:var(--acg)}
+.upz i{font-size:42px;color:var(--fd);margin-bottom:8px;display:block;transition:var(--t)}
+.upz:hover i,.upz.dg i{color:var(--ac)}
+.upz p{color:var(--fm);font-size:13px}.upz .su{font-size:11px;color:var(--fd);margin-top:4px}
+.upz input{display:none}
+.us{margin:14px 16px 0;display:none}.us.sh{display:block}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:11px;font-weight:600;color:var(--fm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.fi{width:100%;padding:11px 14px;background:var(--bgc);border:1px solid var(--bd);border-radius:var(--rs);color:var(--fg);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:var(--t);resize:none}
+.fi:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acg)}.fi::placeholder{color:var(--fd)}
+.pb{margin:14px 16px 0;display:none;border-radius:var(--r);overflow:hidden;position:relative;background:var(--bgc);border:1px solid var(--bd)}
+.pb.sh{display:block}
+.pb img,.pb video{width:100%;max-height:280px;object-fit:contain;display:block;background:#000}
+.pb .rb{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t)}
+.pb .rb:hover{background:var(--dn)}
+.plb{padding:6px 10px;font-size:10px;color:var(--fm);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.tr{margin:10px 16px 0;display:none;align-items:flex-start;gap:10px}.tr.sh{display:flex}
+.tp{width:90px;height:90px;border-radius:var(--rs);overflow:hidden;flex-shrink:0;background:var(--bgc);border:1px solid var(--bd);position:relative}
+.tp img{width:100%;height:100%;object-fit:cover}
+.fr{display:flex;gap:8px;padding:14px 16px 0;overflow-x:auto;scrollbar-width:none}.fr::-webkit-scrollbar{display:none}
+.fc{flex-shrink:0;padding:7px 16px;border-radius:var(--rf);background:var(--bgc);border:1px solid var(--bd);color:var(--fm);font-size:12px;font-family:'Outfit',sans-serif;cursor:pointer;transition:var(--t);font-weight:500}
+.fc:hover{border-color:var(--ac);color:var(--fg)}.fc.on{background:var(--ac);color:#000;border-color:var(--ac);font-weight:600}
+.df{padding:14px 16px}
+.cc{text-align:right;font-size:10px;color:var(--fd);margin-top:3px}.cc.wr{color:var(--ffa502)}.cc.ov{color:var(--dn)}
+.pw{padding:0 16px 28px}
+.bp{width:100%;padding:13px;background:linear-gradient(135deg,var(--ac),#00a885);color:#000;font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;border:none;border-radius:var(--r);cursor:pointer;transition:var(--t)}
+.bp:hover{box-shadow:0 4px 18px rgba(0,212,170,.3);transform:translateY(-1px)}.bp:active{transform:scale(.98)}.bp:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+.lov{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.lov.sh{opacity:1;pointer-events:all}
+.spn{width:44px;height:44px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spi .8s linear infinite}
+@keyframes spi{to{transform:rotate(360deg)}}
+.lov p{font-size:14px;color:var(--fm)}
+.pbw{width:180px;height:4px;background:var(--bd);border-radius:4px;overflow:hidden}
+.pbf{height:100%;background:var(--ac);border-radius:4px;width:0%;transition:width .2s ease}
+.tc{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:9999;max-width:390px;width:calc(100% - 32px)}
+.to{padding:12px 16px;border-radius:var(--rs);font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:6px;animation:ti .3s ease,to2 .3s ease 2.5s forwards;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.to.su{background:#0d2818;border:1px solid rgba(46,213,115,.3);color:var(--ok)}
+.to.er{background:#2d0f13;border:1px solid rgba(255,71,87,.3);color:var(--dn)}
+.to.in{background:#0d1f2d;border:1px solid rgba(0,212,170,.3);color:var(--ac)}
+@keyframes ti{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes to2{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-18px)}}
+@media(min-width:431px){.app{border-left:1px solid var(--bd);border-right:1px solid var(--bd)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="atm"><div class="o"></div></div>
+<div class="pg">
+<div class="tb">
+  <button class="bb" onclick="clrPrev();window.location.href='index.html'"><i class="fas fa-arrow-left"></i></button>
+  <div class="lg">New Post</div>
+  <div style="display:flex;gap:14px">
+    <button onclick="clrPrev();window.location.href='index.html'" style="background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer"><i class="fas fa-times"></i></button>
+  </div>
+</div>
+
+<div class="tys">
+  <button class="tyb on" data-ty="image" onclick="selTy('image')"><i class="fas fa-image"></i> Image</button>
+  <button class="tyb" data-ty="video" onclick="selTy('video')"><i class="fas fa-video"></i> Video</button>
+</div>
+
+<div class="ts">
+  <button class="tt on" data-mt="direct" onclick="selMt('direct')"><i class="fas fa-upload"></i> Direct Upload</button>
+  <button class="tt" data-mt="url" onclick="selMt('url')"><i class="fas fa-link"></i> From URL</button>
+</div>
+
+<div class="upz" id="upZone">
+  <i class="fas fa-cloud-upload-alt"></i>
+  <p>Tap to select or drag here</p>
+  <div class="su" id="upHint">JPG, PNG, WEBP up to 10MB</div>
+  <input type="file" id="fInp" accept="image/*">
+</div>
+
+<div class="us" id="urlSec">
+  <div class="fg">
+    <label id="mUrlLbl">Image URL</label>
+    <input class="fi" id="mUrlInp" type="url" placeholder="https://example.com/photo.jpg">
+  </div>
+  <div class="fg" id="tUrlGrp" style="display:none">
+    <label>Thumbnail Image URL</label>
+    <input class="fi" id="tUrlInp" type="url" placeholder="https://example.com/thumbnail.jpg">
+  </div>
+  <button style="padding:9px 20px;background:var(--bgc);border:1px solid var(--bd);border-radius:var(--rs);color:var(--fg);font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:var(--t)" onclick="prevUrl()">
+    <i class="fas fa-eye" style="margin-right:5px"></i>Preview & Use URL
+  </button>
+</div>
+
+<div class="tr" id="tUpRow">
+  <div style="flex:1">
+    <div class="fg" style="margin-bottom:6px">
+      <label style="font-size:10px;color:var(--fm);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:5px;display:block">Thumbnail</label>
+      <div class="upz" id="tZone" style="margin:0;padding:14px;border-width:1px;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <i class="fas fa-image" style="font-size:22px;margin-bottom:3px"></i>
+        <p style="font-size:11px;margin:0">Select thumbnail</p>
+        <input type="file" id="tFInp" accept="image/*" style="display:none">
+      </div>
+    </div>
+  </div>
+  <div class="tp" id="tPrev" style="display:none">
+    <img id="tPrevImg" src="" alt="Thumb">
+  </div>
+</div>
+
+<div class="pb" id="prevBox">
+  <div class="plb" id="prevLbl">Preview</div>
+  <div id="prevCtn"></div>
+  <button class="rb" onclick="rmPrev()"><i class="fas fa-times"></i></button>
+</div>
+
+<div class="fr" id="fRow" style="display:none">
+  <button class="fc on" data-fl="none">Normal</button>
+  <button class="fc" data-fl="grayscale(100%)">B&W</button>
+  <button class="fc" data-fl="sepia(80%)">Sepia</button>
+  <button class="fc" data-fl="contrast(140%)">Vivid</button>
+  <button class="fc" data-fl="saturate(180%)">Saturated</button>
+  <button class="fc" data-fl="brightness(110%) contrast(90%)">Soft</button>
+  <button class="fc" data-fl="hue-rotate(30deg)">Warm</button>
+  <button class="fc" data-fl="hue-rotate(180deg)">Cool</button>
+</div>
+
+<div class="df" id="detForm" style="display:none">
+  <div class="fg">
+    <label>Caption</label>
+    <textarea class="fi" id="capInp" rows="3" placeholder="Write a caption..." maxlength="500"></textarea>
+    <div class="cc" id="chCt">0 / 500</div>
+  </div>
+  <div class="fg">
+    <label>Tags</label>
+    <input class="fi" id="tagInp" type="text" placeholder="#photography #nature">
+  </div>
+  <div class="fg">
+    <label>Location</label>
+    <input class="fi" id="locInp" type="text" placeholder="Add a location...">
+  </div>
+</div>
+
+<div class="pw" id="pubWrap" style="display:none">
+  <button class="bp" id="pubBtn" disabled onclick="pubPost()">
+    <i class="fas fa-paper-plane" style="margin-right:7px"></i>Publish Post
+  </button>
+</div>
+<div style="height:16px"></div>
+</div>
+
+<div class="lov" id="ldOv">
+  <div class="spn"></div>
+  <p id="ldTxt">Publishing...</p>
+  <div class="pbw" id="prWrap"><div class="pbf" id="prFill"></div></div>
+</div>
+
+<div class="tc" id="tCtn"></div>
+</div>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyAmQxNPKANzO8hEng5pdpAR3t7DJtwkG7U",authDomain:"aibmodel.firebaseapp.com",databaseURL:"https://aibmodel-default-rtdb.firebaseio.com",projectId:"aibmodel",storageBucket:"aibmodel.firebasestorage.app",messagingSenderId:"572663832515",appId:"1:572663832515:web:3fea2dac685b9b5f646776"});
+const db=firebase.database(),CC="dxdcjxigq",CP="Coinxpg",$=id=>document.getElementById(id);
+function toast(m,t='in'){const c=$('tCtn'),e=document.createElement('div');e.className='to '+t;e.innerHTML='<i class="fas fa-info-circle"></i> '+m;c.appendChild(e);setTimeout(()=>e.remove(),3000)}
+function opMod(){$('mOv').classList.add('sh')}
+function clMod(e){if(e&&e.target!==$('mOv'))return;$('mOv').classList.remove('sh')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')clMod({target:$('mOv')})});
+
+let UID='',CU={username:'',displayName:'',avatar:''};
+function initUser(){
+  let sid=null;
+  try{sid=localStorage.getItem('igram_uid')}catch(e){}
+  if(sid){UID=sid;db.ref('users/'+UID).once('value').then(s=>{if(s.exists()){const u=s.val();CU={username:u.username||'user',displayName:u.displayName||'User',avatar:u.avatar||''}}else createNew()}).catch(()=>createNew())}else createNew()
+}
+function createNew(){
+  UID='u_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);
+  const un='user_'+Math.random().toString(36).substr(2,6);CU={username:un,displayName:'New User',avatar:''};
+  db.ref('users/'+UID).set({username:un,displayName:'New User',avatar:'',createdAt:Date.now(),lastSeen:Date.now(),platform:detectPlatform()});
+  db.ref('stats/totalUsers').transaction(v=>(v||0)+1);
+  db.ref('wallet/'+UID+'/balance').set(15);
+  db.ref('wallet/'+UID+'/transactions').push({title:'Welcome Bonus',amount:15,type:'income',icon:'fa-gift',color:'var(--ok)',timestamp:Date.now()});
+  try{localStorage.setItem('igram_uid',UID)}catch(e){}
+}
+function detectPlatform(){const ua=navigator.userAgent||'';if(/telegram/i.test(ua))return'Telegram';if(/instagram/i.test(ua))return'Instagram';return'Browser'}
+
+let uTy='image',uMt='direct',mFile=null,mUrl='',tFile=null,tUrl='',cFlt='none';
+function selTy(ty){
+  uTy=ty;
+  document.querySelectorAll('.tyb').forEach(b=>b.classList.toggle('on',b.dataset.ty===ty));
+  const h=$('upHint'),fi=$('fInp'),tr=$('tUpRow'),tg=$('tUrlGrp'),ml=$('mUrlLbl');
+  if(ty==='image'){h.textContent='JPG, PNG,WEBP up to 10MB';fi.accept='image/*';tr.classList.remove('sh');tr.style.display='none';tg.style.display='none';ml.textContent='Image URL'}
+  else{h.textContent='MP4, MOV,WEBM up to 50MB';fi.accept='video/*';ml.textContent='Video URL';
+    if(uMt==='direct'){tr.style.display='flex';tr.classList.add('sh')}
+    else{tr.style.display='none';tr.classList.remove('sh');tg.style.display='block'}
+  }
+  clrPrev();upPub()
+}
+function selMt(mt){
+  uMt=mt;
+  document.querySelectorAll('.tt').forEach(t=>t.classList.toggle('on',t.dataset.mt===mt));
+  if(mt==='direct'){$('upZone').style.display='block';$('urlSec').classList.remove('sh');if(uTy==='video'){$('tUpRow').style.display='flex';$('tUpRow').classList.add('sh')}}
+  else{$('upZone').style.display='none';$('urlSec').classList.add('sh');$('tUpRow').style.display='none';$('tUpRow').classList.remove('sh');if(uTy==='video')$('tUrlGrp').style.display='block'}
+  clrPrev();upPub()
+}
+
+const upZ=$('upZone'),fIn=$('fInp');
+upZ.onclick=()=>fIn.click();
+upZ.ondragover=e=>{e.preventDefault();upZ.classList.add('dg')};
+upZ.ondragleave=()=>upZ.classList.remove('dg');
+upZ.ondrop=e=>{e.preventDefault();upZ.classList.remove('dg');if(e.dataTransfer.files[0])hMF(e.dataTransfer.files[0])};
+fIn.onchange=()=>{if(fIn.files[0])hMF(fIn.files[0])};
+
+function hMF(f){
+  const isI=f.type.startsWith('image/'),isV=f.type.startsWith('video/');
+  if(!isI&&!isV){toast('Unsupported file','er');return}
+  if(isV&&uTy!=='video')selTy('video');
+  if(isI&&uTy!=='image')selTy('image');
+  mFile=f;mUrl='';
+  const r=new FileReader();
+  r.onload=e=>shPrev(e.target.result,isV?'video':'image');
+  r.readAsDataURL(f);
+}
+
+ $('tZone').onclick=e=>{e.stopPropagation();$('tFInp').click()};
+ $('tFInp').onchange=function(){
+  if(this.files[0]){
+    tFile=this.files[0];tUrl='';
+    const r=new FileReader();
+    r.onload=e=>{$('tPrevImg').src=e.target.result;$('tPrev').style.display='block'}
+    r.readAsDataURL(tFile);
+    upPub();
+  }
+};
+function prevUrl(){
+  const u=$('mUrlInp').value.trim();
+  if(!u){toast('Enter a URL','er');return}
+  mUrl=u;mFile=null;
+  shPrev(u,uTy==='video'?'video':'image');
+  if(uTy==='video'){
+    const tu=$('tUrlInp').value.trim();
+    if(tu){tUrl=tu;tFile=null;$('tPrevImg').src=tu;$('tPrev').style.display='block'}
+  }
+  upPub();
+}
+function shPrev(src,type){
+  $('prevLbl').textContent=type==='video'?'Video Preview':'Image Preview';
+  $('prevCtn').innerHTML=type==='video'
+    ?'<video src="'+src+'" controls style="width:100%;max-height:280px;background:#000;display:block"></video>'
+    :'<img src="'+src+'" alt="Preview" id="prevImg" style="width:100%;max-height:280px;object-fit:contain;display:block;background:#000">';
+  $('prevBox').classList.add('sh');
+  $('detForm').style.display='block';
+  $('pubWrap').style.display='block';
+  if(type==='image')$('fRow').style.display='flex';
+  upPub();
+}
+function rmPrev(){
+  $('prevBox').classList.remove('sh');$('detForm').style.display='none';$('pubWrap').style.display='none';$('fRow').style.display='none';
+  mFile=null;mUrl='';fIn.value='';$('mUrlInp').value='';upPub();
+}
+function clrPrev(){
+  $('prevBox').classList.remove('sh');$('detForm').style.display='none';$('pubWrap').style.display='none';$('fRow').style.display='none';$('tPrev').style.display='none';
+  mFile=null;mUrl='';tFile=null;tUrl='';
+  fIn.value='';$('tFInp').value='';$('mUrlInp').value='';$('tUrlInp').value='';
+  $('capInp').value='';$('chCt').textContent='0 / 500';$('chCt').className='cc';
+  cFlt='none';
+  document.querySelectorAll('.fc').forEach(c=>c.classList.remove('on'));
+  document.querySelector('.fc[data-fl="none"]').classList.add('on');
+}
+document.querySelectorAll('.fc').forEach(c=>c.onclick=()=>{
+  document.querySelectorAll('.fc').forEach(x=>x.classList.remove('on'));c.classList.add('on');
+  cFlt=c.dataset.fl;
+  const img=$('prevImg');
+  if(img) img.style.filter=cFlt==='none'?'':cFlt;
+});
+ $('capInp').oninput=function(){
+  const l=this.value.length,c=$('chCt');
+  c.textContent=l+' / 500';c.className='cc';
+  if(l>450)c.classList.add('wr');if(l>=500)c.classList.add('ov');
+};
+function upPub(){$('pubBtn').disabled=!((mFile||mUrl)&&(uTy==='image'||tFile||tUrl)}
+
+function upCloud(file){
+  return new Promise((res,rej)=>{
+    const fd=new FormData();
+    fd.append('file',file);
+    fd.append('upload_preset',CP);
+    const xhr=new XMLHttpRequest();
+    xhr.open('POST','https://api.cloudinary.com/v1_1/'+CC+'/auto/upload');
+    xhr.upload.onprogress=e=>{
+      if(e.lengthComputable){const p=Math.round(e.loaded/e.total*100);const f=$('prFill');if(f)f.style.width=p+'%'}
+    };
+    xhr.onload=()=>{if(xhr.status===200)res(JSON.parse(xhr.responseText).secure_url);else rej(new Error('Upload failed'))};
+    xhr.onerror=()=>rej(new Error('Network error'));
+    xhr.send(fd);
+  });
+}
+
+async function pubPost(){
+  const hm=mFile||mUrl,ht=uTy==='image'||tFile||tUrl;
+  if(!hm||!ht)return;
+  const lo=$('ldOv'),lt=$('ldTxt'),pw=$('prWrap'),pf=$('prFill');
+  lo.classList.add('sh');pw.style.display='block';pf.style.width='0%';
+  let fmu=mUrl,ftu=tUrl;
+  try{
+    if(mFile&&!mUrl){lt.textContent='Uploading to cloud...';fmu=await upCloud(mFile);pf.style.width='60%'}
+    else if(mUrl){pf.style.width='50%'}
+    if(uTy==='video'&&tFile&&!tUrl){lt.textContent='Uploading thumbnail...';ftu=await upCloud(tFile);pf.style.width='80%'}
+    if(uTy==='image')ftu='';
+    lt.textContent='Saving to database...';pf.style.width='90%';
+    const pid='post_'+Date.now();
+    await db.ref('posts/'+pid).set({
+      id:pid,userId:UID,username:CU.username,
+      posterName:CU.displayName||CU.username,posterAvatar:CU.avatar||'',
+      location:$('locInp').value.trim(),
+      mediaType:uTy,mediaUrl:fmu,thumbnailUrl:ftu,
+      caption:$('capInp').value.trim(),tags:$('tagInp').value.trim(),
+      filter:uTy==='image'?cFlt:'none',
+      likes:0,views:0,shares:0,comments:{},timestamp:Date.now()
+    });
+    db.ref('stats/totalPosts').transaction(v=>(v||0)+1);
+    pf.style.width='100%';lo.classList.remove('sh');pw.style.display='none';
+    toast('Published!','su');clrPrev();
+    setTimeout(()=>window.location.href='index.html',600);
+  }catch(e){lo.classList.remove('sh');pw.style.display='none';toast('Failed: '+e.message,'er')}
+}
+initUser();
+</script>
+</body>
+</html>
