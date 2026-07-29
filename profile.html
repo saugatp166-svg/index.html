@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Profile - InstaGram</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e14;--bg2:#111820;--bgc:#151d28;--bge:#1a2332;--fg:#e8edf3;--fm:#6b7d94;--fd:#3d4f63;--ac:#00d4aa;--acg:rgba(0,212,170,.25);--dn:#ff4757;--ok:#2ed573;--bd:rgba(255,255,255,.06);--gl:rgba(17,24,32,.88);--r:14px;--rs:8px;--rf:9999px;--t:.3s cubic-bezier(.4,0,.2,1)}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+.app{max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
+.atm{position:fixed;top:0;left:50%;transform:translateX(-50%);max-width:430px;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.atm .o{position:absolute;border-radius:50%;filter:blur(80px);animation:of 12s ease-in-out infinite}
+.atm .o:nth-child(1){width:200px;height:200px;background:var(--ac);top:-50px;right:-30px;opacity:.07}
+@keyframes of{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.1)}66%{transform:translate(-15px,20px) scale(.95)}}
+.pg{position:absolute;top:0;left:0;right:0;bottom:60px;overflow-y:auto;overflow-x:hidden;z-index:1;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.pg::-webkit-scrollbar{display:none}
+.tb{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--gl);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.bb{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;padding:4px 8px 4px 0;transition:var(--t)}.bb:hover{color:var(--ac)}
+.lg{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
+.lg i{font-size:13px;color:var(--fm)}
+.ta button{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;transition:var(--t)}
+.ta button:hover{color:var(--ac)}
+.prh{padding:18px 16px;display:flex;align-items:center;gap:18px}
+.ppw{position:relative;flex-shrink:0}
+.ppw img{width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid var(--ac)}
+.ppw .onl{position:absolute;bottom:2px;right:2px;width:14px;height:14px;border-radius:50%;background:var(--ok);border:3px solid var(--bg)}
+.av2{width:76px;height:76px;border-radius:50%;background:var(--bge);display:flex;align-items:center;justify-content:center;color:var(--fm);font-size:28px;font-weight:700;border:3px solid var(--ac);position:relative}
+.av2 .onl{position:absolute;bottom:2px;right:2px;width:14px;height:14px;border-radius:50%;background:var(--ok);border:3px solid var(--bg)}
+.pst{display:flex;gap:18px;flex:1;justify-content:center}
+.ps2{text-align:center;cursor:pointer}
+.ps2 .pn3{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700}
+.ps2 .pl3{font-size:10px;color:var(--fm)}
+.pinf{padding:0 16px 14px}
+.pinf .dn2{font-size:15px;font-weight:700}
+.pinf .bio2{font-size:12px;color:var(--fm);margin-top:3px;line-height:1.5}
+.pinf .plk2{font-size:12px;color:var(--ac);margin-top:3px}
+.pbs{display:flex;gap:7px;padding:0 16px 14px}
+.pbs button{flex:1;padding:9px;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:var(--t)}
+.be{background:var(--bgc);border:1px solid var(--bd);color:var(--fg)}.be:hover{border-color:var(--ac)}
+.bi{width:36px!important;flex:none!important;display:flex;align-items:center;justify-content:center}
+.ptb{display:flex;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:5;background:var(--gl);backdrop-filter:blur(20px)}
+.pt{flex:1;padding:11px;text-align:center;background:none;border:none;color:var(--fd);font-size:19px;cursor:pointer;transition:var(--t);position:relative}
+.pt.on{color:var(--fg)}
+.pt::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%) scaleX(0);width:36px;height:2px;background:var(--fg);border-radius:2px;transition:var(--t)}
+.pt.on::after{transform:translateX(-50%) scaleX(1)}
+.pgr{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px}
+.pgi{aspect-ratio:1;overflow:hidden;cursor:pointer;position:relative}
+.pgi img{width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+.pgi:hover img{transform:scale(1.05)}
+.pgi .gov{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;opacity:0;transition:var(--t)}
+.pgi:hover .gov{opacity:1}
+.gov span{color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px}
+.vbd{position:absolute;top:7px;right:7px;background:rgba(0,0,0,.5);padding:2px 5px;border-radius:4px;font-size:9px;color:#fff}
+.bn{position:absolute;bottom:0;left:0;right:0;height:60px;z-index:100;display:flex;align-items:center;justify-content:space-around;background:var(--gl);backdrop-filter:blur(24px);border-top:1px solid var(--bd)}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--fd);font-size:9px;font-family:'Outfit',sans-serif;font-weight:500;cursor:pointer;padding:4px 12px;border-radius:var(--rs);transition:var(--t);position:relative;text-decoration:none}
+.ni i{font-size:19px;transition:var(--t)}.ni.on{color:var(--ac)}.ni.on i{transform:scale(1.1)}
+.ni::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%) scaleX(0);width:22px;height:2px;border-radius:2px;background:var(--ac);transition:var(--t)}
+.ni.on::before{transform:translateX(-50%) scaleX(1)}
+.ni.ub{position:relative;top:-8px}
+.ni.ub .uw{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--ac),#00a885);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,212,170,.3);transition:var(--t)}
+.ni.ub i{color:#fff;font-size:18px}.ni.ub span{display:none}
+.mov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.mov.sh{opacity:1;pointer-events:all}
+.msh{max-width:430px;width:100%;background:var(--bg2);border-radius:18px 18px 0 0;padding:18px;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:75vh;overflow-y:auto}
+.mov.sh .msh{transform:translateY(0)}
+.mhd{width:36px;height:4px;border-radius:4px;background:var(--fd);margin:0 auto 14px}
+.mtl{font-size:15px;font-weight:700;margin-bottom:14px;text-align:center}
+.rc{background:var(--bgc);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.rc .rci{width:100%;height:150px;object-fit:cover;border-radius:var(--rs);margin-bottom:10px}
+.rss{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rst2{text-align:center}
+.rst2 .rsn{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--ac)}
+.rst2 .rsl{font-size:10px;color:var(--fm);margin-top:2px}
+.rcm{margin-top:12px;border-top:1px solid var(--bd);padding-top:10px}
+.rcm h4{font-size:12px;font-weight:700;margin-bottom:6px;color:var(--fm)}
+.rcc{display:flex;gap:7px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.rcc:last-child{border-bottom:none}
+.rcc .rcu{font-weight:600;color:var(--fg)}.rcc .rct{color:var(--fm)}
+.es{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 18px;color:var(--fd)}
+.es i{font-size:40px;opacity:.15;margin-bottom:8px}
+.tc{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:9999;max-width:390px;width:calc(100% - 32px)}
+.to{padding:12px 16px;border-radius:var(--rs);font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:6px;animation:ti .3s ease,to2 .3s ease 2.5s forwards;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.to.su{background:#0d2818;border:1px solid rgba(46,213,115,.3);color:var(--ok)}
+.to.er{background:#2d0f13;border:1px solid rgba(255,71,87,.3);color:var(--dn)}
+.to.in{background:#0d1f2d;border:1px solid rgba(0,212,170,.3);color:var(--ac)}
+@keyframes ti{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes to2{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-18px)}}
+@media(min-width:431px){.app{border-left:1px solid var(--bd);border-right:1px solid var(--bd)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="atm"><div class="o"></div></div>
+<div class="pg">
+<div class="tb">
+  <button class="bb" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i></button>
+  <div class="lg"><i class="fas fa-lock"></i><span id="hdrUn">Loading...</span></div>
+  <div class="ta"><button onclick="toast('Settings coming soon','in')"><i class="fas fa-cog"></i></button></div>
+</div>
+<div class="prh" id="profAvWrap"><img id="profAv" src="" alt="Profile"><div class="onl"></div></div>
+<div class="pst">
+  <div class="ps2"><div class="pn3" id="pstCt">0</div><div class="pl3">Posts</div></div>
+  <div class="ps2" onclick="showFol('followers')"><div class="pn3" id="folCt">0</div><div class="pl3">Followers</div></div>
+  <div class="ps2" onclick="showFol('following')"><div class="pn3" id="fngCt">0</div><div class="pl3">Following</div></div>
+</div>
+<div class="pinf">
+  <div class="dn2" id="dName">Loading...</div>
+  <div class="bio2" id="bioTxt"></div>
+  <div class="plk2" id="webLnk"></div>
+</div>
+<div class="pbs">
+  <button class="be" onclick="toast('Edit profile - coming soon','in')">Edit Profile</button>
+  <button class="be" onclick="shareProf()">Share</button>
+  <button class="be bi" onclick="window.location.href='referral.html'"><i class="fas fa-gift"></i></button>
+</div>
+<div class="ptb">
+  <button class="pt on" data-pt="grid" onclick="swTab('grid')"><i class="fas fa-th"></i></button>
+  <button class="pt" data-pt="reels" onclick="swTab('reels')"><i class="fas fa-play-circle"></i></button>
+  <button class="pt" data-pt="tagged" onclick="swTab('tagged')"><i class="fas fa-user-tag"></i></button>
+</div>
+<div id="tabCtn"><div class="pgr" id="profGrid"></div></div>
+<div style="height:20px"></div>
+</div>
+<nav class="bn" role="navigation">
+<a class="ni" href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+<a class="ni" href="wallet.html"><i class="fas fa-wallet"></i><span>Wallet</span></a>
+<a class="ni ub" href="upload.html"><div class="uw"><i class="fas fa-plus"></i></div><span>Upload</span></a>
+<a class="ni" href="referral.html"><i class="fas fa-gift"></i><span>Invite</span></a>
+<a class="ni on" href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a>
+</nav>
+<div class="mov" id="mOv" onclick="clMod(event)"><div class="msh" id="mSh" onclick="event.stopPropagation()"><div class="mhd"></div><div id="mCtn"></div></div></div>
+<div class="tc" id="tCtn"></div>
+</div>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyAmQxNPKANzO8hEng5pdpAR3t7DJtwkG7U",authDomain:"aibmodel.firebaseapp.com",databaseURL:"https://aibmodel-default-rtdb.firebaseio.com",projectId:"aibmodel",storageBucket:"aibmodel.firebasestorage.app",messagingSenderId:"572663832515",appId:"1:572663832515:web:3fea2dac685b9b5f646776"});
+const db=firebase.database(),$=id=>document.getElementById(id);
+const fmN=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'K':n.toString();
+const fmL=n=>n>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'K':n.toString();
+function toast(m,t='in'){const c=$('tCtn'),e=document.createElement('div');e.className='to '+t;e.innerHTML='<i class="fas fa-info-circle"></i> '+m;c.appendChild(e);setTimeout(()=>e.remove(),3000)}
+function opMod(){$('mOv').classList.add('sh')}
+function clMod(e){if(e&&e.target!==$('mOv'))return;$('mOv').classList.remove('sh')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')clMod({target:$('mOv')})});
+function timeAgo(ts){if(!ts)return'';const d=Date.now()-ts,m=Math.floor(d/60000),h=Math.floor(d/3600000),dy=Math.floor(d/86400000);if(m<1)return'now';if(m<60)return m+'m';if(h<24)return h+'h';if(dy<7)return dy+'d';return new Date(ts).toLocaleDateString()}
+
+let UID='',CU={username:'',displayName:'',avatar:''};
+function initUser(){
+  let sid=null;try{sid=localStorage.getItem('igram_uid')}catch(e){}
+  if(sid){UID=sid;db.ref('users/'+UID).once('value').then(s=>{if(s.exists()){const u=s.val();CU={username:u.username||'user',displayName:u.displayName||'User',avatar:u.avatar||''};loadProf()}else createNew()}).catch(()=>createNew())}else createNew()
+}
+function createNew(){
+  UID='u_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);
+  const un='user_'+Math.random().toString(36).substr(2,6);CU={username:un,displayName:'New User',avatar:''};
+  db.ref('users/'+UID).set({username:un,displayName:'New User',avatar:'',createdAt:Date.now(),lastSeen:Date.now()});
+  db.ref('stats/totalUsers').transaction(v=>(v||0)+1);db.ref('wallet/'+UID+'/balance').set(15);
+  db.ref('wallet/'+UID+'/transactions').push({title:'Welcome Bonus',amount:15,type:'income',icon:'fa-gift',color:'var(--ok)',timestamp:Date.now()});
+  try{localStorage.setItem('igram_uid',UID)}catch(e){}
+  loadProf();
+}
+function detectPlatform(){const ua=navigator.userAgent||'';if(/telegram/i.test(ua))return'Telegram';if(/instagram/i.test(ua))return'Instagram';return'Browser'}
+setInterval(()=>{if(UID)db.ref('users/'+UID+'/lastSeen').set(Date.now())},60000);
+
+let myPosts=[],cTab='grid';
+function loadProf(){
+  db.ref('users/'+UID).on('value',snap=>{
+    const u=snap.val()||{};
+    CU.username=u.username||'user';CU.displayName=u.displayName||'User';CU.avatar=u.avatar||'';
+    $('hdrUn').textContent='@'+CU.username;
+    $('dName').textContent=CU.displayName;
+    $('bioTxt').textContent=u.bio||'';$('webLnk').textContent=u.website||'';
+    if(CU.avatar){$('profAvWrap').innerHTML='<img id="profAv" src="'+CU.avatar+'" alt="Profile"><div class="onl"></div></div>'}
+    else{$('profAvWrap').innerHTML='<div class="av2">'+CU.username.charAt(0).toUpperCase()+'<div class="onl"></div></div>'}
+  });
+  db.ref('social/'+UID+'/followers').on('value',snap=>$('folCt').textContent=fmN(snap.val()?Object.keys(snap.val()).length:0));
+  db.ref('social/'+UID+'/following').on('value',snap=>$('fngCt').textContent=fmN(snap.val()?Object.keys(snap.val()).length:0));
+  db.ref('posts').orderByChild('userId').equalTo(UID).on('value',snap=>{
+    myPosts=[];
+    snap.forEach(c=>{const p=c.val();if(!p.views){p.views=1;db.ref('posts/'+p.id+'/views').set(1)}if(!p.shares)p.shares=0;myPosts.push(p)});
+    myPosts.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+    $('pstCt').textContent=myPosts.length;
+    rTab();
+  });
+}
+function rTab(){
+  const g=$('profGrid');
+  if(cTab==='grid'){
+    if(!myPosts.length){g.innerHTML='<div class="es" style="grid-column:1/-1"><i class="fas fa-camera"></i><p>No posts yet</p></div>';return}
+    g.innerHTML=myPosts.map(p=>{
+      const s=p.mediaType==='video'?(p.thumbnailUrl||p.mediaUrl):p.mediaUrl;
+      const cc=p.comments?Object.keys(p.comments).length:0;
+      return '<div class="pgi" onclick="opReport(\''+p.id+'\')"><img src="'+s+'" alt="Post" loading="lazy">'+(p.mediaType==='video'?'<div class="vbd"><i class="fas fa-play"></i></div>':'')+'<div class="gov"><span><i class="fas fa-eye"></i> '+fmN(p.views||0)+'</span><span><i class="fas fa-heart"></i> '+fmL(p.likes||0)+'</span><span><i class="fas fa-comment"></i> '+cc+'</span></div></div>';
+    }).join('');
+  }else if(cTab==='reels'){
+    const rl=myPosts.filter(p=>p.mediaType==='video');
+    if(!rl.length){g.innerHTML='<div class="es" style="grid-column:1/-1"><i class="fas fa-video"></i><p>No reels yet</p></div>';return}
+    g.innerHTML=rl.map(p=>
+      '<div class="pgi" onclick="opReport(\''+p.id+'\')"><img src="'+(p.thumbnailUrl||'')+'" alt="Reel" loading="lazy"><div class="gov"><span><i class="fas fa-eye"></i> '+fmN(p.views||0)+'</span><span><i class="fas fa-heart"></i> '+fmL(p.likes||0)+'</span></div></div>'
+    ).join('');
+  }else{
+    g.innerHTML='<div class="es" style="grid-column:1/-1"><i class="fas fa-user-tag"></i><p>No tagged posts</p></div>';
+  }
+}
+function swTab(t){cTab=t;document.querySelectorAll('.pt').forEach(x=>x.classList.toggle('on',x.dataset.pt===t));rTab()}
+
+function opReport(pid){
+  const p=myPosts.find(x=>x.id===pid);if(!p)return;
+  const s=p.mediaType==='video'?(p.thumbnailUrl||p.mediaUrl):p.mediaUrl;
+  const cc=p.comments?Object.values(p.comments):[];
+  const chtml=cc.length>0?'<div class="rcm"><h4>Comments ('+cc.length+')</h4>'+cc.map(c=>'<div class="rcc"><span class="rcu">'+(c.username||'user')+'</span> <span class="rct">'+(c.text||'')+'</span></div>').join('')+'</div>':'<div class="rcm"><h4>No comments yet</h4></div>';
+  db.ref('posts/'+pid+'/views').transaction(v=>(v||0)+1);p.views=(p.views||0)+1;
+  $('mCtn').innerHTML=
+    '<div class="mtl">Post Report</div><div class="rc">'+
+    (s?'<img class="rci" src="'+s+'" alt="Post">':'')+
+    '<div class="rss">'+
+    '<div class="rst2"><div class="rsn">'+fmN(p.views||0)+'</div><div class="rsl"><i class="fas fa-eye" style="margin-right:3px"></i>Views</div></div>'+
+    '<div class="rst2"><div class="rsn">'+fmL(p.likes||0)+'</div><div class="rsl"><i class="fas fa-heart" style="margin-right:3px"></i>Likes</div></div>'+
+    '<div class="rst2"><div class="rsn">'+cc.length+'</div><div class="rsl"><i class="fas fa-comment" style="margin-right:3px"></i>Comments</div></div>'+
+    '<div class="rst2"><div class="rsn">'+(p.shares||0)+'</div><div class="rsl"><i class="fas fa-share" style="margin-right:3px"></i>Shares</div></div>'+
+    '</div>'+chtml+'</div>'+
+    '<div style="text-align:center;font-size:11px;color:var(--fd);padding-bottom:6px">Posted '+timeAgo(p.timestamp)+'</div>';
+  opMod();rTab();
+}
+function showFol(type){
+  $('mCtn').innerHTML='<div class="mtl">'+(type==='followers'?'Followers':'Following')+'</div><div style="max-height:380px;overflow-y:auto" id="folList"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></div>';
+  opMod();
+  db.ref('social/'+UID+'/'+type).once('value',snap=>{
+    const cnt=snap.exists()?Object.keys(snap.val()).length:0;
+    $('folList').innerHTML=cnt?'<div style="text-align:center;padding:12px;color:var(--fm);font-size:13px;font-weight:600">'+fmN(cnt)+' '+(type==='followers'?'followers':'following')+'</div>':'<div class="es"><i class="fas fa-users"></i><p>None yet</p></div>';
+  }).catch(()=>{$('folList').innerHTML='<div class="es"><i class="fas fa-users"></i><p>Could not load</p></div>'});
+}
+function shareProf(){if(navigator.share)navigator.share({title:CU.displayName+' on InstaGram',text:'Check out my profile!'});else toast('Link copied!','su')}
+initUser();
+</script>
+</body>
+</html>
